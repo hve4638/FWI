@@ -1,4 +1,5 @@
 ﻿using FWI;
+using FWI.Prompt;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,57 +32,21 @@ namespace FWIServer
 
         static public string GetTimelineString(this FWIManager manager)
         {
+            var last = "_";
             var output = "";
             foreach (var item in manager.GetTimeline())
-                output += $"{item.Date:yyMMdd HH:mm:ss}\t|\t{item.GetAliasOrName(),-15}\t|\t{item.Title}\t\n";
+            {
+                var name = item.GetAliasOrName();
+
+                if (last == name) name = "";
+                else last = name;
+
+                output += $"{item.Date:yyMMdd HH:mm:ss}\t|\t{name,-15}\t|\t{item.Title}\t\n";
+
+            }
+                
             return output;
         }
 
-        static public void AppendPromptCommand(this FWIManager manager, Prompt prompt)
-        {
-            prompt.Add("timeline", (args) => {
-                var output = manager.GetTimelineString();
-                Console.WriteLine(output);
-            });
-            prompt.Add("rank", (args) => {
-                var ranks = manager.GetRankString();
-                Console.WriteLine(ranks);
-            });
-            prompt.Add("import", (args) => {
-                try
-                {
-                    manager.Import(manager.Signiture);
-                }
-                catch (FileNotFoundException)
-                {
-                    Console.WriteLine($"import fail : File not found exeception");
-                    return;
-                }
-
-                Console.WriteLine($"import success");
-            });
-            prompt.Add("export", (args) => {
-                manager.Export(manager.Signiture);
-                Console.WriteLine($"export success");
-            });
-            prompt.Add("interval", (args) => {
-                if (int.TryParse(args[0], out int num))
-                {
-                    manager.SetLoggingInterval(num);
-                    Console.WriteLine($"Set LoggingInterval : {num} minutes");
-                }
-                else
-                {
-                    Console.WriteLine("Set failed");
-                }
-            });
-            prompt.Add("save", (args) => {
-                manager.SaveFilter(manager.Signiture);
-            });
-            prompt.Add("reload", (args) => {
-                manager.LoadFilter(manager.Signiture);
-            });
-
-        }
     }
 }

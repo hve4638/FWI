@@ -55,10 +55,12 @@ namespace FWI
             return this;
         }
 
-        public HashSet<string> Items() {
-            var copy = new HashSet<string>();
-            copy.UnionWith(set);
-            return copy;
+        public HashSet<string> Items {
+            get {
+                var copy = new HashSet<string>();
+                copy.UnionWith(set);
+                return copy;
+            }
         }
     }
 }

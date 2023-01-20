@@ -9,7 +9,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace FWITest
+namespace FWITest.Learning
 {
     [TestClass]
     public class JsonTest

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace FWIConnection.Message
 {
-    public class WindowInfoMessage
+    [Obsolete]
+    static public class WindowInfoMessage
     {
         static public void Make(ByteWriter bw, string name, string title, DateTime? date = null) {
             bw.Write((short)MessageOp.UpdateCurrentWI);
@@ -16,6 +17,17 @@ namespace FWIConnection.Message
             bw.WriteInt(Encoding.Default.GetByteCount(title));
             bw.WriteString(title);
         }
+
+        static public void MakeDateTime(in ByteWriter bw, DateTime date)
+        {
+            bw.WriteInt(date.Year);
+            bw.WriteInt(date.Month);
+            bw.WriteInt(date.Day);
+            bw.WriteInt(date.Hour);
+            bw.WriteInt(date.Minute);
+            bw.WriteInt(date.Second);
+        }
+
         static public void Parse(ByteReader br, out string name, out string title, out DateTime date)
         {
             int nameSize, titleSize;
@@ -35,8 +47,7 @@ namespace FWIConnection.Message
             date = new DateTime(year, month, day, hour, minute, second);
         }
 
-
-        static byte[] GetDateTimeBytes(DateTime date)
+        static public byte[] GetDateTimeBytes(DateTime date)
         {
             var bw = new ByteWriter();
             bw.WriteInt(date.Year);

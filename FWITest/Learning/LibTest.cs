@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using FWI;
 using System.Security.Claims;
 
-namespace FWITest
+namespace FWITest.Learning
 {
     [TestClass]
     public class LibTest

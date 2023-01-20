@@ -27,6 +27,14 @@ namespace FWI
         {
             if (dict.ContainsKey(wi.Name)) wi.Alias = dict[wi.Name];
         }
+        public void Filter(IEnumerable<WindowInfo> enumerable)
+        {
+            foreach (var item in enumerable)
+            {
+                var wi = item;
+                Filter(ref wi);
+            }
+        }
 
         public AliasMap Import(string filename)
         {

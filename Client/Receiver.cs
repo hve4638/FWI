@@ -54,8 +54,12 @@ namespace FWIClient
 
             manager.ElevateUpdatePrivillege(nonce, accepted);
 
-            if (accepted) Console.WriteLine("Trace 권한 상승");
-            else Console.WriteLine($"Trace 권한 상승 실패");
+            if (accepted) Program.Out.WriteLine("[D][A] Target 지정됨");
+            else
+            {
+                Program.Out.WriteLine($"[D][A] Target 거부됨");
+                Program.Out.WriteLine($"[D][I] Observer Mode로 전환합니다");
+            }
         }
     }
 
@@ -64,7 +68,7 @@ namespace FWIClient
         static public void ResponseEcho(this Socket socket, ByteReader br)
         {
             var str = br.ReadString();
-            Console.WriteLine(str);
+            Program.Out.WriteLine(str);
 
             var bw = new ByteWriter();
             bw.Write((short)MessageOp.Message);
@@ -74,7 +78,7 @@ namespace FWIClient
         static public void ResponseMessage(this Socket socket, ByteReader br)
         {
             var str = br.ReadString();
-            Console.WriteLine(str);
+            Program.Out.WriteLine(str);
         }
 
     }

@@ -12,7 +12,6 @@ namespace FWIConnection
         readonly int maximumBufferSize = 8192;
         Func<IReceiver> getReceiver;
         readonly int port;
-
         public bool Verbose { get; set; }
 
         public Server(int port, bool verbose = false)
@@ -105,7 +104,6 @@ namespace FWIConnection
             public Socket Accept()
             {
                 Socket clientSocket = socket.Accept();
-                Console.WriteLine("Accept Connection");
                 Thread thread = new Thread(() =>
                 {
                     onEstablish(clientSocket);

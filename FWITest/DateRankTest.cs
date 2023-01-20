@@ -234,8 +234,7 @@ namespace FWITest
             foreach (var item in items) eRank.Add(item);
 
             var name = "test-save";
-            var signiture = "test-signiture";
-            eRank.Export(name, signiture);
+            eRank.Export(name);
 
             var iRank = new DateRank();
             iRank.Import(name);

@@ -50,6 +50,7 @@
     <Compile Include="MessageOp.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Message\WindowInfoMessage.cs" />
+    <Compile Include="WIParser.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

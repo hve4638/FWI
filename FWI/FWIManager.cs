@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FWI.Results;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -10,26 +11,46 @@ namespace FWI
 {
     public class FWIManager
     {
-        const string FILENAME_RANK = "fwi.{0}.rank";
-        const string FILENAME_ALIAS = "fwi.{0}.alias";
-        const string FILENAME_IGNORE = "fwi.{0}.ignore";
+        readonly Dictionary<string, string> pathDict;
         readonly AliasMap aliasMap;
         readonly IgnoreMap ignoreMap;
         readonly Logger logger;
-        readonly DateRank rank;
-        public string Signiture { get; set; }
+        readonly History<WindowInfo> history;
+        WindowInfo lastWI;
+        bool isAFK;
 
+        public WindowInfo LastWI => (history.Count == 0 ?  new NoWindowInfo() : history.GetLast());
+        public string Signiture { get; set; }
         public int TraceCount { get; set; }
 
         public FWIManager(string signiture)
         {
             logger = new SingleLogger();
-            rank = new DateRank();
             aliasMap = new AliasMap();
             ignoreMap = new IgnoreMap();
+            history = new History<WindowInfo>();
 
             Signiture = signiture;
             TraceCount = 0;
+
+            pathDict = new Dictionary<string, string>
+            {
+                ["rank"] = "fwi.rank",
+                ["timeline"] = "fwi.timeline",
+                ["alias"] = "fwi.alias",
+                ["ignore"] = "fwi.ignore",
+            };
+        }
+
+        public void SetPath(Dictionary<string, string> path)
+        {
+            foreach(var key in path.Keys) pathDict[key] = path[key];
+            
+            if (logger is SingleLogger)
+            {
+                var singleLogger = logger as SingleLogger;
+                singleLogger.SetPath(pathDict);
+            }
         }
 
         public FWIManager AddWI(WindowInfo wi) => AppendWindowInfo(wi);
@@ -37,15 +58,39 @@ namespace FWI
         {
             if (ignoreMap.Contains(wi)) return this;
             aliasMap.Filter(ref wi);
+            isAFK = false;
+            lastWI = wi;
 
             logger.AddWI(wi);
-            rank.Add(wi);
+            history.Add(wi);
+            return this;
+        }
+        public FWIManager SetAFK(DateTime date)
+        {
+            var afkWI = new AFKWindowInfo(date);
+            isAFK = true;
+
+            logger.AddWI(afkWI);
+            history.Add(afkWI);
+            return this;
+        }
+        public FWIManager SetNoAFK(DateTime date)
+        {
+            isAFK = false;
+            if (lastWI != null)
+            {
+                var wi = lastWI.Copy();
+                wi.Date = date;
+
+                AddWI(wi);
+            }
+
             return this;
         }
 
         public void Update()
         {
-            rank.AddLast(DateTime.Now);
+            logger.Update(DateTime.Now);
         }
 
         public void SetLoggingInterval(int minutes = 0) => logger.SetLoggingInterval(minutes);
@@ -54,84 +99,63 @@ namespace FWI
         public ReadOnlyCollection<WindowInfo> GetTimeline()
         {
             var log = logger.GetLog();
-            FilterAlias(log);
+            aliasMap.Filter(log);
 
             return log;
         }
         public ReadOnlyCollection<WindowInfo> GetTimeline(DateTime from, DateTime to)
         {
             var log = logger.GetLog(from, to);
-            FilterAlias(log);
+            aliasMap.Filter(log);
 
             return log;
         }
 
-        public void FilterAlias(IEnumerable<WindowInfo> enumerable)
+        public Dictionary<int, RankResult<WindowInfo>> GetRanks()
         {
-            foreach (var item in enumerable)
-            {
-                var wi = item;
-                aliasMap.Filter(ref wi);
-            }
-        }
+            var ranks = logger.GetRanks();
+            var enumerable = ranks.Values.Select(result => result.Item);
+            aliasMap.Filter(enumerable);
 
-        public Dictionary<int, RankResult<WindowInfo>> GetRanks() => GetRanks(1, rank.Count);
-        public Dictionary<int, RankResult<WindowInfo>> GetRanks(int beginRank = 1, int endRank = 1)
-        {
-            var ranks = rank.GetRanks(beginRank, endRank);
-            
             return ranks;
         }
+        public Dictionary<int, RankResult<WindowInfo>> GetRanks(int beginRank = 1, int endRank = 1) => logger.GetRanks(beginRank, endRank);
 
         static public FWIManager operator +(FWIManager manager, WindowInfo wi) => manager.AppendWindowInfo(wi);
-        public void Import(string name)
+        public void Import(string path)
         {
-            logger.Import(name);
-            rank.Import(name);
+            logger.Import(path);
         }
         public void Export(string path)
         {
-            string dir, name;
-            (dir, name) = HUtils.SplitPath(path);
-            var rankName = FileNameFilter(FILENAME_RANK, name, dir);
-
             logger.Export(path);
-            rank.Export(rankName, name);
         }
-        public void LoadFilter(string path)
+        public Results<string> LoadFilter()
         {
-            string dir, name;
-            (dir, name) = HUtils.SplitPath(path);
-            var aliasPath = FileNameFilter(FILENAME_ALIAS, name, dir);
-            var ignorePath = FileNameFilter(FILENAME_IGNORE, name, dir);
-            bool isLoad = true;
-
-            ExecuteFileIOSafe(() => aliasMap.Import(aliasPath), () => {
-                Console.WriteLine($"Import Fail : Alias List '{aliasPath}'");
-                isLoad = false;
+            var results = new Results<string>();
+            
+            ExecuteFileIOSafe(() => aliasMap.Import(pathDict["alias"]), () => {
+                results += $"Import Fail : Alias List '{pathDict["alias"]}'";
+                results.State = ResultState.HasProblem;
             });
-            ExecuteFileIOSafe(() => ignoreMap.Import(ignorePath), () => Console.WriteLine($"Import Fail : Ignore List '{ignorePath}'"));
+            ExecuteFileIOSafe(() => ignoreMap.Import(pathDict["ignore"]), () => {
+                results += $"Import Fail : Ignore List '{pathDict["ignore"]}'";
+                results.State = ResultState.HasProblem;
+            });
 
-            if (isLoad) FilterAlias(rank.GetWIs());
+            return results;
         }
 
-        public void SaveFilter(string path)
+        public void SaveFilter()
         {
-            string dir, name;
-            (dir, name) = HUtils.SplitPath(path);
-            var aliasPath = FileNameFilter(FILENAME_ALIAS, name, dir);
-            var ignorePath = FileNameFilter(FILENAME_IGNORE, name, dir);
-
-            aliasMap.Export(aliasPath);
-            ignoreMap.Export(ignorePath);
+            aliasMap.Export(pathDict["alias"]);
+            ignoreMap.Export(pathDict["ignore"]);
         }
 
-        string FileNameFilter(string format, string name, string directory = "")
-        {
-            var formatted = string.Format(format, name);
-            if (directory == "") return formatted;
-            else return directory + @"\" + formatted;
-        }
+        public List<WindowInfo> History => history.GetAll();
+
+        public ReadOnlyDictionary<string, string> GetAlias() => aliasMap.Items;
+        public HashSet<string> GetIgnore() => ignoreMap.Items;
 
 
         static void ExecuteFileIOSafe(Action execute, Action onCatchException = null)
@@ -148,7 +172,7 @@ namespace FWI
 
         public int GetLogHashCode()
         {
-            return logger.GetHashCode() ^ rank.GetHashCode();
+            return logger.GetHashCode();
         }
     }
 }

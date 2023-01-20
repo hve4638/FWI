@@ -15,8 +15,6 @@ namespace FWI
 {
     public class DateRank
     {
-        const string FILENAME_RANK = "fwi.rank.{0}.ranking";
-        const string FILENAME_WI = "fwi.rank.{0}.wi";
         readonly Dictionary<string, WindowInfo> WIs;
         readonly Rank rank;
         WindowInfo lastWI;
@@ -43,6 +41,12 @@ namespace FWI
             AddToWIs(wi);
 
             lastWI = wi;
+        }
+
+        public void ClearLast(DateTime date)
+        {
+            AddLast(date);
+            lastWI = null;
         }
 
         void AddToWIs(WindowInfo wi)
@@ -85,27 +89,28 @@ namespace FWI
             var hash = rank.GetContentsHash();
             int hashWI = 0;
             foreach(var wi in WIs.Values)
+            {
                 hashWI ^= wi.GetContentsHashCode();
+                hashWI *= 7;
+            }
 
             return hash ^ hashWI;
         }
 
-        public void Import(string filename)
-        {   
-            var reader = new StreamReader(filename);
-            Import(reader, filename);
-            reader.Close();
+        public void Import(string path)
+        {
+            using (var reader = new StreamReader(path))
+            {
+                Import(reader, path);
+            }
         }
 
         public void Import(StreamReader reader, string path)
         {
-            string dir;
-            (dir, _) = HUtils.SplitPath(path);
-
             var config = ImportMeta(reader);
-            
-            var rankFilename = HUtils.MergePath(dir, config.RankPath);
-            var wiFilename = HUtils.MergePath(dir, config.WIPath);
+
+            var rankFilename = config.RankPath;
+            var wiFilename = config.WIPath;
 
             ImportContents(rankFilename, wiFilename);
         }
@@ -119,11 +124,13 @@ namespace FWI
 
         public void ImportContents(string rankFilename, string wiFilename)
         {
-            var rankReader = new StreamReader(rankFilename);
-            var wiReader = new StreamReader(wiFilename);
-            ImportContents(rankReader, wiReader);
-            rankReader.Close();
-            wiReader.Close();
+            using (var rankReader = new StreamReader(rankFilename))
+            {
+                using (var wiReader = new StreamReader(wiFilename))
+                {
+                    ImportContents(rankReader, wiReader);
+                }   
+            }
         }
         public void ImportContents(StreamReader rankReader, StreamReader wiReader)
         {
@@ -137,26 +144,19 @@ namespace FWI
             }
         }
 
-
-        public void Export(string name, string signiture = null)
+        public void Export(string name)
         {
-            string path;
-            (path, _) = HUtils.SplitPath(name);
             var writer = new StreamWriter(name);
-            Export(writer, path, signiture);
+            var rankPath = name + ".rank";
+            var timelinePath = name + ".wi";
+            Export(writer, rankPath, timelinePath);
+
             writer.Close();
         }
-        public void Export(StreamWriter writer, string path, string signiture = null)
+        public void Export(StreamWriter writer, string rankPath, string timelineRank)
         {
-            string name, dir;
-            (dir, name) = HUtils.SplitPath(path);
-            signiture = signiture ?? name;
-
-            var rankFilename = FileNameFilter(FILENAME_RANK, signiture);
-            var wiFilename = FileNameFilter(FILENAME_WI, signiture);
-
-            ExportMeta(writer, rankFilename, wiFilename);
-            ExportContents(MergeFullPath(dir, rankFilename), MergeFullPath(dir, wiFilename));
+            ExportMeta(writer, rankPath, timelineRank);
+            ExportContents(rankPath, timelineRank);
         }
         public void ExportMeta(StreamWriter writer, string rankFilename, string wiFilename)
         {
@@ -173,6 +173,7 @@ namespace FWI
         {
             var rankWriter = new StreamWriter(rankFilename);
             var wiWriter = new StreamWriter(wiFilename);
+
             ExportContents(rankWriter, wiWriter);
             rankWriter.Close();
             wiWriter.Close();

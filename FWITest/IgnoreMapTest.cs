@@ -23,7 +23,7 @@ namespace FWITest
                 "hello.exe",
                 "make.exe",
             };
-            var actual = manager.Items();
+            var actual = manager.Items;
             Assert.IsTrue(expected.SetEquals(actual));
         }
 
@@ -44,7 +44,7 @@ namespace FWITest
                 "hello.exe",
                 "make.exe",
             };
-            var actual = manager.Items();
+            var actual = manager.Items;
             Assert.IsTrue(expected.SetEquals(actual));
         }
 
@@ -62,8 +62,8 @@ namespace FWITest
             var reader = new MockStreamReader(writer.GetOutputAsString());
             manager2.Import(reader);
 
-            var expected = manager.Items();
-            var actual = manager2.Items();
+            var expected = manager.Items;
+            var actual = manager2.Items;
             Assert.IsTrue(expected.SetEquals(actual));
         }
 

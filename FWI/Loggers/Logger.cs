@@ -17,6 +17,11 @@ namespace FWI
         ReadOnlyCollection<WindowInfo> GetLog();
         ReadOnlyCollection<WindowInfo> GetLog(DateTime from, DateTime to);
 
+        Dictionary<int, RankResult<WindowInfo>> GetRanks();
+        Dictionary<int, RankResult<WindowInfo>> GetRanks(int beginRank, int endRank);
+
+        void Update(DateTime time);
+
         void SetLoggingInterval(int minutes);
         void SetOnLoggingListener(Action<WindowInfo> listener);
         /// <summary>

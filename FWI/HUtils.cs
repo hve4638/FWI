@@ -80,12 +80,8 @@ namespace FWI
             }
             catch (ArgumentException)
             {
-
-
                 throw new ArgumentException($"잘못된 경로 : {path}");
             }
-
-            
         }
 
         static public string EncodeVertical(string plain)

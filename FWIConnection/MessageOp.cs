@@ -6,10 +6,10 @@
         Echo = 1,
         Message = 2,
 
-        UpdateCurrentWI = 10,
+        UpdateWI = 10,
         ResetCurrent = 11,
         SetAFK = 12,
-        UnsetAFK = 13,
+        SetNoAFK = 13,
 
         SetAlias = 20,
         SetGroup = 21,
@@ -17,12 +17,18 @@
         RequestTimeline = 31,
         RequestRank = 32,
 
-        RequestPrivillegeTrace = 40,
 
-        ResponsePrivillegeTrace = 50,
+        RequestToBeTarget = 40,
+        ResponseToBeTarget = 50,
 
         Execute = 90,
         Alert = 91,
+        ServerCall = 98,
         Debug = 99,
+
+        //Obsolete
+        UpdateCurrentWI = 101,
+        RequestPrivillegeTrace = 102,
+        ResponsePrivillegeTrace = 103,
     }
 }

@@ -84,18 +84,28 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IntervalThread.cs" />
     <Compile Include="AliasManager.cs" />
-    <Compile Include="Prompt.cs" />
+    <Compile Include="History.cs" />
+    <Compile Include="OutputStream\IOutputStream.cs" />
+    <Compile Include="OutputStream\NullOutputStream.cs" />
+    <Compile Include="OutputStream\OutputStream.cs" />
+    <Compile Include="OutputStream\FormatStandardOutputStream.cs" />
+    <Compile Include="Prompt\Prompt.cs" />
+    <Compile Include="Prompt\PromptArgs.cs" />
+    <Compile Include="Results\Results.cs" />
     <Compile Include="Rank\DateRank.cs" />
     <Compile Include="Exceptions\ParseException.cs" />
     <Compile Include="Exceptions\TimeSequenceException.cs" />
     <Compile Include="HUtils.cs" />
     <Compile Include="IgnoreManager.cs" />
+    <Compile Include="Results\ResultState.cs" />
     <Compile Include="Timeline\TimelineInstantUpdater.cs" />
     <Compile Include="DateRange\DateRange.cs" />
     <Compile Include="DateRange\DynamicDateRange.cs" />
     <Compile Include="FWIManager.cs" />
     <Compile Include="Loggers\Logger.cs" />
+    <Compile Include="WindowInfo\AFKWindowInfo.cs" />
     <Compile Include="WindowInfo\NoWindowInfo.cs" />
     <Compile Include="Rank\Rank.cs" />
     <Compile Include="Loggers\SingleLogger.cs" />

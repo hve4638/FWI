@@ -10,25 +10,47 @@ using System.Xml.Linq;
 namespace FWI {
     public class SingleLogger : Logger
     {
-        const string FILENAME_RANK = "fwi.rank.{0}.json";
-        const string FILENAME_TIMELINE = "fwi.timeline.{0}.json";
         int maximumSize;
         readonly Timeline timeline;
         readonly DateRank rank;
+        readonly Dictionary<string, string> pathDict;
         public SingleLogger(int maximumSize = 50, DateTime? date = null)
         {
             timeline = new Timeline();
             rank = new DateRank();
             this.maximumSize = maximumSize;
+            pathDict = new Dictionary<string, string>
+            {
+                ["rank"] = "fwi.logger.rank",
+                ["timeline"] = "fwi.logger.timeline",
+            };
+        }
+
+        public void SetPath(Dictionary<string, string> path)
+        {
+            foreach (var key in path.Keys) pathDict[key] = path[key];
         }
 
         public void SetLoggingInterval(int minutes=0) => timeline.SetInterval(minutes);
         public void SetDateTimeDelegate(DateTimeDelegate dateTimeDelegate) => timeline.SetDateTimeDelegate(dateTimeDelegate);
-        public Logger AddWI(WindowInfo wi) => AppendWindowInfo(wi);
-        public Logger AppendWindowInfo(WindowInfo wi)
+        public Logger AppendWindowInfo(WindowInfo wi) => AddWI(wi);
+        public Logger AddWI(WindowInfo wi)
         {
-            rank.Add(wi);
-            timeline.AddLog(wi);
+            if (wi is AFKWindowInfo)
+            {
+                AddAFK(wi.Date);
+            }
+            else
+            {
+                rank.Add(wi);
+                timeline.AddLog(wi);
+            }
+            return this;
+        }
+        public Logger AddAFK(DateTime date)
+        {
+            rank.ClearLast(date);
+            timeline.AddLog(new AFKWindowInfo(date));
             return this;
         }
 
@@ -48,45 +70,29 @@ namespace FWI {
         public ReadOnlyCollection<WindowInfo> GetLog(DateTime from, DateTime to) => GetLog(new DateRange(from, to));
         public ReadOnlyCollection<WindowInfo> GetLog(DateRange range) => timeline.GetTimeline(range);
 
+        public Dictionary<int, RankResult<WindowInfo>> GetRanks() => GetRanks(1, rank.Count);
+        public Dictionary<int, RankResult<WindowInfo>> GetRanks(int beginRank = 1, int endRank = 1)
+        {
+            var ranks = rank.GetRanks(beginRank, endRank);
+
+            return ranks;
+        }
+
+        public void Update(DateTime lastTime)
+        {
+            rank.AddLast(lastTime);
+        }
+
         public void Import(string path)
         {
-            string dir, name;
-            (dir, name) = HUtils.SplitPath(path);
-            var timelinePath = FileNameFilter(FILENAME_TIMELINE, name, dir);
-            var rankPath = FileNameFilter(FILENAME_RANK, name, dir);
-
-            timeline.Import(timelinePath);
-            rank.Import(rankPath);
+            timeline.Import(pathDict["timeline"]);
+            rank.Import(pathDict["rank"]);
         }
 
         public void Export(string path)
         {
-            string dir, name;
-            (dir, name) = HUtils.SplitPath(path);
-            var timelinePath = FileNameFilter(FILENAME_TIMELINE, name, dir);
-            var rankPath = FileNameFilter(FILENAME_RANK, name, dir);
-
-            timeline.Export(timelinePath);
-            rank.Export(rankPath, name);
-        }
-
-        void ExecuteFileIOSafe(Action execute, Action onCatchException = null)
-        {
-            try
-            {
-                execute();
-            }
-            catch (FileNotFoundException)
-            {
-                onCatchException?.Invoke();
-            }
-        }
-
-        string FileNameFilter(string format, string name, string directory = "")
-        {
-            var formatted = string.Format(format, name);
-            if (directory == "") return formatted;
-            else return directory + @"\" + formatted;
+            timeline.Export(pathDict["timeline"]);
+            rank.Export(pathDict["rank"]);
         }
 
         public int GetContentsHashCode()

@@ -8,23 +8,28 @@ using System.Threading.Tasks;
 using FWIConnection;
 using FWIConnection.Message;
 using FWI;
+using FWI.Prompt;
 using System.Xml.Linq;
+using YamlDotNet.Core.Tokens;
 
 namespace FWIServer
 {
     internal class Receiver : IReceiver
     {
         FWIManager manager;
+        Prompt prompt;
         IPEndPoint? client;
         Socket? socket;
         Func<bool>? onVerbose;
         Action<Receiver>? onConnect;
         Action<Receiver>? onDisconnect;
-        bool CanTrace { get; set; }
+        
+        public bool IsTarget { get; private set; }
 
-        public Receiver(FWIManager manager, Action<Receiver>? onConnect = null, Action<Receiver>? onDisconnect = null)
+        public Receiver(FWIManager manager, Prompt prompt, Action<Receiver>? onConnect = null, Action<Receiver>? onDisconnect = null)
         {
             this.manager = manager;
+            this.prompt = prompt;
             client = null;
             this.onConnect = onConnect;
             this.onDisconnect = onDisconnect;
@@ -36,7 +41,7 @@ namespace FWIServer
             {
                 Addr = client?.Address.ToString() ?? "N/A",
                 Port = client?.Port ?? 0,
-                CanTrace = CanTrace,
+                Target = IsTarget,
             };
         }
 
@@ -50,32 +55,37 @@ namespace FWIServer
             client = socket.RemoteEndPoint as IPEndPoint;
             this.socket = socket;
 
-            Console.WriteLine($"Connect: {client?.Address}:{client?.Port}");
+            Program.Out.WriteLine($"[D][I] Connect: {ClientName}");
             onConnect?.Invoke(this);
         }
         public void Disconnect()
         {
-            if (CanTrace)
+            if (IsTarget)
             {
-                CanTrace = false;
+                IsTarget = false;
                 manager.TraceCount--;
+                Out.WriteLine($"[D][A] Target Client 가 지정 해제되었습니다 : {ClientName}");
             }
             
-            Console.WriteLine($"Disconnect: {client?.Address}:{client?.Port}");
+            Out.WriteLine($"[D][I] Disconnect: {ClientName}");
             onDisconnect?.Invoke(this);
         }
         public void Receive(in byte[] buf, int size)
         {
             var br = new ByteReader(buf, size);
             var op = (MessageOp)br.ReadShort();
-
-            var verbose = onVerbose?.Invoke() ?? false;
-            if (verbose) Console.WriteLine($"[Response] {op}");
+            
             switch (op)
             {
+                case MessageOp.UpdateWI:
                 case MessageOp.UpdateCurrentWI:
-                    if (CanTrace) ResponseUpdateCurrentWI(br);
-                    else if (verbose) Console.WriteLine($"Ignore UpdateCurrentWI");
+                    ResponseUpdateWI(br);
+                    break;
+                case MessageOp.SetAFK:
+                    ResponseAFK(br);
+                    break;
+                case MessageOp.SetNoAFK:
+                    ResponseNoAFK(br);
                     break;
                 case MessageOp.Message:
                     Message(br);
@@ -89,29 +99,76 @@ namespace FWIServer
                 case MessageOp.RequestRank:
                     ResponseRank();
                     break;
+                case MessageOp.RequestToBeTarget:
                 case MessageOp.RequestPrivillegeTrace:
                     ResponseTracePrivillege(br);
                     break;
-
+                case MessageOp.ServerCall:
+                    ResponseServerCall(br);
+                    break;
                 default:
+                    ResponseOther(br, op);
                     break;
             }
         }
 
-
-        void ResponseUpdateCurrentWI(ByteReader br)
+        void ResponseAFK(in ByteReader br)
         {
-            WindowInfoMessage.Parse(br, name: out string name, title: out string title, date: out DateTime date);
+            if (IsTarget)
+            {
+                br.ReadDateTime(out DateTime date);
+                manager.SetAFK(date);
+                VerboseOut.WriteLine($"[D][I] Target Client가 AFK 상태입니다.");
+            }
+            else
+            {
+                VerboseOut.WriteLine($"[D][I][{ClientName}] Non-Target Client의 요청: UpdateWI (무시)");
+            }
+        }
 
-            var wi = new WindowInfo(name: name, title: title, date: date);
-            manager.AddWI(wi);
+        void ResponseNoAFK(in ByteReader br)
+        {
+            if (IsTarget)
+            {
+                br.ReadDateTime(out DateTime date);
+                manager.SetNoAFK(date);
+                VerboseOut.WriteLine($"[D][I] Target Client가 AFK 상태가 아닙니다.");
+            }
+            else
+            {
+                VerboseOut.WriteLine($"[D][I][{ClientName}] Non-Target Client의 요청: SetNoAFK (무시)");
+            }
+        }
 
-            var verbose = onVerbose?.Invoke() ?? false;
-            if (verbose) Console.WriteLine($"response WI : {wi.Name} {wi.Title} {wi.Date}");
+        void ResponseServerCall(in ByteReader br)
+        {
+            var cmd = br.ReadString();
+            VerboseOut.WriteLine($"[D][A][{ClientName}] SeverCall 요청 > {cmd}");
+            
+            prompt.Execute(cmd, new SocketOutputStream(socket!));
+        }
+
+        void ResponseUpdateWI(in ByteReader br)
+        {
+            if (IsTarget)
+            {
+                br.ReadWI(name: out string name, title: out string title, date: out DateTime date);
+
+                var wi = new WindowInfo(name: name, title: title, date: date);
+                manager.AddWI(wi);
+
+                VerboseOut.WriteLine($"[D][I][{ClientName}] UpdateWI : {wi.Date}\t|\t{wi.Name}\t|\t{wi.Title}");
+            }
+            else
+            {
+                VerboseOut.WriteLine($"[D][I][{ClientName}] Non-Target Client의 요청: UpdateWI (무시)");
+            }
         }
 
         void ResponseTimeline()
         {
+            VerboseOut.WriteLine($"[D][I][{ClientName}] 요청 : Rank");
+
             var str = manager.GetTimelineString();
             var bw = new ByteWriter(str);
             var br = new ByteReader(bw);
@@ -120,6 +177,8 @@ namespace FWIServer
 
         void ResponseRank()
         {
+            VerboseOut.WriteLine($"[D][I][{ClientName}] 요청 : Rank");
+
             var str = manager.GetRankString();
             var bw = new ByteWriter(str);
             var br = new ByteReader(bw);
@@ -128,14 +187,18 @@ namespace FWIServer
 
         void ResponseTracePrivillege(ByteReader br)
         {
+            VerboseOut.WriteLine($"[D][I][{ClientName}] 요청 : To Be Target");
+
             bool accepted;
             var nonce = br.ReadShort();
 
             if (manager.TraceCount == 0)
             {
-                CanTrace = true;
+                IsTarget = true;
                 manager.TraceCount++;
                 accepted = true;
+
+                Out.WriteLine($"[D][A] Target Client가 지정되었습니다 : {ClientName}");
             }
             else
             {
@@ -149,10 +212,15 @@ namespace FWIServer
             socket!.Send(bw.ToBytes());
         }
 
+        void ResponseOther(in ByteReader br, MessageOp op)
+        {
+            VerboseOut.WriteLine($"[D][I][{ClientName}] 처리할 수 없는 요청: {op}");
+        }
+
         public void Message(ByteReader br)
         {
             var str = br.ReadString();
-            Console.WriteLine(str);
+            Out.WriteLine(str);
         }
 
         public void Send(ByteReader br)
@@ -177,7 +245,7 @@ namespace FWIServer
                 var ranking = result.Ranking;
                 var name = result.Item.Name;
                 var duration = result.Duration;
-
+                    
                 str += $"{ranking}\t|\t{name}\t|\t{duration}\n";
             }
             return str;
@@ -191,12 +259,27 @@ namespace FWIServer
                 output += $"{num++}. {item.Title}\t|\t{item.Name}\t|\t{item.Date}\n";
             return output;
         }
+
+        string ClientName => $"{client?.Address}:{client?.Port}";
+
+        static IOutputStream Out => Program.Out;
+        static IOutputStream noOut = new NullOutputStream();
+        IOutputStream VerboseOut
+        {
+            get
+            {
+                var verbose = onVerbose?.Invoke() ?? false;
+                if (verbose) return Out;
+                else return noOut;
+            }
+        }
     }
 
     public class ReceiverInfo
     {
         public string? Addr { get; set; }
         public int Port { get; set; }
-        public bool CanTrace { get; set; }
+        public bool Target { get; set; }
+        public bool CanTrace => Target;
     }
 }

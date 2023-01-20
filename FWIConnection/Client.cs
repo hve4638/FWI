@@ -56,7 +56,7 @@ namespace FWIConnection
             return true;
         }
 
-        public void WaitForConnection()
+        public void WaitForConnect()
         {
             while (!connected)
             {
@@ -92,11 +92,20 @@ namespace FWIConnection
 
         public void Disconnect()
         {
-            receiver.Disconnect();
-            socket.Close();
+            connected = false;
+            try
+            {
+                receiver.Disconnect();
+                socket.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"{e}");
+            }
         }
 
-        public string Ip { get { return ipAddr; } }
+        public string IP { get { return ipAddr; } }
         public int Port { get { return port; } }
+        public bool IsConnected { get { return connected; } }
     }
 }

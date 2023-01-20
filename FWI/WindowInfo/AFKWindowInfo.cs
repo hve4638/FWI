@@ -3,20 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace FWI
 {
-    public class NoWindowInfo : WindowInfo
+    public class AFKWindowInfo : WindowInfo
     {
-        public NoWindowInfo(DateTime? date = null) : base(title:"", name: "", alias: "__nowindow", date: date)
+        public AFKWindowInfo(DateTime? date = null) : base(title: "", name: "", alias: "AFK", date: date)
         {
 
         }
 
         public override WindowInfo Copy()
         {
-            return new NoWindowInfo(date: Date);
+            return new AFKWindowInfo(date: Date);
         }
     }
 }

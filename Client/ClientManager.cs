@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using FWIConnection;
+using System.Security.Policy;
+using FWIConnection.Message;
 
 namespace FWIClient
 {
@@ -64,7 +66,27 @@ namespace FWIClient
 
             privillegeTraceResult = null;
         }
-    }
 
-    
+        public void SendAFK()
+        {
+            if (ServerSocket == null) return;
+
+            var bw = new ByteWriter();
+            bw.Write((short)MessageOp.SetAFK);
+            bw.WriteDateTime(DateTime.Now);
+
+            ServerSocket.Send(bw.ToBytes());
+        }
+
+        public void SendNoAFK()
+        {
+            if (ServerSocket == null) return;
+
+            var bw = new ByteWriter();
+            bw.Write((short)MessageOp.SetNoAFK);
+            bw.WriteDateTime(DateTime.Now);
+
+            ServerSocket.Send(bw.ToBytes());
+        }
+    }
 }

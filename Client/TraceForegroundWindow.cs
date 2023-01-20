@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Net.Sockets;
 
 namespace FWIClient
 {
@@ -13,20 +14,30 @@ namespace FWIClient
         static public void Trace(Action<WindowInfoCapture> onTrace, int traceInterval = 1000)
         {
             string pName = "", pTitle = "";
-            while (true)
+            try
             {
-                Thread.Sleep(traceInterval);
-
-                var wi = WindowInfoCapture.GetForeground();
-
-                if (wi.Name != pName || wi.Title != pTitle)
+                while (true)
                 {
-                    pName = wi.Name;
-                    pTitle = wi.Title;
-                    onTrace(wi);
+                    Thread.Sleep(traceInterval);
+
+                    var wi = WindowInfoCapture.GetForeground();
+
+                    if (wi.Name != pName || wi.Title != pTitle)
+                    {
+                        pName = wi.Name;
+                        pTitle = wi.Title;
+                        onTrace(wi);
+                    }
                 }
             }
-        }
+            catch (ThreadInterruptedException)
+            {
 
+            }
+            catch (SocketException)
+            {
+
+            }
+        }
     }
 }
