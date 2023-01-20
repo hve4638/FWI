@@ -16,11 +16,13 @@
 
 [ ] 백그라운드 실행 & Form 추가
 
-[ ] AFK 체크해서 보내기
+[X] AFK 체크해서 보내기
 
 [X] 연결 종료시 trace, prompt 스레드 안전하게 종료
 
 [ ] 강제 종료하는 대신, 정상 종료하기
+
+[ ] 서버로부터 AFK 처리 시간 받기
 
 ### 서버
 
@@ -45,3 +47,5 @@
 [ ] Youtube Export 기능 만들기
 
 [ ] Target Client 해제시 AFK상태로
+
+[ ] AFK 상태 체크 (AFK 도중 UpdateWI시 AFK 해제)

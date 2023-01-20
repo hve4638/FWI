@@ -15,7 +15,7 @@ namespace FWIServer
 {
     static class Program
     {
-        static readonly string Version = "0.5a";
+        static readonly string Version = "0.5b";
         static readonly DateTime runDateTime = DateTime.Now;
         static readonly IOutputStream nullOut = new NullOutputStream();
         static public readonly IOutputStream stdOut = new FormatStandardOutputStream();

@@ -118,7 +118,7 @@ namespace FWIServer
             {
                 br.ReadDateTime(out DateTime date);
                 manager.SetAFK(date);
-                VerboseOut.WriteLine($"[D][I] Target Client가 AFK 상태입니다.");
+                Out.WriteLine($"[D][I] Target Client가 AFK 상태입니다.");
             }
             else
             {
@@ -132,7 +132,7 @@ namespace FWIServer
             {
                 br.ReadDateTime(out DateTime date);
                 manager.SetNoAFK(date);
-                VerboseOut.WriteLine($"[D][I] Target Client가 AFK 상태가 아닙니다.");
+                Out.WriteLine($"[D][I] Target Client가 AFK 상태가 아닙니다.");
             }
             else
             {

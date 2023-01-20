@@ -14,7 +14,7 @@ namespace FWIClient
     {
         static readonly FormatStandardOutputStream formatStandardOutput =  new FormatStandardOutputStream();
         public static FormatStandardOutputStream Out => formatStandardOutput;
-        public static readonly string Version = "0.5a";
+        public static readonly string Version = "0.5b";
 
         static void Main(string[] args)
         {

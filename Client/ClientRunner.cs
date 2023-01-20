@@ -23,7 +23,7 @@ namespace FWIClient
         {
             threads = new Threads();
             tryTraced = options.Trace;
-            afkTime = 5 * 60;
+            afkTime = 10 * 60;
             this.manager = manager;
             this.client = client;
         }
