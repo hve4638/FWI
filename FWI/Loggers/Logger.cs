@@ -13,6 +13,7 @@ namespace FWI
         int Count { get; }
         Logger AppendWindowInfo(WindowInfo wi);
         Logger AddWI(WindowInfo wi);
+        Logger ClearLast(DateTime date);
 
         ReadOnlyCollection<WindowInfo> GetLog();
         ReadOnlyCollection<WindowInfo> GetLog(DateTime from, DateTime to);

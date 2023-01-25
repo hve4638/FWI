@@ -19,6 +19,12 @@ namespace FWIConnection
             this.size = size;
             offset = 0;
         }
+
+        public ByteReader(string value) : this(new ByteWriter(value))
+        {
+
+        }
+
         public ByteReader(ByteWriter bw) : this(bw.ToBytes())
         {
 

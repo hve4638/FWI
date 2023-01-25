@@ -104,9 +104,11 @@
     <Compile Include="DateRankTest.cs" />
     <Compile Include="FWIManagerTest.cs" />
     <Compile Include="IgnoreMapTest.cs" />
+    <Compile Include="LazyRequestResultTest.cs" />
     <Compile Include="Learning\JsonTest.cs" />
     <Compile Include="Learning\ThreadTest.cs" />
     <Compile Include="Learning\LibTest.cs" />
+    <Compile Include="Learning\TimeSpanTest.cs" />
     <Compile Include="MockStreamReader.cs" />
     <Compile Include="MockStreamTest.cs" />
     <Compile Include="MockStreamWriter.cs" />

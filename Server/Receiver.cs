@@ -16,7 +16,7 @@ namespace FWIServer
 {
     internal class Receiver : IReceiver
     {
-        FWIManager manager;
+        ServerManager manager;
         Prompt prompt;
         IPEndPoint? client;
         Socket? socket;
@@ -26,7 +26,7 @@ namespace FWIServer
         
         public bool IsTarget { get; private set; }
 
-        public Receiver(FWIManager manager, Prompt prompt, Action<Receiver>? onConnect = null, Action<Receiver>? onDisconnect = null)
+        public Receiver(ServerManager manager, Prompt prompt, Action<Receiver>? onConnect = null, Action<Receiver>? onDisconnect = null)
         {
             this.manager = manager;
             this.prompt = prompt;
@@ -63,7 +63,7 @@ namespace FWIServer
             if (IsTarget)
             {
                 IsTarget = false;
-                manager.TraceCount--;
+                manager.ResetTarget(DateTime.Now);
                 Out.WriteLine($"[D][A] Target Client 가 지정 해제되었습니다 : {ClientName}");
             }
             
@@ -117,8 +117,9 @@ namespace FWIServer
             if (IsTarget)
             {
                 br.ReadDateTime(out DateTime date);
+                Out.WriteLine($"[D][A] Target Client가 AFK 상태입니다. (From {date})");
+
                 manager.SetAFK(date);
-                Out.WriteLine($"[D][I] Target Client가 AFK 상태입니다.");
             }
             else
             {
@@ -131,8 +132,9 @@ namespace FWIServer
             if (IsTarget)
             {
                 br.ReadDateTime(out DateTime date);
+                Out.WriteLine($"[D][A] Target Client가 AFK 상태가 아닙니다. (To {date})");
+
                 manager.SetNoAFK(date);
-                Out.WriteLine($"[D][I] Target Client가 AFK 상태가 아닙니다.");
             }
             else
             {
@@ -169,7 +171,7 @@ namespace FWIServer
         {
             VerboseOut.WriteLine($"[D][I][{ClientName}] 요청 : Rank");
 
-            var str = manager.GetTimelineString();
+            var str = manager.GetTimelineAsString();
             var bw = new ByteWriter(str);
             var br = new ByteReader(bw);
             Send(br);
@@ -179,7 +181,7 @@ namespace FWIServer
         {
             VerboseOut.WriteLine($"[D][I][{ClientName}] 요청 : Rank");
 
-            var str = manager.GetRankString();
+            var str = manager.GetRankAsString();
             var bw = new ByteWriter(str);
             var br = new ByteReader(bw);
             Send(br);
@@ -192,10 +194,10 @@ namespace FWIServer
             bool accepted;
             var nonce = br.ReadShort();
 
-            if (manager.TraceCount == 0)
+            if (!manager.HasTarget)
             {
                 IsTarget = true;
-                manager.TraceCount++;
+                manager.SetTarget();
                 accepted = true;
 
                 Out.WriteLine($"[D][A] Target Client가 지정되었습니다 : {ClientName}");
@@ -233,44 +235,16 @@ namespace FWIServer
             socket!.Send(bw.ToBytes());
         }
 
-        public string GetRank()
-        {
-            var ranks = manager.GetRanks();
-            Dictionary<int, RankResult<WindowInfo>> sorted = ranks.OrderBy(kvp => kvp.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-            var str = "";
-            foreach (var item in sorted)
-            {
-                var result = item.Value;
-                var ranking = result.Ranking;
-                var name = result.Item.Name;
-                var duration = result.Duration;
-                    
-                str += $"{ranking}\t|\t{name}\t|\t{duration}\n";
-            }
-            return str;
-        }
-
-        public string GetTimeline()
-        {
-            var output = "";
-            int num = 1;
-            foreach (var item in manager.GetTimeline())
-                output += $"{num++}. {item.Title}\t|\t{item.Name}\t|\t{item.Date}\n";
-            return output;
-        }
-
         string ClientName => $"{client?.Address}:{client?.Port}";
 
         static IOutputStream Out => Program.Out;
-        static IOutputStream noOut = new NullOutputStream();
         IOutputStream VerboseOut
         {
             get
             {
                 var verbose = onVerbose?.Invoke() ?? false;
                 if (verbose) return Out;
-                else return noOut;
+                else return NullOutputStream.Instance;
             }
         }
     }

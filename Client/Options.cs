@@ -22,7 +22,10 @@ namespace FWIClient
         [Option('b', "background", Default = false, HelpText = "Running on background.")]
         public bool Background { get; set; }
 
-        [Option('t', "target", Default = true, HelpText = "Target")]
-        public bool Trace { get; set; }
+        [Option('t', "target", Default = false, HelpText = "Target")]
+        public bool Target { get; set; }
+
+        [Option('a', "afk", Default = 10, HelpText = "AFK Time")]
+        public int AFK { get; set; }
     }
 }

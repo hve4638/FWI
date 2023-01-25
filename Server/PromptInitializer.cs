@@ -11,36 +11,30 @@ namespace FWIServer
 {
     internal class PromptInitializer
     {
-        readonly FWIManager manager;
+        readonly ServerManager serverManager;
+        readonly FWIManager fwiManager;
         readonly LinkedList<Receiver> sessions;
-        public PromptInitializer(FWIManager manager, LinkedList<Receiver> sessions)
+        public PromptInitializer(FWIManager fwiManager, ServerManager serverManager, LinkedList<Receiver> sessions)
         {
-            this.manager = manager;
+            this.fwiManager = fwiManager;
+            this.serverManager = serverManager;
             this.sessions = sessions;
         }
 
         public void Initialize(Prompt prompt)
         {
-            prompt.Add("timeline", () => {
-                var output = manager.GetTimelineString();
-                prompt.Out.WriteLine(output);
-            });
-            prompt.Add("rank", () => {
-                var ranks = manager.GetRankString();
-                prompt.Out.WriteLine(ranks);
-            });
             prompt.Add("import", (_, output) => {
-                manager.Import(manager.Signiture);
+                fwiManager.Import(fwiManager.Signiture);
                 output.WriteLine($"[D][I] import success");
             });
             prompt.Add("export", (_, output) => {
-                manager.Export(manager.Signiture);
+                fwiManager.Export(fwiManager.Signiture);
                 output.WriteLine($"[D][I] export success");
             });
             prompt.Add("interval", (args, output) => {
                 if (int.TryParse(args[0], out int num))
                 {
-                    manager.SetLoggingInterval(num);
+                    fwiManager.SetLoggingInterval(num);
                     output.WriteLine($"[D][I] Set LoggingInterval : {num} minutes");
                 }
                 else
@@ -48,9 +42,9 @@ namespace FWIServer
                     output.WriteLine("Set failed");
                 }
             });
-            prompt.Add("save", () => { manager.SaveFilter(); });
+            prompt.Add("save", () => { fwiManager.SaveFilter(); });
             prompt.Add("reload", (args, output) => {
-                var results = manager.LoadFilter();
+                var results = fwiManager.LoadFilter();
                 if (results.IsNormal)
                 {
                     output.WriteLine("[D][I] Load successful");
@@ -68,9 +62,16 @@ namespace FWIServer
 
                 switch(args[0])
                 {
+                    case "timeline":
+                        {
+                            var timeline = serverManager.GetTimelineAsString();
+                            output.WriteLine(timeline);
+                            break;
+                        }
+
                     case "rank":
                         {
-                            var ranks = manager.GetRankString();
+                            var ranks = serverManager.GetRankAsString();
                             output.WriteLine(ranks);
                             break;
                         }
@@ -80,7 +81,7 @@ namespace FWIServer
 
                     case "ignore":
                         {
-                            var ignoreSet = manager.GetIgnore();
+                            var ignoreSet = fwiManager.GetIgnore();
 
                             output.WriteLine($"ignore list:");
                             foreach (var value in ignoreSet)
@@ -90,7 +91,7 @@ namespace FWIServer
 
                     case "alias":
                         {
-                            var aliasDict = manager.GetAlias();
+                            var aliasDict = fwiManager.GetAlias();
 
                             output.WriteLine($"alias:");
                             foreach (var (key, value) in aliasDict)
@@ -100,12 +101,12 @@ namespace FWIServer
 
                     case "current":
                     case "lastwi":
-                        output.WriteLine($"last WI: {manager.LastWI}");
+                        output.WriteLine($"last WI: {serverManager.LastWI}");
                         break;
 
                     case "history":
                         {
-                            var list = manager.History;
+                            var list = serverManager.GetHistory();
 
                             output.WriteLine($"history");
                             foreach (var item in list)
@@ -132,17 +133,10 @@ namespace FWIServer
                         }
                 }
             });
-            prompt.Add("client", (args, output) => {
-                output.WriteLine($"Client List:");
-                foreach (var session in sessions)
-                {
-                    var info = session.Info();
-
-                    output.Write($"- [{info.Addr}:{info.Port}] ");
-                    if (info.CanTrace) output.Write($"Target");
-                    else output.Write($"Observer");
-                }
-            });
+            prompt.Add("client", "show client");
+            prompt.Add("lastwi", "show lastwi");
+            prompt.Add("timeline", "show timeline");
+            prompt.Add("rank", "show rank");
 
             prompt.Add("uptime", (_, output) =>
             {

@@ -84,6 +84,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\ExceptionHandler.cs" />
     <Compile Include="IntervalThread.cs" />
     <Compile Include="AliasManager.cs" />
     <Compile Include="History.cs" />
@@ -93,6 +94,10 @@
     <Compile Include="OutputStream\FormatStandardOutputStream.cs" />
     <Compile Include="Prompt\Prompt.cs" />
     <Compile Include="Prompt\PromptArgs.cs" />
+    <Compile Include="Results\LazyRequestResult.cs" />
+    <Compile Include="Results\LazyRequestResultManager.cs" />
+    <Compile Include="Results\RequestResult.cs" />
+    <Compile Include="Results\RequestResultState.cs" />
     <Compile Include="Results\Results.cs" />
     <Compile Include="Rank\DateRank.cs" />
     <Compile Include="Exceptions\ParseException.cs" />

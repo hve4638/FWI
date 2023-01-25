@@ -5,88 +5,127 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using FWIConnection;
+using FWI.Results;
 using System.Security.Policy;
 using FWIConnection.Message;
+using FWI;
 
 namespace FWIClient
 {
     internal class ClientManager
     {
-        bool hasPrivillegeTrace;
-        PrivillegeElevationResult? privillegeTraceResult;
-        public Socket? ServerSocket { get; set; }
+        readonly Client client;
+        readonly ToBeTargetManager toBeTargetManager;
+        public bool Connected { get; set; }
+        public bool IsTarget { get; set; }
+        public bool IsAFK { get; private set; }
 
-        public ClientManager()
+        public ClientManager(Client client)
         {
-            privillegeTraceResult = null;
-            hasPrivillegeTrace = false;
+            this.client = client;
+            toBeTargetManager = new();
+            Connected = false;
+            IsTarget = false;
+            IsAFK = false;
         }
 
-        public PrivillegeElevationResult RequestPrivillegeTrace()
+        public RequestResult<string> RequestToBeTarget()
         {
-            if (ServerSocket == null) return new MustDeniedPrivillegeElevationResult("내부 요청 거절: 연결되지 않음");
-            if (hasPrivillegeTrace) return new MustDeniedPrivillegeElevationResult("내부 요청 거절: 권한이 존재");
+            var DeniedResult = (string message) => new RequestResult<string>(RequestResultState.Denied, message);
 
-            var nonce = Nonce();
-            privillegeTraceResult?.Deny("중복 요청, 오래된 요청을 만료함");
-            privillegeTraceResult = new()
+            if (!Connected) return DeniedResult("내부 요청 거절 - 연결되지 않음");
+            else if (IsTarget) return DeniedResult("내부 요청 거절 - 권한이 존재");
+            else
             {
-                Progress = PrivilegeElevation.Requested,
-                Nonce = nonce,
-            };
+                toBeTargetManager.Reset();
+                toBeTargetManager.Request();
 
-            var bw = new ByteWriter();
-            bw.Write((short)MessageOp.RequestPrivillegeTrace);
-            bw.Write(nonce);
-            ServerSocket.Send(bw.ToBytes());
-
-            return privillegeTraceResult;
-        }
-
-        static short Nonce()
-        {
-            var rand = new Random(DateTime.Now.Millisecond);
-            return (short)rand.Next(0, short.MaxValue);
-        }
-
-        public void ElevateUpdatePrivillege(short nonce, bool accepted)
-        {
-            var result = privillegeTraceResult;
-
-            if (result is null) return;
-            else if (result.Progress != PrivilegeElevation.Requested) return;
-            else if (result.Nonce != nonce) return;
-            
-            if (accepted)
-            {
-                hasPrivillegeTrace = true;
-                result.Accept();
+                var bw = new ByteWriter();
+                bw.Write((short)MessageOp.RequestToBeTarget);
+                bw.Write(toBeTargetManager.Id);
+                client.Send(bw.ToBytes());
             }
-            else result.Deny("Request Denied");
 
-            privillegeTraceResult = null;
+            return toBeTargetManager.Result;
         }
 
-        public void SendAFK()
+        public Results<string> ResponseToBeTarget(short nonce, bool accepted)
         {
-            if (ServerSocket == null) return;
+            var results = new Results<string>();
 
-            var bw = new ByteWriter();
-            bw.Write((short)MessageOp.SetAFK);
-            bw.WriteDateTime(DateTime.Now);
+            var manager = toBeTargetManager;
+            if (manager.Progress != ToBeTargetState.Requested)
+            {
+                results.State = ResultState.None;
+                results += "요청되지 않음";
+            }
+            else if (manager.Id != nonce)
+            {
+                results.State = ResultState.None;
+                results += "잘못된 ID";
+            }
+            else if (accepted)
+            {
+                results.State = ResultState.Normal;
+                IsTarget = true;
 
-            ServerSocket.Send(bw.ToBytes());
+                manager.Accept("Request Accepted");
+            }
+            else
+            {
+                results.State = ResultState.HasProblem;
+                results += "요청 거부됨";
+
+                manager.Deny("Request Denied");
+            }
+
+            return results;
         }
 
-        public void SendNoAFK()
+        public void SendWI(WindowInfo wi)
         {
-            if (ServerSocket == null) return;
+            if (!Connected) return;
+            else if (!IsTarget) return;
+            else
+            {
+                IsAFK = false;
 
-            var bw = new ByteWriter();
-            bw.Write((short)MessageOp.SetNoAFK);
-            bw.WriteDateTime(DateTime.Now);
+                var bw = new ByteWriter();
+                bw.Write((short)MessageOp.UpdateCurrentWI);
+                bw.WriteWI(name: wi.Name, title: wi.Title, date: wi.Date);
 
-            ServerSocket.Send(bw.ToBytes());
+                client.Send(bw.ToBytes());
+            }
+        }
+
+        public void SendAFK(DateTime date)
+        {
+            if (!Connected) return;
+            else if (!IsTarget) return;
+            else if (IsAFK) return;
+            else
+            {
+                var bw = new ByteWriter();
+                bw.Write((short)MessageOp.SetAFK);
+                bw.WriteDateTime(date);
+
+                client.Send(bw.ToBytes());
+            }
+        }
+
+        public void SendNoAFK(DateTime date)
+        {
+            if (!Connected) return;
+            else if (!IsTarget) return;
+            else if (!IsAFK) return;
+            else
+            {
+                var bw = new ByteWriter();
+                bw.Write((short)MessageOp.SetNoAFK);
+                bw.WriteDateTime(date);
+
+                client.Send(bw.ToBytes());
+            }
         }
     }
 }

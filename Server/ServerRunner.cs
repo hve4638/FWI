@@ -11,7 +11,8 @@ namespace FWIServer
 {
     class ServerRunner
     {
-        readonly FWIManager manager;
+        readonly FWIManager fwiManager;
+        readonly ServerManager serverManager;
         readonly Prompt prompt;
         readonly Server server;
         readonly LinkedList<Receiver> sessionList;
@@ -34,7 +35,8 @@ namespace FWIServer
             signiture = options.Signiture!;
 #pragma warning restore CS8629
 
-            manager = new(signiture: signiture);
+            fwiManager = new(signiture: signiture);
+            serverManager = new(manager: fwiManager);
             sessionList = new();
             prompt = new();
             server = new(port: port)
@@ -56,12 +58,13 @@ namespace FWIServer
 
         public void RunManager()
         {
-            manager.SetPath(pathDict);
-            manager.LoadFilter();
+            fwiManager.SetPath(pathDict);
+            fwiManager.LoadFilter();
+
             server.SetReceiverGetter(() =>
             {
                 var receiver = new Receiver(
-                    manager: manager,
+                    manager: serverManager,
                     prompt: prompt,
                     onConnect: (receiver) => sessionList.AddLast(receiver),
                     onDisconnect: (receiver) => sessionList.Remove(receiver)
@@ -70,8 +73,8 @@ namespace FWIServer
                 return receiver;
             });
 
-            manager.SetLoggingInterval(interval);
-            manager.SetOnLoggingListener((WindowInfo item) =>
+            fwiManager.SetLoggingInterval(interval);
+            fwiManager.SetOnLoggingListener((WindowInfo item) =>
             {
                 if (server.Verbose)
                 {
@@ -83,9 +86,10 @@ namespace FWIServer
         public Thread RunPrompt()
         {
             var promptInitializer = new PromptInitializer(
-                manager: manager,
+                fwiManager: fwiManager,
+                serverManager : serverManager,
                 sessions: sessionList
-            );
+            );;
             promptInitializer.Initialize(prompt);
 
             prompt.Add("verbose", (args, output) => {
@@ -96,12 +100,14 @@ namespace FWIServer
                     case "TRUE":
                     case "1":
                         server.Verbose = true;
+                        Program.VerboseMode = true;
                         break;
 
                     case "F":
                     case "FALSE":
                     case "0":
                         server.Verbose = false;
+                        Program.VerboseMode = false;
                         break;
 
                     case "":
@@ -109,6 +115,7 @@ namespace FWIServer
                 }
 
                 output.WriteLine($"Current verbose mode: {server.Verbose}");
+
             });
             prompt.DefaultOutputStream = Program.Out;
 
@@ -117,8 +124,9 @@ namespace FWIServer
 
         public void RunChecker()
         {
+
             var alertChecker = new IntervalThread(() => {
-                if (manager.TraceCount == 0)
+                if (!serverManager.HasTarget)
                 {
                     Program.Out.WriteLine("[D][A] 현재 Target 클라이언트가 없습니다.");
                 }

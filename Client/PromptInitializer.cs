@@ -24,7 +24,7 @@ namespace FWIClient
             prompt.Add("exit", (_) => {
 
             });
-
+            
             prompt.Add("echo", (args) => {
                 var bw = new ByteWriter();
                 var str = args.GetArgs();
@@ -68,10 +68,14 @@ namespace FWIClient
                 client.Send(bw.ToBytes());
             });
 
-            prompt.Add("afk", (args) =>
+            prompt.Add("afk", (args, output) =>
             {
-                Program.Out.WriteLine("Send AFK");
-                manager.SendAFK();
+                manager.SendAFK(DateTime.Now);
+            });
+
+            prompt.Add("request", (args, output) =>
+            {
+                output.WriteLine("request target");
             });
         }
     }

@@ -8,6 +8,9 @@ namespace FWI
 {
     public class NullOutputStream : IOutputStream
     {
+        private static readonly Lazy<NullOutputStream> lazy = new Lazy<NullOutputStream>(() => new NullOutputStream());
+        public static NullOutputStream Instance { get { return lazy.Value; } }
+        private NullOutputStream() { }
         public void Write(string value)
         {
         }

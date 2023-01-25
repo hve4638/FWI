@@ -36,15 +36,14 @@ namespace FWI {
         public Logger AppendWindowInfo(WindowInfo wi) => AddWI(wi);
         public Logger AddWI(WindowInfo wi)
         {
-            if (wi is AFKWindowInfo)
-            {
-                AddAFK(wi.Date);
-            }
-            else
-            {
-                rank.Add(wi);
-                timeline.AddLog(wi);
-            }
+            rank.Add(wi);
+            timeline.AddLog(wi);
+            return this;
+        }
+        public Logger ClearLast(DateTime date)
+        {
+            rank.ClearLast(date);
+            timeline.AddLog(new AFKWindowInfo(date));
             return this;
         }
         public Logger AddAFK(DateTime date)
@@ -58,7 +57,7 @@ namespace FWI {
 
         public static SingleLogger operator +(SingleLogger logger, WindowInfo wi)
         {
-            logger.AppendWindowInfo(wi);
+            logger.AddWI(wi);
             return logger;
         }
 
@@ -94,7 +93,6 @@ namespace FWI {
             timeline.Export(pathDict["timeline"]);
             rank.Export(pathDict["rank"]);
         }
-
         public int GetContentsHashCode()
         {
             return rank.GetContentsHash() ^ timeline.GetContentsHashCode();

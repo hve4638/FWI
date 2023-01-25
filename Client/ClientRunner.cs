@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Packaging;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -15,15 +16,15 @@ namespace FWIClient
     {
         readonly ClientManager manager;
         readonly Client client;
-        readonly bool tryTraced;
+        readonly bool targetMode;
         readonly uint afkTime;
         Threads threads;
 
         public ClientRunner(Options options, Client client, ClientManager manager)
         {
             threads = new Threads();
-            tryTraced = options.Trace;
-            afkTime = 10 * 60;
+            targetMode = options.Target;
+            afkTime = (uint)options.AFK * 60;
             this.manager = manager;
             this.client = client;
         }
@@ -37,18 +38,24 @@ namespace FWIClient
             {
                 Program.Out.WriteLine($"[D][I] Connect: {client.IP}:{client.Port}");
 
-                Thread? traceThread = null;
-                if (tryTraced) RequestToBeTarget();
                 RunAFKChecker();
 
-                RunPrompt();
+                var prompt = RunPrompt();
+                prompt.DefaultOutputStream = Program.Out;
+                prompt.Add("rt", (args, output) =>
+                {
+                    output.WriteLine("[D][I] Target 요청");
+                    RequestToBeTarget();
+                });
+
+
+                if (targetMode) prompt.Execute("rt");
                 try
                 {
                     client.ReceiveProgress();
                 }
                 finally
                 {
-                    traceThread?.Interrupt();
                     threads.Interrupt();
                 }
             }
@@ -76,54 +83,67 @@ namespace FWIClient
                 () => TraceForegroundWindow.Trace(
                     onTrace: (wi) =>
                     {
-                        var bw = new ByteWriter();
-                        bw.Write((short)MessageOp.UpdateCurrentWI);
-                        bw.WriteWI(name: wi.Name, title: wi.Title, date: wi.Date);
-                        
-                        client.Send(bw.ToBytes());
+                        manager.SendWI(wi);
                     },
                     traceInterval: interval
                 )
             );
 
-            manager.RequestPrivillegeTrace()
-                .WithAccepted(() =>
+            manager.RequestToBeTarget()
+                .WithAccepted((str) =>
                 {
+                    Program.Out.WriteLine("[D][I] Target 지정됨");
                     thread.Start();
+                })
+                .WithDenied((str) => {
+                    Program.Out.WriteLine("[D][I] Target 요청 실패");
+                    Program.Out.WriteLine($" 사유 : {str}");
                 });
 
             threads += thread;
         }
 
-        public void RunPrompt()
+        public Prompt RunPrompt()
         {
             var prompt = new Prompt();
             var promptInitializer = new PromptInitializer(client, manager);
             promptInitializer.Init(prompt);
 
             threads += prompt.LoopAsync();
+            return prompt;
         }
 
         public void RunAFKChecker()
         {
             var thread = new Thread(() => {
                 bool afk = false;
+                int noAFKTime = 0;
+                int sleepTime = 750;
+
                 while (true)
                 {
                     var current = AFKChecker.GetLastInputTime();
 
-                    if (!afk && current >= afkTime)
+                    if (afk)
+                    {
+                        if (current == 0) noAFKTime += sleepTime;
+                        else noAFKTime = 0;
+
+                        if (noAFKTime >= 2000)
+                        {
+                            Program.Out.WriteLine($"[D][I] No longer AFK");
+                            manager.SendNoAFK(DateTime.Now);
+                            afk = false;
+                        }
+                    }
+                    else if (!afk && current >= afkTime)
                     {
                         Program.Out.WriteLine($"[D][I] Now AFK");
-                        manager.SendAFK();
+                        manager.SendAFK(DateTime.Now - new TimeSpan(0, 0, (int)afkTime));
                         afk = true;
+                        noAFKTime = 0;
                     }
-                    else if (afk && current < afkTime)
-                    {
-                        Program.Out.WriteLine($"[D][I] No longer AFK");
-                        manager.SendNoAFK();
-                        afk = false;
-                    }
+                    Thread.Sleep(sleepTime);
                 }
             });
             thread.Start();

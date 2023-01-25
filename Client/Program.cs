@@ -12,15 +12,24 @@ namespace FWIClient
 {
     static public class Program
     {
+        public static readonly string Version = "0.5d dev 3";
         static readonly FormatStandardOutputStream formatStandardOutput =  new FormatStandardOutputStream();
-        public static FormatStandardOutputStream Out => formatStandardOutput;
-        public static readonly string Version = "0.5b";
-
+        public static bool VerboseMode { get; set; }
+        
         static void Main(string[] args)
         {
             Console.Title = "FWIClient";
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(Run);
+        }
+
+        public static FormatStandardOutputStream Out => formatStandardOutput;
+        public static IOutputStream VerboseOut
+        {
+            get {
+                if (VerboseMode) return formatStandardOutput;
+                else return formatStandardOutput;
+            }
         }
 
         static void Run(Options options)
@@ -29,9 +38,12 @@ namespace FWIClient
             Console.WriteLine($"version: {Version}");
             Console.WriteLine($"Connection {options.IP}:{options.Port}");
             Console.WriteLine($"Verbose : {options.Verbose}");
+            Console.WriteLine($"AFK Time : {options.AFK}min");
 
-            if (options.Trace) Console.WriteLine($"Mode: Target");
+            if (options.Target) Console.WriteLine($"Mode: Target");
             else Console.WriteLine($"Mode: Observe");
+
+            VerboseMode = options.Verbose;
 
             Console.WriteLine("연결중...");
             var thread = new Thread(() => { RunClient(options); });
@@ -41,8 +53,8 @@ namespace FWIClient
 
         static void RunClient(Options options)
         {
-            var manager = new ClientManager();
             var client = new Client(options.IP, options.Port);
+            var manager = new ClientManager(client);
             var runner = new ClientRunner(
                 options: options,
                 client: client,

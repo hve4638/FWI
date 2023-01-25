@@ -1,5 +1,6 @@
 ﻿using FWIConnection.Message;
 using FWIConnection;
+using FWI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace FWIClient
 {
     class TraceForegroundWindow
     {
-        static public void Trace(Action<WindowInfoCapture> onTrace, int traceInterval = 1000)
+        static public void Trace(Action<WindowInfo> onTrace, int traceInterval = 1000)
         {
             string pName = "", pTitle = "";
             try
@@ -20,7 +21,7 @@ namespace FWIClient
                 {
                     Thread.Sleep(traceInterval);
 
-                    var wi = WindowInfoCapture.GetForeground();
+                    var wi = WICapture.GetForeground();
 
                     if (wi.Name != pName || wi.Title != pTitle)
                     {
@@ -32,7 +33,7 @@ namespace FWIClient
             }
             catch (ThreadInterruptedException)
             {
-
+                //Program.VerboseOut.WriteLine("");
             }
             catch (SocketException)
             {

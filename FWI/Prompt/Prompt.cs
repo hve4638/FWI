@@ -23,6 +23,7 @@ namespace FWI.Prompt
             };
 
             DefaultOutputStream = new StandardOutputStream();
+            UnhandleException = false;
 
             Add("help", (_) => {
                 foreach(var cmd in GetCommandList())
@@ -32,8 +33,8 @@ namespace FWI.Prompt
             });
         }
 
+        public bool UnhandleException { get; set; }
         public IOutputStream DefaultOutputStream { get; set; }
-
         public Thread LoopAsync()
         {
             var thread = new Thread(Loop);
@@ -69,23 +70,44 @@ namespace FWI.Prompt
                 try
                 {
                     action(args, currentOutputStream);
-                    Out.Flush();
+                    Out?.Flush();
                 }
                 catch (Exception e)
                 {
-                    Out.WriteLine("[D][W] Prompt 명령 실행중 오류가 발생했습니다.");
-                    Out.WriteLine($"-------------------------------");
-                    Out.WriteLine($"{e}");
-                    Out.WriteLine($"-------------------------------");
-                    Out.Flush();
+                    if (UnhandleException)
+                    {
+                        throw e;
+                    }
+                    else
+                    {
+                        Out.WriteLine("[D][W] Prompt 명령 실행중 오류가 발생했습니다.");
+                        Out.WriteLine($"-------------------------------");
+                        Out.WriteLine($"{e}");
+                        Out.WriteLine($"-------------------------------");
+                        Out.Flush();
+                    }
                 }
                 finally
                 {
-                    currentOutputStream = null;
+                    currentOutputStream = DefaultOutputStream;
                 }
             }
         }
 
+        public void Add(string cmd, string redirectTo)
+        {
+            if (cmd.Split(' ').Length == 1)
+            {
+                Add(cmd, (args, output) =>
+                {
+                    Execute(redirectTo, output);
+                });
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
         public void Add(string cmd, Action action)
         {
             Add(cmd, (args, output) => { action(); });

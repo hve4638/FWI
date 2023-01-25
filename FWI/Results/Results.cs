@@ -19,7 +19,6 @@ namespace FWI.Results
             results = new List<T>();
         }
 
-
         public void Add(T item)
         {
             results.Add(item);

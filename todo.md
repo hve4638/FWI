@@ -6,9 +6,14 @@
 
 ### FWI
 
+[ ] Timeline capture interval / display interval 만들기
+
 [?] Console.WriteLine 사용하는 대신 Results<string> 사용
 
 [?] FormatStandardOutput 버그 수정
+
+[ ] Prompt 중첩된 Execute실행시 DefaultOutputStream이 정상적으로 동작하도록
+- 현재 중첩 실행시 돌아오는 과정에서 무조건 DefaultOutputStream으로 돌아가는데 Stack 형식으로 바꿔서 정상적으로 동작하도록
 
 ### 클라이언트
 
@@ -23,6 +28,12 @@
 [ ] 강제 종료하는 대신, 정상 종료하기
 
 [ ] 서버로부터 AFK 처리 시간 받기
+
+[ ] AFK 시 마지막으로 움직이지 않은 시간을 전송
+
+[ ] AFK 해제
+
+[ ] 디버그 모드 (-d 인자) : 패킷 보낼때 평문의 디버그 문자열 보내기
 
 ### 서버
 
@@ -46,6 +57,9 @@
 
 [ ] Youtube Export 기능 만들기
 
-[ ] Target Client 해제시 AFK상태로
+[X] Target Client 해제시 AFK상태로
 
 [ ] AFK 상태 체크 (AFK 도중 UpdateWI시 AFK 해제)
+
+[ ] 순차 처리 & 충동하는 요청 무시하기
+

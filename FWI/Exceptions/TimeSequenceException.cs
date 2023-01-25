@@ -10,5 +10,9 @@ namespace FWI.Exceptions
     {
         public TimeSeqeunceException() : base() { }
         public TimeSeqeunceException(string message) : base(message) { }
+
+        public DateTime Last { get; set; }
+        public DateTime Input { get; set; }
+
     }
 }

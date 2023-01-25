@@ -2,6 +2,7 @@
 using FWIConnection;
 using FWI;
 using FWI.Prompt;
+using FWI.Exceptions;
 using System.Diagnostics;
 using CommandLine;
 using System.Net;
@@ -15,12 +16,10 @@ namespace FWIServer
 {
     static class Program
     {
-        static readonly string Version = "0.5b";
+        static readonly string Version = "0.5d dev 3";
         static readonly DateTime runDateTime = DateTime.Now;
-        static readonly IOutputStream nullOut = new NullOutputStream();
         static public readonly IOutputStream stdOut = new FormatStandardOutputStream();
 
-        
         static public TimeSpan Elapsed => (DateTime.Now - runDateTime);
         static public bool VerboseMode { get; set; }
         static public IOutputStream Out => stdOut;
@@ -29,12 +28,14 @@ namespace FWIServer
             get
             {
                 if (VerboseMode) return stdOut;
-                else return nullOut;
+                else return NullOutputStream.Instance;
             }
         }
 
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(ExceptionHandler.CurrentDomain_UnhandledException);
+
             Console.Title = "FWIServer";
             Console.WriteLine($"FWI Server");
             Console.WriteLine($"version: {Version}");

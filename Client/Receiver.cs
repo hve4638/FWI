@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using FWIConnection.Message;
+using FWI.Results;
 
 namespace FWIClient
 {
@@ -21,11 +22,11 @@ namespace FWIClient
         public void Connect(Socket socket)
         {
             this.socket = socket;
-            manager.ServerSocket = socket;
+            manager.Connected = true;
         }
         public void Disconnect()
         {
-
+            manager.Connected = false;
         }
         public void Receive(in byte[] buf, int size)
         {
@@ -35,51 +36,28 @@ namespace FWIClient
             switch (op)
             {
                 case MessageOp.Message:
-                    socket!.ResponseMessage(br);
+                    ResponseMessage(br);
                     break;
-                case MessageOp.Echo:
-                    socket!.ResponseEcho(br);
-                    break;
+                case MessageOp.ResponseToBeTarget:
                 case MessageOp.ResponsePrivillegeTrace:
-                    ResponsePrivillegeTrace(br);
+                    ResponseToBeTarget(br);
                     break;
                 default:
                     break;
             }
         }
-        public void ResponsePrivillegeTrace(ByteReader br)
+        void ResponseToBeTarget(ByteReader br)
         {
             var nonce = br.ReadShort();
             var accepted = (br.ReadShort() == 1);
-
-            manager.ElevateUpdatePrivillege(nonce, accepted);
-
-            if (accepted) Program.Out.WriteLine("[D][A] Target 지정됨");
-            else
-            {
-                Program.Out.WriteLine($"[D][A] Target 거부됨");
-                Program.Out.WriteLine($"[D][I] Observer Mode로 전환합니다");
-            }
-        }
-    }
-
-    static class SocketResponseExtender
-    {
-        static public void ResponseEcho(this Socket socket, ByteReader br)
-        {
-            var str = br.ReadString();
-            Program.Out.WriteLine(str);
-
-            var bw = new ByteWriter();
-            bw.Write((short)MessageOp.Message);
-            socket.Send(bw.ToBytes());
+            
+            manager.ResponseToBeTarget(nonce, accepted);
         }
 
-        static public void ResponseMessage(this Socket socket, ByteReader br)
+        static void ResponseMessage(ByteReader br)
         {
             var str = br.ReadString();
             Program.Out.WriteLine(str);
         }
-
     }
 }

@@ -25,21 +25,17 @@ namespace FWIClient
 
         static public uint GetLastInputTime()
         {
-            uint idleTime = 0;
             LASTINPUTINFO lastInputInfo = new LASTINPUTINFO();
             lastInputInfo.cbSize = (uint)Marshal.SizeOf(lastInputInfo);
             lastInputInfo.dwTime = 0;
 
+
+            if (!GetLastInputInfo(ref lastInputInfo)) return 0;
             uint envTicks = (uint)Environment.TickCount;
+            uint lastInputTick = lastInputInfo.dwTime;
 
-            if (GetLastInputInfo(ref lastInputInfo))
-            {
-                uint lastInputTick = lastInputInfo.dwTime;
-
-                idleTime = envTicks - lastInputTick;
-            }
-
-            return ((idleTime > 0) ? (idleTime / 1000) : 0);
+            if (envTicks < lastInputTick) return 0;
+            else return (envTicks - lastInputTick) / 1000;
         }
     }
 }

@@ -15,11 +15,7 @@ namespace FWI
         readonly AliasMap aliasMap;
         readonly IgnoreMap ignoreMap;
         readonly Logger logger;
-        readonly History<WindowInfo> history;
-        WindowInfo lastWI;
-        bool isAFK;
 
-        public WindowInfo LastWI => (history.Count == 0 ?  new NoWindowInfo() : history.GetLast());
         public string Signiture { get; set; }
         public int TraceCount { get; set; }
 
@@ -28,7 +24,6 @@ namespace FWI
             logger = new SingleLogger();
             aliasMap = new AliasMap();
             ignoreMap = new IgnoreMap();
-            history = new History<WindowInfo>();
 
             Signiture = signiture;
             TraceCount = 0;
@@ -53,44 +48,24 @@ namespace FWI
             }
         }
 
-        public FWIManager AddWI(WindowInfo wi) => AppendWindowInfo(wi);
-        public FWIManager AppendWindowInfo(WindowInfo wi)
+        public FWIManager AddWI(WindowInfo wi)
         {
             if (ignoreMap.Contains(wi)) return this;
             aliasMap.Filter(ref wi);
-            isAFK = false;
-            lastWI = wi;
 
             logger.AddWI(wi);
-            history.Add(wi);
             return this;
         }
-        public FWIManager SetAFK(DateTime date)
+        public FWIManager AddEmpty(DateTime date)
         {
-            var afkWI = new AFKWindowInfo(date);
-            isAFK = true;
-
-            logger.AddWI(afkWI);
-            history.Add(afkWI);
-            return this;
-        }
-        public FWIManager SetNoAFK(DateTime date)
-        {
-            isAFK = false;
-            if (lastWI != null)
-            {
-                var wi = lastWI.Copy();
-                wi.Date = date;
-
-                AddWI(wi);
-            }
-
+            logger.ClearLast(date);
             return this;
         }
 
-        public void Update()
+        public void Update() => Update(DateTime.Now);
+        public void Update(DateTime date)
         {
-            logger.Update(DateTime.Now);
+            logger.Update(date);
         }
 
         public void SetLoggingInterval(int minutes = 0) => logger.SetLoggingInterval(minutes);
@@ -121,7 +96,6 @@ namespace FWI
         }
         public Dictionary<int, RankResult<WindowInfo>> GetRanks(int beginRank = 1, int endRank = 1) => logger.GetRanks(beginRank, endRank);
 
-        static public FWIManager operator +(FWIManager manager, WindowInfo wi) => manager.AppendWindowInfo(wi);
         public void Import(string path)
         {
             logger.Import(path);
@@ -130,45 +104,41 @@ namespace FWI
         {
             logger.Export(path);
         }
-        public Results<string> LoadFilter()
-        {
-            var results = new Results<string>();
-            
-            ExecuteFileIOSafe(() => aliasMap.Import(pathDict["alias"]), () => {
-                results += $"Import Fail : Alias List '{pathDict["alias"]}'";
-                results.State = ResultState.HasProblem;
-            });
-            ExecuteFileIOSafe(() => ignoreMap.Import(pathDict["ignore"]), () => {
-                results += $"Import Fail : Ignore List '{pathDict["ignore"]}'";
-                results.State = ResultState.HasProblem;
-            });
-
-            return results;
-        }
 
         public void SaveFilter()
         {
             aliasMap.Export(pathDict["alias"]);
             ignoreMap.Export(pathDict["ignore"]);
         }
-
-        public List<WindowInfo> History => history.GetAll();
-
-        public ReadOnlyDictionary<string, string> GetAlias() => aliasMap.Items;
-        public HashSet<string> GetIgnore() => ignoreMap.Items;
-
-
-        static void ExecuteFileIOSafe(Action execute, Action onCatchException = null)
+        public Results<string> LoadFilter()
         {
+            var results = new Results<string>();
+            
             try
             {
-                execute();
+                aliasMap.Import(pathDict["alias"]);
             }
             catch (FileNotFoundException)
             {
-                onCatchException?.Invoke();
+                results.State = ResultState.HasProblem;
+                results += $"Import Fail : Alias List '{pathDict["alias"]}'";
             }
+
+            try
+            {
+                ignoreMap.Import(pathDict["ignore"]);
+            }
+            catch (FileNotFoundException)
+            {
+                results.State = ResultState.HasProblem;
+                results += $"Import Fail : Ignore List '{pathDict["ignore"]}'";
+            }
+
+            return results;
         }
+
+        public ReadOnlyDictionary<string, string> GetAlias() => aliasMap.Items;
+        public HashSet<string> GetIgnore() => ignoreMap.Items;
 
         public int GetLogHashCode()
         {

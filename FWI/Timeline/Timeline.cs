@@ -98,7 +98,7 @@ namespace FWI
 
         public void AddLog(WindowInfo wi)
         {
-            if (wi.Date < lastTime) throw new TimeSeqeunceException();
+            if (wi.Date < lastTime) throw new TimeSeqeunceException($"{lastTime} - {wi.Date}");
             else if (IsLastWI(wi)) return;
             else
             {
