@@ -1,4 +1,6 @@
 ﻿using FWI;
+using FWI.Exceptions;
+using FWI.Results;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,40 +42,145 @@ namespace FWIServer
             }
         }
 
-        public void AddWI(WindowInfo wi)
+        public Results<ServerResultState, string> AddWI(WindowInfo wi)
         {
-            if (wi is NoWindowInfo) return;
-            else if (wi is AFKWindowInfo) SetAFK(wi.Date);
+            var results = new Results<ServerResultState, string>();
+            if (wi is NoWindowInfo && wi is AFKWindowInfo)
+            {
+                var result = new Result<ServerResultState, string>(ServerResultState.NonFatalIssue);
+                result += "처리할 수 없는 WindowInfo";
+                result += $"Item: {wi}";
+                result += "처리 - 무시됨";
+
+                results += result;
+            }
             else
             {
-                if (isAFK) Program.VerboseOut.WriteLine("[D][Verbose] AFK가 해제되었습니다. (AddWI에 의해)");
+                if (isAFK)
+                {
+                    var result = new Result<ServerResultState, string>(ServerResultState.ChangeAFK);
+                    result += $"AFK가 해제되었습니다. ({wi.Date})";
+
+                    results += result;
+                }
 
                 lastWI = wi;
                 isAFK = false;
-                manager.AddWI(wi);
-                history.Add(wi);
+
+                try
+                {
+                    var result = manager.AddWI(wi);
+                    history.Add(wi);
+
+                    if (result.State == ResultState.Normal)
+                    {
+                        results += new Result<ServerResultState, string>(ServerResultState.Normal);
+                    }
+                }
+                catch(TimeSequenceException e)
+                {
+                    var result = new Result<ServerResultState, string>(ServerResultState.NonFatalIssue);
+                    result += "TimeSeqeunce 충돌";
+                    result += $"Last - {e.Last}";
+                    result += $"Input - {e.Input}";
+                    result += "처리 - 무시됨";
+
+                    results += result;
+                }
             }
+
+
+            return results;
         }
 
-        public void SetAFK(DateTime date)
+        public Results<ServerResultState, string> SetAFK(DateTime date)
         {
-            if (isAFK) return;
-
-            isAFK = true;
-            manager.AddEmpty(date);
-            history.Add(new AFKWindowInfo(date));
-        }
-        public void SetNoAFK(DateTime date)
-        {
-            if (!isAFK) return;
-
-            isAFK = false;
-            if (lastWI is not null)
+            var results = new Results<ServerResultState, string>();
+            
+            if (isAFK)
             {
-                var wi = lastWI.Copy();
-                wi.Date = date;
-                AddWI(wi);
+                var result = new Result<ServerResultState, string>(ServerResultState.NonFatalIssue);
+                result += "AFK 중복";
+                result += "처리 - 무시됨";
+
+                results += result;
             }
+            else
+            {
+                isAFK = true;
+
+                try
+                {
+                    manager.AddEmpty(date);
+                    history.Add(new AFKWindowInfo(date));
+
+                    results += new Result<ServerResultState, string>(ServerResultState.Normal);
+                    results += new Result<ServerResultState, string>(ServerResultState.ChangeAFK);
+                }
+                catch (TimeSequenceException e)
+                {
+                    var result = new Result<ServerResultState, string>(ServerResultState.NonFatalIssue);
+                    result += "TimeSeqeunce 충돌";
+                    result += $"Last - {e.Last}";
+                    result += $"Input - {e.Input}";
+                    result += "처리 - 무시됨";
+
+                    results += result;
+                }
+            }
+
+            return results;
+        }
+
+        public Results<ServerResultState, string> SetNoAFK(DateTime date)
+        {
+            var results = new Results<ServerResultState, string>();
+
+            if (isAFK)
+            {
+                isAFK = false;
+
+                if (lastWI is null)
+                {
+                    var result = new Result<ServerResultState, string>
+                    {
+                        State = ServerResultState.Info
+                    };
+                    result += "이전 로그가 없음";
+
+                    results += result;
+                }
+                else
+                {
+                    var wi = lastWI.Copy();
+                    wi.Date = date;
+
+                    try
+                    {
+                        results += AddWI(wi);
+                    }
+                    catch (TimeSequenceException e)
+                    {
+                        var result = new Result<ServerResultState, string>(ServerResultState.NonFatalIssue);
+                        result += "TimeSeqeunce 충돌";
+                        result += $"Last - {e.Last}";
+                        result += $"Input - {e.Input}";
+                        result += "처리 - AFK 해제, 추가 로그 기록 무시";
+
+                        results += result;
+                    }
+                }
+            }
+            else
+            {
+                var result = new Result<ServerResultState, string>(ServerResultState.NonFatalIssue);
+                result += "AFK 상태가 아님";
+                result += "처리 - 무시됨";
+
+                results += result;
+            }
+
+            return results;
         }
 
         public List<WindowInfo> GetHistory()
@@ -95,7 +202,7 @@ namespace FWIServer
                 var name = result.Item.GetAliasOrName();
                 var duration = result.Duration;
 
-                str += $"{ranking}\t|\t{name}\t|\t{duration}\n";
+                str += $"{ranking}\t|{name.PadCenter(30)}|\t{duration}\n";
             }
             return str;
         }
@@ -111,8 +218,7 @@ namespace FWIServer
                 if (last == name) name = "";
                 else last = name;
 
-                output += $"{item.Date:yyMMdd HH:mm:ss}\t|\t{name,-15}\t|\t{item.Title}\t\n";
-
+                output += $"{item.Date:yyMMdd HH:mm:ss}\t|{name.PadCenter(30)}|\t{item.Title}\t\n";
             }
             return output;
         }

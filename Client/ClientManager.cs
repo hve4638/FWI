@@ -7,73 +7,76 @@ using System.Net.Sockets;
 using FWIConnection;
 using FWI.Results;
 using System.Security.Policy;
-using FWIConnection.Message;
 using FWI;
+using FWIConnection.Message;
+using System.Threading;
 
 namespace FWIClient
 {
-    internal class ClientManager
+    public class ClientManager
     {
-        readonly Client client;
+        private readonly Client client;
+        private CancellationTokenSource? afkCancelToken;
+        private CancellationTokenSource? receiveCancelToken;
+        public ClientSender Sender { get; private set; }
         readonly ToBeTargetManager toBeTargetManager;
-        public bool Connected { get; set; }
-        public bool IsTarget { get; set; }
-        public bool IsAFK { get; private set; }
+        public bool IsAFK
+        {
+            get => Sender.IsAFK;
+            set { Sender.IsAFK = value; }
+        }
+        public bool DebugMode {
+            get => Sender.DebugMode;
+            set { Sender.DebugMode = value; }
+        }
 
-        public ClientManager(Client client)
+        public ClientManager(Client client, bool debugMode = false)
         {
             this.client = client;
-            toBeTargetManager = new();
-            Connected = false;
-            IsTarget = false;
+            Sender = new ClientSender(client);
+            DebugMode = debugMode;
             IsAFK = false;
+            toBeTargetManager = new();
         }
 
         public RequestResult<string> RequestToBeTarget()
         {
             var DeniedResult = (string message) => new RequestResult<string>(RequestResultState.Denied, message);
 
-            if (!Connected) return DeniedResult("내부 요청 거절 - 연결되지 않음");
-            else if (IsTarget) return DeniedResult("내부 요청 거절 - 권한이 존재");
+            if (!Sender.Connected) return DeniedResult("내부 요청 거절 - 연결되지 않음");
+            else if (Sender.IsTarget) return DeniedResult("내부 요청 거절 - 권한이 존재");
             else
             {
                 toBeTargetManager.Reset();
                 toBeTargetManager.Request();
 
-                var bw = new ByteWriter();
-                bw.Write((short)MessageOp.RequestToBeTarget);
-                bw.Write(toBeTargetManager.Id);
-                client.Send(bw.ToBytes());
+                var message = new RequestToBeTargetMessage()
+                {
+                    Id = toBeTargetManager.Id,
+                };
+                Sender.Send(message);
             }
 
             return toBeTargetManager.Result;
         }
 
-        public Results<string> ResponseToBeTarget(short nonce, bool accepted)
+        public Result<ResultState, string> ResponseToBeTarget(short nonce, bool accepted)
         {
-            var results = new Results<string>();
+            var results = new Result<ResultState, string>();
 
             var manager = toBeTargetManager;
-            if (manager.Progress != ToBeTargetState.Requested)
-            {
-                results.State = ResultState.None;
-                results += "요청되지 않음";
-            }
-            else if (manager.Id != nonce)
-            {
-                results.State = ResultState.None;
-                results += "잘못된 ID";
-            }
+            if (manager.Progress != ToBeTargetState.Requested) results += "요청되지 않음";
+            else if (manager.Id != nonce) results += "잘못된 ID";
             else if (accepted)
             {
-                results.State = ResultState.Normal;
-                IsTarget = true;
+                results.State |= ResultState.Normal;
+                Sender.IsTarget = true;
 
                 manager.Accept("Request Accepted");
             }
             else
             {
-                results.State = ResultState.HasProblem;
+                results.State |= ResultState.HasProblem;
                 results += "요청 거부됨";
 
                 manager.Deny("Request Denied");
@@ -82,50 +85,68 @@ namespace FWIClient
             return results;
         }
 
-        public void SendWI(WindowInfo wi)
+        public Task ReceiveFromServerAsync()
         {
-            if (!Connected) return;
-            else if (!IsTarget) return;
-            else
+            var cancelToken = new CancellationTokenSource();
+
+            receiveCancelToken?.Cancel();
+            receiveCancelToken = cancelToken;
+
+            var task = new Task(() =>
             {
-                IsAFK = false;
+                while (!cancelToken.IsCancellationRequested)
+                {
+                    client.WaitForReceive();
+                }
+            });
+            task.Start();
 
-                var bw = new ByteWriter();
-                bw.Write((short)MessageOp.UpdateCurrentWI);
-                bw.WriteWI(name: wi.Name, title: wi.Title, date: wi.Date);
-
-                client.Send(bw.ToBytes());
-            }
+            return task;
         }
 
-        public void SendAFK(DateTime date)
+        public Task CheckAFKAsync(uint afkTime)
         {
-            if (!Connected) return;
-            else if (!IsTarget) return;
-            else if (IsAFK) return;
-            else
-            {
-                var bw = new ByteWriter();
-                bw.Write((short)MessageOp.SetAFK);
-                bw.WriteDateTime(date);
+            var cancelToken = new CancellationTokenSource();
 
-                client.Send(bw.ToBytes());
-            }
-        }
+            afkCancelToken?.Cancel();
+            afkCancelToken = cancelToken;
 
-        public void SendNoAFK(DateTime date)
-        {
-            if (!Connected) return;
-            else if (!IsTarget) return;
-            else if (!IsAFK) return;
-            else
-            {
-                var bw = new ByteWriter();
-                bw.Write((short)MessageOp.SetNoAFK);
-                bw.WriteDateTime(date);
+            var task = new Task(() => {
+                bool afk = false;
+                int noAFKTime = 0;
+                int sleepTime = 750;
 
-                client.Send(bw.ToBytes());
-            }
+                while (!cancelToken.IsCancellationRequested)
+                {
+                    var current = AFKChecker.GetLastInputTime();
+
+                    if (afk)
+                    {
+                        if (current == 0) noAFKTime += sleepTime;
+                        else noAFKTime = 0;
+
+                        if (noAFKTime >= 2000)
+                        {
+                            Program.Out.WriteLine($"[D][I] No longer AFK");
+                            Sender.SendNoAFK(DateTime.Now);
+                            afk = false;
+                        }
+                    }
+                    else if (!IsAFK && current >= afkTime)
+                    {
+                        Program.Out.WriteLine($"[D][I] Now AFK");
+                        var now = DateTime.Now;
+                        var from = now - new TimeSpan(0, 0, (int)afkTime);
+                        Sender.SendAFK(from, now);
+                        afk = true;
+                        noAFKTime = 0;
+                    }
+                    Thread.Sleep(sleepTime);
+                }
+            }, cancelToken.Token);
+            task.Start();
+
+            return task;
         }
     }
 }

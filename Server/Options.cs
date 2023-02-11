@@ -19,15 +19,18 @@ namespace FWIServer
 
         [Option('s', "signiture", Default = null, HelpText = "signiture to save")]
         public string? Signiture { get; set; }
-
         
         [Option('o', "option", Default = null, HelpText = "Option path")]
         public string? Path { get; set; }
 
-        
         [Option('i', "interval", Default = null, HelpText = "Interval")]
         public int? Interval { get; set; }
-        
+
+        [Option('a', "autosave", Default = null, HelpText = "Autosave")]
+        public int AutoSave { get; set; }
+
+        [Option('h', "help", Default = false, HelpText = "Show help text")]
+        public bool Help { get; set; } 
 #pragma warning restore CS8618
     }
 }

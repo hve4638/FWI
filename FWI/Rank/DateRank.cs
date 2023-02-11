@@ -58,7 +58,11 @@ namespace FWI
         {
             if (lastWI == null) { }
             else if (date >= lastTime) rank.Add(lastWI, date - lastTime);
-            else throw new TimeSeqeunceException($"{lastTime} - {date}");
+            else throw new TimeSequenceException()
+            {
+                Last = lastTime,
+                Input = date,
+            };
 
             lastTime = date;
         }

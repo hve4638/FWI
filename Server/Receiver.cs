@@ -11,6 +11,7 @@ using FWI;
 using FWI.Prompt;
 using System.Xml.Linq;
 using YamlDotNet.Core.Tokens;
+using FWI.Results;
 
 namespace FWIServer
 {
@@ -73,42 +74,100 @@ namespace FWIServer
         public void Receive(in byte[] buf, int size)
         {
             var br = new ByteReader(buf, size);
-            var op = (MessageOp)br.ReadShort();
-            
-            switch (op)
+            var op = (MessageOp)br.PeekShort();
+
+            try
             {
-                case MessageOp.UpdateWI:
-                case MessageOp.UpdateCurrentWI:
-                    ResponseUpdateWI(br);
-                    break;
-                case MessageOp.SetAFK:
-                    ResponseAFK(br);
-                    break;
-                case MessageOp.SetNoAFK:
-                    ResponseNoAFK(br);
-                    break;
-                case MessageOp.Message:
-                    Message(br);
-                    break;
-                case MessageOp.Echo:
-                    Send(br);
-                    break;
-                case MessageOp.RequestTimeline:
-                    ResponseTimeline();
-                    break;
-                case MessageOp.RequestRank:
-                    ResponseRank();
-                    break;
-                case MessageOp.RequestToBeTarget:
-                case MessageOp.RequestPrivillegeTrace:
-                    ResponseTracePrivillege(br);
-                    break;
-                case MessageOp.ServerCall:
-                    ResponseServerCall(br);
-                    break;
-                default:
-                    ResponseOther(br, op);
-                    break;
+                switch (op)
+                {
+                    case MessageOp.UpdateWI:
+                        ResponseUpdateWI(br);
+                        break;
+                    case MessageOp.SetAFK:
+                        ResponseAFK(br);
+                        break;
+                    case MessageOp.SetNoAFK:
+                        ResponseNoAFK(br);
+                        break;
+                    case MessageOp.Message:
+                        ResponseMessage(br);
+                        break;
+                    case MessageOp.Echo:
+                        ResponseEcho(br);
+                        break;
+                    case MessageOp.RequestTimeline:
+                        ResponseTimeline();
+                        break;
+                    case MessageOp.RequestRank:
+                        ResponseRank();
+                        break;
+                    case MessageOp.RequestToBeTarget:
+                        ResponseToBeTarget(br);
+                        break;
+                    case MessageOp.ServerCall:
+                        ResponseServerCall(br);
+                        break;
+                    default:
+                    case MessageOp.UpdateCurrentWI:
+                    case MessageOp.RequestPrivillegeTrace:
+                        ResponseOther(br, op);
+                        break;
+                }
+            }
+            catch(DeserializeFailException e)
+            {
+                Out.WriteLine($"[D][W] Receiver에서 Deserialize에 실패했습니다. (OP: {op})");
+                Out.WriteLine($"----------------------");
+                Out.WriteLine($"");
+                Out.WriteLine(e.ToString());
+                Out.WriteLine(e.StackTrace);
+                Out.WriteLine($"----------------------");
+            }
+            catch(ThreadInterruptedException e)
+            {
+                throw e;
+            }
+            catch(Exception e)
+            {
+                Out.WriteLine($"[D][W] Receiver에서 예외가 발생했습니다");
+                Out.WriteLine($"----------------------");
+                Out.WriteLine(e.ToString());
+                Out.WriteLine(e.StackTrace);
+                Out.WriteLine($"----------------------");
+            }
+        }
+
+        void ResponseUpdateWI(in ByteReader br)
+        {
+            if (IsTarget)
+            {
+                var message = UpdateWIMessage.Deserialize(br);
+                var name = message.Name;
+                var title = message.Title;
+                var date = message.Date;
+
+                var wi = new WindowInfo(name: name, title: title, date: date);
+                var results = manager.AddWI(wi);
+
+                foreach(var result in results)
+                {
+                    switch(result.State)
+                    {
+                        case ServerResultState.Normal:
+                            VerboseOut.WriteLine($"[D][I][{ClientName}] UpdateWI : {wi.Date:yyMMdd HH:mm:ss}  |  {wi.Name.PadCenter(28)}  |\t{wi.Title.Truncate(40)}");
+                            break;
+                        case ServerResultState.FatalIssue:
+                        case ServerResultState.NonFatalIssue:
+                            VerboseOut.WriteLine($"[D][I][{ClientName}] UpdateWI 실패 {wi.Name}");
+                            break;
+                    }
+
+                    foreach (var item in result) VerboseOut.WriteLine($"  {item}");
+                }
+            }
+            else
+            {
+                VerboseOut.WriteLine($"[D][I][{ClientName}] Non-Target Client의 요청: UpdateWI (무시)");
             }
         }
 
@@ -116,14 +175,30 @@ namespace FWIServer
         {
             if (IsTarget)
             {
-                br.ReadDateTime(out DateTime date);
-                Out.WriteLine($"[D][A] Target Client가 AFK 상태입니다. (From {date})");
+                var message = AFKMessage.Deserialize(br);
+                var date = message.FromDate;
+                var results = manager.SetAFK(date);
 
-                manager.SetAFK(date);
+                results.Parse()
+                    .With(ServerResultState.ChangeAFK, (result) =>
+                    {
+                        Out.WriteLine($"[D][A] Target Client가 AFK 상태입니다. (From {date})");
+                        foreach (var item in result) VerboseOut.WriteLine($"  {item}");
+                    })
+                    .With(ServerResultState.NonFatalIssue, (result) =>
+                    {
+                        Out.WriteLine($"[D][A] ResponseAFK 처리 중 Non-Fatal Issue가 발생했습니다.");
+                        foreach (var item in result) Out.WriteLine($"  {item}");
+                    })
+                    .With(ServerResultState.FatalIssue, (result) =>
+                    {
+                        Out.WriteLine($"[D][W] ResponseAFK 처리 중 심각한 문제를 발견했습니다.");
+                        foreach (var item in result) Out.WriteLine($"  {item}");
+                    });
             }
             else
             {
-                VerboseOut.WriteLine($"[D][I][{ClientName}] Non-Target Client의 요청: UpdateWI (무시)");
+                VerboseOut.WriteLine($"[D][I][{ClientName}] Non-Target Client의 요청: RequestAFK (무시)");
             }
         }
 
@@ -131,10 +206,30 @@ namespace FWIServer
         {
             if (IsTarget)
             {
-                br.ReadDateTime(out DateTime date);
-                Out.WriteLine($"[D][A] Target Client가 AFK 상태가 아닙니다. (To {date})");
+                var message = NoAFKMessage.Deserialize(br);
+                var date = message.FromDate;
 
-                manager.SetNoAFK(date);
+                var results = manager.SetNoAFK(date);
+                results.Parse()
+                    .With(ServerResultState.Normal, (result) =>
+                    {
+                        Out.WriteLine($"[D][A] Target Client가 AFK 상태가 아닙니다. (To {date})");
+                        foreach (var detail in result) VerboseOut.WriteLine($"  {detail}");
+                    })
+                    .With(ServerResultState.NonFatalIssue, (result) =>
+                    {
+                        Out.WriteLine($"[D][A] ResponseNoAFK 처리 중 문제가 발생했습니다.");
+                        foreach (var detail in result) Out.WriteLine($"  {detail}");
+                    })
+                    .With(ServerResultState.FatalIssue, (result) =>
+                    {
+                        Out.WriteLine($"[D][W] NoAFK 처리 중 심각한 문제가 발생했습니다.");
+                        foreach (var detail in result) Out.WriteLine($"  {detail}");
+                    })
+                    .With(ServerResultState.Info, (result) =>
+                    {
+                        foreach (var detail in result) Out.WriteLine($"  {detail}");
+                    });
             }
             else
             {
@@ -142,57 +237,54 @@ namespace FWIServer
             }
         }
 
+        void ResponseMessage(in ByteReader br)
+        {
+            var message = TextMessage.Deserialize(br);
+            var text = message.Text;
+
+            Out.WriteLine($"{ClientName}> {text}");
+        }
+
+        void ResponseEcho(in ByteReader br)
+        {
+            var message = EchoMessage.Deserialize(br);
+            var text = message.Text;
+
+            SendMessage(text);
+        }
+
         void ResponseServerCall(in ByteReader br)
         {
-            var cmd = br.ReadString();
-            VerboseOut.WriteLine($"[D][A][{ClientName}] SeverCall 요청 > {cmd}");
+            var message = ServerCallMessage.Deserialize(br);
+            var cmd = message.Command;
+            VerboseOut.WriteLine($"[D][I][{ClientName}] SeverCall 요청 > {cmd}");
             
             prompt.Execute(cmd, new SocketOutputStream(socket!));
         }
 
-        void ResponseUpdateWI(in ByteReader br)
-        {
-            if (IsTarget)
-            {
-                br.ReadWI(name: out string name, title: out string title, date: out DateTime date);
-
-                var wi = new WindowInfo(name: name, title: title, date: date);
-                manager.AddWI(wi);
-
-                VerboseOut.WriteLine($"[D][I][{ClientName}] UpdateWI : {wi.Date}\t|\t{wi.Name}\t|\t{wi.Title}");
-            }
-            else
-            {
-                VerboseOut.WriteLine($"[D][I][{ClientName}] Non-Target Client의 요청: UpdateWI (무시)");
-            }
-        }
-
         void ResponseTimeline()
         {
-            VerboseOut.WriteLine($"[D][I][{ClientName}] 요청 : Rank");
+            VerboseOut.WriteLine($"[D][I][{ClientName}] 요청 : Timeline");
 
-            var str = manager.GetTimelineAsString();
-            var bw = new ByteWriter(str);
-            var br = new ByteReader(bw);
-            Send(br);
+            var text = manager.GetTimelineAsString();
+            SendMessage(text);
         }
 
         void ResponseRank()
         {
             VerboseOut.WriteLine($"[D][I][{ClientName}] 요청 : Rank");
 
-            var str = manager.GetRankAsString();
-            var bw = new ByteWriter(str);
-            var br = new ByteReader(bw);
-            Send(br);
+            var text = manager.GetRankAsString();
+            SendMessage(text);
         }
 
-        void ResponseTracePrivillege(ByteReader br)
+        void ResponseToBeTarget(ByteReader br)
         {
-            VerboseOut.WriteLine($"[D][I][{ClientName}] 요청 : To Be Target");
+            VerboseOut.WriteLine($"[D][I][{ClientName}] 요청 : ToBeTarget");
 
             bool accepted;
-            var nonce = br.ReadShort();
+            var receiveMessage = RequestToBeTargetMessage.Deserialize(br);
+            var nonce = receiveMessage.Id;
 
             if (!manager.HasTarget)
             {
@@ -207,11 +299,13 @@ namespace FWIServer
                 accepted = false;
             }
 
-            var bw = new ByteWriter();
-            bw.Write((short)MessageOp.ResponsePrivillegeTrace);
-            bw.Write(nonce);
-            bw.Write((short)(accepted ? 1 : 0));
-            socket!.Send(bw.ToBytes());
+            var message = new ResponseToBeTargetMessage()
+            {
+                Id = nonce,
+                Accepted = accepted
+            };
+
+            Send(message);
         }
 
         void ResponseOther(in ByteReader br, MessageOp op)
@@ -219,20 +313,21 @@ namespace FWIServer
             VerboseOut.WriteLine($"[D][I][{ClientName}] 처리할 수 없는 요청: {op}");
         }
 
-        public void Message(ByteReader br)
+        public void SendMessage(string text)
         {
-            var str = br.ReadString();
-            Out.WriteLine(str);
+            var message = new TextMessage()
+            {
+                Text = text,
+            };
+
+            Send(message);
         }
 
-        public void Send(ByteReader br)
+        public void Send(ISerializableMessage serializableMessage)
         {
-            var str = br.ReadString();
+            var bytes = serializableMessage.Serialize();
 
-            var bw = new ByteWriter();
-            bw.Write((short)MessageOp.Message);
-            bw.Write(str);
-            socket!.Send(bw.ToBytes());
+            socket!.Send(bytes);
         }
 
         string ClientName => $"{client?.Address}:{client?.Port}";

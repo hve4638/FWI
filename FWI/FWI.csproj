@@ -84,27 +84,34 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DateTimeParser.cs" />
     <Compile Include="Exceptions\ExceptionHandler.cs" />
     <Compile Include="IntervalThread.cs" />
     <Compile Include="AliasManager.cs" />
     <Compile Include="History.cs" />
-    <Compile Include="OutputStream\IOutputStream.cs" />
-    <Compile Include="OutputStream\NullOutputStream.cs" />
-    <Compile Include="OutputStream\OutputStream.cs" />
-    <Compile Include="OutputStream\FormatStandardOutputStream.cs" />
+    <Compile Include="IOStream\InputStream.cs" />
+    <Compile Include="IOStream\IOutputStream.cs" />
+    <Compile Include="IOStream\NullOutputStream.cs" />
+    <Compile Include="IOStream\OutputStream.cs" />
+    <Compile Include="IOStream\FormatStandardOutputStream.cs" />
+    <Compile Include="IOStream\StandardInputStream.cs" />
     <Compile Include="Prompt\Prompt.cs" />
     <Compile Include="Prompt\PromptArgs.cs" />
     <Compile Include="Results\LazyRequestResult.cs" />
     <Compile Include="Results\LazyRequestResultManager.cs" />
+    <Compile Include="Results\ReadonlyResults.cs" />
     <Compile Include="Results\RequestResult.cs" />
     <Compile Include="Results\RequestResultState.cs" />
     <Compile Include="Results\Results.cs" />
+    <Compile Include="Results\Result.cs" />
     <Compile Include="Rank\DateRank.cs" />
     <Compile Include="Exceptions\ParseException.cs" />
     <Compile Include="Exceptions\TimeSequenceException.cs" />
     <Compile Include="HUtils.cs" />
     <Compile Include="IgnoreManager.cs" />
+    <Compile Include="Results\ResultsParser.cs" />
     <Compile Include="Results\ResultState.cs" />
+    <Compile Include="StringExtender.cs" />
     <Compile Include="Timeline\TimelineInstantUpdater.cs" />
     <Compile Include="DateRange\DateRange.cs" />
     <Compile Include="DateRange\DynamicDateRange.cs" />

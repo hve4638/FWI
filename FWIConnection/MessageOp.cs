@@ -17,7 +17,6 @@
         RequestTimeline = 31,
         RequestRank = 32,
 
-
         RequestToBeTarget = 40,
         ResponseToBeTarget = 50,
 
@@ -27,8 +26,8 @@
         Debug = 99,
 
         //Obsolete
-        UpdateCurrentWI = 101,
-        RequestPrivillegeTrace = 102,
-        ResponsePrivillegeTrace = 103,
+        UpdateCurrentWI = 1001,
+        RequestPrivillegeTrace = 1002,
+        ResponsePrivillegeTrace = 1003,
     }
 }

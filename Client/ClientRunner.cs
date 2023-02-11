@@ -12,7 +12,7 @@ using FWIConnection.Message;
 
 namespace FWIClient
 {
-    internal class ClientRunner
+    public class ClientRunner
     {
         readonly ClientManager manager;
         readonly Client client;
@@ -24,7 +24,7 @@ namespace FWIClient
         {
             threads = new Threads();
             targetMode = options.Target;
-            afkTime = (uint)options.AFK * 60;
+            afkTime = (uint)(options.AFK * 60);
             this.manager = manager;
             this.client = client;
         }
@@ -34,20 +34,19 @@ namespace FWIClient
             threads.Clear();
             client.SetReceiver(new Receiver(manager: manager));
 
-            if (TryConnect(5))
+            var prompt = new Prompt();
+            InitializePrompt(prompt);
+            Program.CurrentPrompt = prompt;
+
+            var connectResult = TryConnect(5);
+            if (connectResult)
             {
                 Program.Out.WriteLine($"[D][I] Connect: {client.IP}:{client.Port}");
+                Program.Out.Flush();
 
-                RunAFKChecker();
-
-                var prompt = RunPrompt();
-                prompt.DefaultOutputStream = Program.Out;
-                prompt.Add("rt", (args, output) =>
-                {
-                    output.WriteLine("[D][I] Target 요청");
-                    RequestToBeTarget();
-                });
-
+                manager.CheckAFKAsync(afkTime);
+                
+                Program.RunPromptOnRemoteConsole();
 
                 if (targetMode) prompt.Execute("rt");
                 try
@@ -63,16 +62,14 @@ namespace FWIClient
             {
                 Program.Out.WriteLine("[D][I] 연결에 실패했습니다");
             }
+            Program.Out.Flush();
         }
 
         public bool TryConnect(int tryCount = 1)
         {
             var connected = false;
             var count = 0;
-            while (!connected && count <= tryCount)
-            {
-                connected = client.Connect();
-            }
+            while (!connected && count <= tryCount) connected = client.Connect();
             
             return connected;
         }
@@ -83,7 +80,9 @@ namespace FWIClient
                 () => TraceForegroundWindow.Trace(
                     onTrace: (wi) =>
                     {
-                        manager.SendWI(wi);
+                        if (manager.IsAFK) return;
+
+                        manager.Sender.SendWI(wi);
                     },
                     traceInterval: interval
                 )
@@ -103,14 +102,17 @@ namespace FWIClient
             threads += thread;
         }
 
-        public Prompt RunPrompt()
+        public void InitializePrompt(Prompt prompt)
         {
-            var prompt = new Prompt();
             var promptInitializer = new PromptInitializer(client, manager);
             promptInitializer.Init(prompt);
+            prompt.DefaultOutputStream = Program.Out;
 
-            threads += prompt.LoopAsync();
-            return prompt;
+            prompt.Add("rt", (args, output) =>
+            {
+                output.WriteLine("[D][I] Target 요청");
+                RequestToBeTarget();
+            });
         }
 
         public void RunAFKChecker()
@@ -132,14 +134,16 @@ namespace FWIClient
                         if (noAFKTime >= 2000)
                         {
                             Program.Out.WriteLine($"[D][I] No longer AFK");
-                            manager.SendNoAFK(DateTime.Now);
+                            manager.Sender.SendNoAFK(DateTime.Now);
                             afk = false;
                         }
                     }
-                    else if (!afk && current >= afkTime)
+                    else if (!manager.IsAFK && current >= afkTime)
                     {
                         Program.Out.WriteLine($"[D][I] Now AFK");
-                        manager.SendAFK(DateTime.Now - new TimeSpan(0, 0, (int)afkTime));
+                        var now = DateTime.Now;
+                        var from = now - new TimeSpan(0, 0, (int)afkTime);
+                        manager.Sender.SendAFK(from, now);
                         afk = true;
                         noAFKTime = 0;
                     }
@@ -149,6 +153,11 @@ namespace FWIClient
             thread.Start();
 
             threads += thread;
+        }
+
+        public void RunReceiver()
+        {
+
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using YamlDotNet.Core.Tokens;
+using FWI.Results;
 
 namespace FWIServer
 {
@@ -23,38 +24,36 @@ namespace FWIServer
 
         public void Initialize(Prompt prompt)
         {
-            prompt.Add("import", (_, output) => {
+            prompt.Add("load", (_, output) => {
                 fwiManager.Import(fwiManager.Signiture);
-                output.WriteLine($"[D][I] import success");
+                output.WriteLine($"[D][I] logger load success");
             });
-            prompt.Add("export", (_, output) => {
+            prompt.Add("save", (_, output) => {
                 fwiManager.Export(fwiManager.Signiture);
-                output.WriteLine($"[D][I] export success");
+                output.WriteLine($"[D][I] logger save success");
             });
             prompt.Add("interval", (args, output) => {
                 if (int.TryParse(args[0], out int num))
                 {
                     fwiManager.SetLoggingInterval(num);
-                    output.WriteLine($"[D][I] Set LoggingInterval : {num} minutes");
+                    output.WriteLine($"[D][I] Set loggingInterval : {num} minutes");
                 }
                 else
                 {
-                    output.WriteLine("Set failed");
+                    output.WriteLine("set failed");
                 }
             });
-            prompt.Add("save", () => { fwiManager.SaveFilter(); });
             prompt.Add("reload", (args, output) => {
                 var results = fwiManager.LoadFilter();
-                if (results.IsNormal)
+                if (results.State == ResultState.Normal)
                 {
-                    output.WriteLine("[D][I] Load successful");
+                    output.WriteLine("[D][I] Load config successful");
                 }
-                else if (results.HasProblem)
+                else if (results.State == ResultState.HasProblem)
                 {
                     output.WriteLine("[D][W] Something went wrong while loading");
                     foreach (var result in results) output.WriteLine($"  {result}");
                 }
-
             });
             prompt.Add("show", (args, output) =>
             {

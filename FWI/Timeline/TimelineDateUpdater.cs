@@ -47,7 +47,11 @@ namespace FWI
             if (!(initWI == null || initWI is NoWindowInfo))
             {
                 if (end > initWI.Date) Add(initWI);
-                else throw new TimeSeqeunceException($"{end} - {initWI.Date}");
+                else throw new TimeSequenceException()
+                {
+                    Last = end,
+                    Input = initWI.Date,
+                };
             }
         }
 

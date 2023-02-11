@@ -78,7 +78,8 @@ namespace FWIServer
             {
                 if (server.Verbose)
                 {
-                    Program.Out.WriteLine($"[D][Verbose] Log Add: {item}");
+                    Program.Out.WriteLine($"[D][A] Log Added: {item.Name.PadCenter(25)} | {item.Title.Truncate(40)}");
+                    
                 }
             });
         }

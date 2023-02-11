@@ -6,41 +6,40 @@ using System.Text;
 using System.Threading.Tasks;
 using FWI;
 using FWIConnection;
+using FWIConnection.Message;
 
 namespace FWIServer
 {
     class SocketOutputStream : IOutputStream
     {
         readonly Socket socket;
-        readonly List<string> list;
+        readonly StringBuilder builder;
         public SocketOutputStream(Socket socket)
         {
             this.socket = socket;
-            list = new List<string>();
+            builder = new StringBuilder();
         }
         public void Write(string value)
         {
-            list.Add(value);
+            builder.Append(value);
         }
         public void WriteLine(string value)
         {
-            list.Add(value);
-            list.Add("\n");
+            builder.Append(value);
+            builder.Append('\n');
         }
         public void Flush()
         {
-            if (list.Count > 0)
+            if (builder.Length > 0)
             {
-                var bw = new ByteWriter();
-                bw.Write((short)MessageOp.Message);
-
-                foreach (string str in list)
+                var message = new TextMessage()
                 {
-                    bw.Write(str);
-                }
+                    Text = builder.ToString()
+                };
+                var bytes = message.Serialize();
 
-                list.Clear();
-                socket.Send(bw.ToBytes());
+                builder.Clear();
+                socket.Send(bytes);
             }
         }
     }

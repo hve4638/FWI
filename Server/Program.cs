@@ -16,7 +16,7 @@ namespace FWIServer
 {
     static class Program
     {
-        static readonly string Version = "0.5d dev 3";
+        static readonly string Version = "0.6e";
         static readonly DateTime runDateTime = DateTime.Now;
         static public readonly IOutputStream stdOut = new FormatStandardOutputStream();
 
@@ -41,7 +41,16 @@ namespace FWIServer
             Console.WriteLine($"version: {Version}");
 
             Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(Run);
+                .WithParsed((options) => {
+                    if (options.Help)
+                    {
+                        Console.WriteLine("");
+                    }
+                    else
+                    {
+                        Run(options);
+                    }
+                });
         }
 
         static void Run(Options options)

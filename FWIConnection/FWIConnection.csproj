@@ -46,10 +46,21 @@
     <Compile Include="ByteWriter.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="IReceiver.cs" />
+    <Compile Include="Message\AFKMessage.cs" />
+    <Compile Include="Message\DeserializeFailException.cs" />
+    <Compile Include="Message\EchoMessage.cs" />
+    <Compile Include="Message\ISerializableMessage.cs" />
+    <Compile Include="Message\TextMessage.cs" />
+    <Compile Include="Message\NoAFKMessage.cs" />
+    <Compile Include="Message\RequestRankMessage.cs" />
+    <Compile Include="Message\RequestTimelineMessage.cs" />
+    <Compile Include="Message\RequestToBeTargetMessage.cs" />
+    <Compile Include="Message\ResponseToBeTargetMessage.cs" />
+    <Compile Include="Message\ServerCallMessage.cs" />
+    <Compile Include="Message\UpdateWIMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MessageOp.cs" />
     <Compile Include="Server.cs" />
-    <Compile Include="Message\WindowInfoMessage.cs" />
     <Compile Include="WIParser.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

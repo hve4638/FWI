@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace FWIConnection
 {
@@ -32,7 +30,7 @@ namespace FWIConnection
         public void Write(byte[] bytes) => WriteBytes(bytes);
         public void Write(ByteWriter bw)
         {
-            this.WriteBytes(bw.ToBytes());
+            WriteBytes(bw.ToBytes());
         }
 
         public void WriteShort(short num)

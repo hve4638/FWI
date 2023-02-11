@@ -9,6 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FWIClient", "Client\FWIClie
 	ProjectSection(ProjectDependencies) = postProject
 		{0F70BA71-7854-4CBD-828B-892BA67019F7} = {0F70BA71-7854-4CBD-828B-892BA67019F7}
 		{169AEEC7-A761-4974-8216-06C5893B90A2} = {169AEEC7-A761-4974-8216-06C5893B90A2}
+		{79CEC1D7-897B-4B6D-A866-3FFBAA797197} = {79CEC1D7-897B-4B6D-A866-3FFBAA797197}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FWIServer", "Server\FWIServer.csproj", "{299258AD-AE1C-4B35-93D7-B766342C8B06}"
@@ -24,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FWITest", "FWITest\FWITest.
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FWI", "FWI\FWI.csproj", "{0F70BA71-7854-4CBD-828B-892BA67019F7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteConsole", "RemoteConsole\RemoteConsole.csproj", "{79CEC1D7-897B-4B6D-A866-3FFBAA797197}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +54,10 @@ Global
 		{0F70BA71-7854-4CBD-828B-892BA67019F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F70BA71-7854-4CBD-828B-892BA67019F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F70BA71-7854-4CBD-828B-892BA67019F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79CEC1D7-897B-4B6D-A866-3FFBAA797197}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79CEC1D7-897B-4B6D-A866-3FFBAA797197}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79CEC1D7-897B-4B6D-A866-3FFBAA797197}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79CEC1D7-897B-4B6D-A866-3FFBAA797197}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

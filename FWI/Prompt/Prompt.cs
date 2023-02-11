@@ -10,17 +10,15 @@ namespace FWI.Prompt
 {
     public class Prompt
     {
-        private static object _Lock = new object();
-
-        IOutputStream currentOutputStream;
+        private static readonly object _Lock = new object();
         readonly Dictionary<string, Action<PromptArgs, IOutputStream>> commands;
+        readonly Stack<IOutputStream> outputStreamStack;
         Action<PromptArgs, IOutputStream> commandDefault;
         public Prompt()
         {
+            outputStreamStack = new Stack<IOutputStream>();
             commands = new Dictionary<string, Action<PromptArgs, IOutputStream>>();
-            commandDefault = (args, output) => {
-                output.WriteLine("Unknown Command");
-            };
+            commandDefault = (args, output) => output.WriteLine("Unknown Command");
 
             DefaultOutputStream = new StandardOutputStream();
             UnhandleException = false;
@@ -32,25 +30,35 @@ namespace FWI.Prompt
                 }
             });
         }
-
+        
         public bool UnhandleException { get; set; }
         public IOutputStream DefaultOutputStream { get; set; }
-        public Thread LoopAsync()
+        public Thread LoopAsync(IInputStream inputStream = null, IOutputStream outputStream = null)
         {
-            var thread = new Thread(Loop);
+            var thread = new Thread(() => { Loop(inputStream); });
             thread.Start();
 
             return thread;
         }
 
-        public void Loop()
+        public void Loop(IInputStream inputStream = null, IOutputStream outputStream = null)
         {
-            while (true)
+            outputStream = outputStream ?? DefaultOutputStream;
+            outputStreamStack.Push(outputStream);
+            try
             {
-                Console.Write("$ ");
-                var cmd = Console.ReadLine();
-                if (cmd is null || cmd == "") continue;
-                else Execute(cmd);
+                while (true)
+                {
+                    Out.Write("$ ");
+                    Out.Flush();
+                    var cmd = inputStream.Read();
+                    if (cmd is null || cmd == "") continue;
+                    else Execute(cmd);
+                }
+            }
+            finally
+            {
+                outputStreamStack.Pop();
             }
         }
 
@@ -65,7 +73,8 @@ namespace FWI.Prompt
 
             lock(_Lock)
             {
-                currentOutputStream = outputStream ?? DefaultOutputStream;
+                var currentOutputStream = outputStream ?? DefaultOutputStream;
+                outputStreamStack.Push(currentOutputStream);
 
                 try
                 {
@@ -89,7 +98,7 @@ namespace FWI.Prompt
                 }
                 finally
                 {
-                    currentOutputStream = DefaultOutputStream;
+                    outputStreamStack.Pop();
                 }
             }
         }
@@ -138,6 +147,6 @@ namespace FWI.Prompt
             return list;
         }
 
-        public IOutputStream Out => currentOutputStream;
+        public IOutputStream Out => outputStreamStack.LastOrDefault();
     }
 }

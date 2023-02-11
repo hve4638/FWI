@@ -27,5 +27,8 @@ namespace FWIClient
 
         [Option('a', "afk", Default = 10, HelpText = "AFK Time")]
         public int AFK { get; set; }
+
+        [Option('x', "debug", Default = false, HelpText = "Debug Mode")]
+        public bool DebugMode { get; set; }
     }
 }

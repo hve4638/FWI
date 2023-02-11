@@ -18,6 +18,11 @@ namespace FWI.Prompt
         
         public string GetCMD() { return rawArgs[0]; }
 
+        public bool HasArg(int index)
+        {
+            return (index >= 0 && index + 1 < rawArgs.Length);
+        }
+
         public string GetArg(int index, string def = null)
         {
             if (index >= 0 && index + 1 < rawArgs.Length) return rawArgs[index + 1];

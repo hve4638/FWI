@@ -8,8 +8,8 @@ namespace FWI.Results
 {
     public enum ResultState
     {
-        Normal,
-        HasProblem,
-        None,
+        None = 0,
+        Normal = 1,
+        HasProblem = 2,
     }
 }

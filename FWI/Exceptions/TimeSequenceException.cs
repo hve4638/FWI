@@ -6,13 +6,20 @@ using System.Threading.Tasks;
 
 namespace FWI.Exceptions
 {
-    public class TimeSeqeunceException : Exception
+    public class TimeSequenceException : Exception
     {
-        public TimeSeqeunceException() : base() { }
-        public TimeSeqeunceException(string message) : base(message) { }
+        public TimeSequenceException() : base()
+        {
+            Last = DateTime.MinValue;
+            Input = DateTime.MinValue;
+        }
+        public TimeSequenceException(string message) : base(message)
+        {
+            Last = DateTime.MinValue;
+            Input = DateTime.MinValue;
+        }
 
         public DateTime Last { get; set; }
         public DateTime Input { get; set; }
-
     }
 }

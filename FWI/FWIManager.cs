@@ -1,4 +1,5 @@
 ﻿using FWI.Results;
+using Microsoft.SqlServer.Server;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -48,14 +49,22 @@ namespace FWI
             }
         }
 
-        public FWIManager AddWI(WindowInfo wi)
+        /// <exception cref="TimeSequenceException"></exception>
+        public Result<ResultState, string> AddWI(WindowInfo wi)
         {
-            if (ignoreMap.Contains(wi)) return this;
-            aliasMap.Filter(ref wi);
-
-            logger.AddWI(wi);
-            return this;
+            var results = new Result<ResultState, string>(ResultState.Normal);
+            if (ignoreMap.Contains(wi))
+            {
+                results += $"ignoreMap 필터링됨";
+            }
+            else
+            {
+                aliasMap.Filter(ref wi);
+                logger.AddWI(wi);
+            }
+            return results;
         }
+        /// <exception cref="TimeSequenceException"></exception>
         public FWIManager AddEmpty(DateTime date)
         {
             logger.ClearLast(date);
@@ -110,17 +119,18 @@ namespace FWI
             aliasMap.Export(pathDict["alias"]);
             ignoreMap.Export(pathDict["ignore"]);
         }
-        public Results<string> LoadFilter()
+        public Result<ResultState, string> LoadFilter()
         {
-            var results = new Results<string>();
-            
+            var results = new Result<ResultState, string>();
+            results.State = ResultState.Normal;
+
             try
             {
                 aliasMap.Import(pathDict["alias"]);
             }
             catch (FileNotFoundException)
             {
-                results.State = ResultState.HasProblem;
+                results.State |= ResultState.HasProblem;
                 results += $"Import Fail : Alias List '{pathDict["alias"]}'";
             }
 
@@ -130,7 +140,7 @@ namespace FWI
             }
             catch (FileNotFoundException)
             {
-                results.State = ResultState.HasProblem;
+                results.State |= ResultState.HasProblem;
                 results += $"Import Fail : Ignore List '{pathDict["ignore"]}'";
             }
 

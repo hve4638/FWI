@@ -54,7 +54,13 @@ namespace FWIConnection
         static public void ReadText(this ByteReader br, out string value)
         {
             var size = br.ReadInt();
-            value = br.ReadString(size);
+            value = br.ReadString(ref size);
+        }
+
+        static public string ReadText(this ByteReader br)
+        {
+            var size = br.ReadInt();
+            return br.ReadString(ref size);
         }
     }
 }

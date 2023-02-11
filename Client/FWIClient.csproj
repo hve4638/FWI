@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -14,11 +14,18 @@
 
   <ItemGroup>
     <Reference Include="FWI">
-      <HintPath>..\FWI\bin\Debug\FWI.dll</HintPath>
+      <HintPath>..\FWI\bin\Release\FWI.dll</HintPath>
     </Reference>
     <Reference Include="FWIConnection">
       <HintPath>..\FWIConnection\bin\Debug\FWIConnection.dll</HintPath>
     </Reference>
+    <Reference Include="SimpleConnection">
+      <HintPath>..\lib\SimpleConnection.dll</HintPath>
+    </Reference>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;$(SolutionDir)lib\RemoteConsole.exe&quot; &quot;$(TargetDir)&quot;" />
+  </Target>
 
 </Project>

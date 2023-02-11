@@ -39,12 +39,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FWI">
-      <HintPath>..\FWI\bin\Debug\FWI.dll</HintPath>
-    </Reference>
-    <Reference Include="FWIConnection">
-      <HintPath>..\FWIConnection\bin\Debug\FWIConnection.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\MSTest.TestFramework.2.2.7\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.dll</HintPath>
     </Reference>
@@ -98,35 +92,50 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AliasMapTest.cs" />
+    <Compile Include="FWIConnection\BrBwTest.cs" />
+    <Compile Include="FWIConnection\MessageSerializeDebugTest.cs" />
+    <Compile Include="FWIConnection\MessageSerializeTest.cs" />
+    <Compile Include="FWI\AliasMapTest.cs" />
     <Compile Include="Date.cs" />
-    <Compile Include="DateRangeTest.cs" />
-    <Compile Include="DateRankTest.cs" />
-    <Compile Include="FWIManagerTest.cs" />
-    <Compile Include="IgnoreMapTest.cs" />
-    <Compile Include="LazyRequestResultTest.cs" />
+    <Compile Include="FWI\DateRangeTest.cs" />
+    <Compile Include="FWI\Rank\DateRankTest.cs" />
+    <Compile Include="FWI\IgnoreMapTest.cs" />
+    <Compile Include="FWI\LazyRequestResultTest.cs" />
     <Compile Include="Learning\JsonTest.cs" />
     <Compile Include="Learning\ThreadTest.cs" />
     <Compile Include="Learning\LibTest.cs" />
     <Compile Include="Learning\TimeSpanTest.cs" />
-    <Compile Include="MockStreamReader.cs" />
-    <Compile Include="MockStreamTest.cs" />
-    <Compile Include="MockStreamWriter.cs" />
-    <Compile Include="PromptArgsTest.cs" />
-    <Compile Include="PromptTest.cs" />
-    <Compile Include="RankTest.cs" />
+    <Compile Include="FWITest\MockStreamReader.cs" />
+    <Compile Include="FWITest\MockStreamTest.cs" />
+    <Compile Include="FWITest\MockStreamWriter.cs" />
+    <Compile Include="FWI\PromptArgsTest.cs" />
+    <Compile Include="FWI\PromptTest.cs" />
+    <Compile Include="FWI\Rank\RankTest.cs" />
     <Compile Include="Learning\ParsingTest.cs" />
-    <Compile Include="TimelineTest.cs" />
-    <Compile Include="TimelineUpdaterTest.cs" />
-    <Compile Include="WindowInfoTest.cs" />
+    <Compile Include="FWI\StringExtenderTest.cs" />
+    <Compile Include="FWI\Timeline\TimelineTest.cs" />
+    <Compile Include="FWI\Timeline\TimelineUpdaterTest.cs" />
+    <Compile Include="FWI\WindowInfoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SingleLoggerTest.cs" />
+    <Compile Include="FWI\SingleLoggerTest.cs" />
     <Compile Include="Learning\YamlTest.cs" />
-    <Compile Include="FWIConnection\WIParserTest.cs" />
+    <Compile Include="FWIConnection\BrBwExtenderTest.cs" />
+    <Compile Include="FWI\ResultsTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\FWIConnection\FWIConnection.csproj">
+      <Project>{169aeec7-a761-4974-8216-06c5893b90a2}</Project>
+      <Name>FWIConnection</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FWI\FWI.csproj">
+      <Project>{0f70ba71-7854-4cbd-828b-892ba67019f7}</Project>
+      <Name>FWI</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -11,11 +11,12 @@ namespace FWIConnection
     public class Client
     {
         readonly int maximumBufferSize = 8192;
+        private byte[] receiveBuffer;
         IReceiver receiver;
         bool verbose;
-        Socket socket;
-        string ipAddr;
-        int port;
+        readonly Socket socket;
+        readonly string ipAddr;
+        readonly int port;
         bool connected;
 
         public Client(string ipAddr, int port)
@@ -64,16 +65,32 @@ namespace FWIConnection
             }
         }
 
+        public void WaitForReceive()
+        {
+            receiveBuffer = receiveBuffer ?? new byte[maximumBufferSize];
+            try
+            {
+                int size = socket.Receive(receiveBuffer);
+                if (size > 0) receiver.Receive(receiveBuffer, size);
+            }
+            catch (SocketException e)
+            {
+                VerboseWriteLine("Socket Disconnected");
+                VerboseWriteLine("-------------------------------");
+                VerboseWriteLine($"{e}");
+                VerboseWriteLine("-------------------------------");
+            }
+        }
+
         public void ReceiveProgress()
         {
+            receiveBuffer = receiveBuffer ?? new byte[maximumBufferSize];
             try
             {
                 while (true)
                 {
-                    byte[] buff = new byte[maximumBufferSize];
-                    int size = socket.Receive(buff);
-
-                    if (size > 0) receiver.Receive(buff, size);
+                    int size = socket.Receive(receiveBuffer);
+                    if (size > 0) receiver.Receive(receiveBuffer, size);
                 }
             }
             catch (SocketException e)
