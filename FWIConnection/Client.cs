@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System;
+using System.Threading;
 
 namespace FWIConnection
 {
@@ -13,25 +14,24 @@ namespace FWIConnection
         readonly int maximumBufferSize = 8192;
         private byte[] receiveBuffer;
         IReceiver receiver;
-        bool verbose;
         readonly Socket socket;
-        readonly string ipAddr;
-        readonly int port;
-        bool connected;
+        public bool Verbose { get; set; }
+        public string IP { get; private set; }
+        public int Port { get; private set; }
+        public bool Connected => socket.Connected;
 
         public Client(string ipAddr, int port)
         {
             receiver = new DefaultReceiver();
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            this.ipAddr = ipAddr;
-            this.port = port;
-            verbose = false;
-            connected = false;
+            IP = ipAddr;
+            Port = port;
+            Verbose = false;
         }
 
         void VerboseWriteLine(string value)
         {
-            if (verbose) Console.WriteLine(value);
+            if (Verbose) Console.WriteLine(value);
         }
 
         public void SetReceiver(IReceiver receiver)
@@ -41,7 +41,7 @@ namespace FWIConnection
 
         public bool Connect()
         {
-            var endPoint = new IPEndPoint(IPAddress.Parse(ipAddr), 7000);
+            var endPoint = new IPEndPoint(IPAddress.Parse(IP), Port);
             try
             {
                 socket.Connect(endPoint);
@@ -51,7 +51,6 @@ namespace FWIConnection
                 return false;
             }
 
-            connected = true;
             receiver.Connect(socket);
 
             return true;
@@ -59,13 +58,14 @@ namespace FWIConnection
 
         public void WaitForConnect()
         {
-            while (!connected)
+            while (!Connected)
             {
-
+                Thread.Sleep(100);
             }
         }
+        public void WaitForReceive() => BeginReceive();
 
-        public void WaitForReceive()
+        public void BeginReceive()
         {
             receiveBuffer = receiveBuffer ?? new byte[maximumBufferSize];
             try
@@ -82,7 +82,7 @@ namespace FWIConnection
             }
         }
 
-        public void ReceiveProgress()
+        public void WaitForReceiveLoop()
         {
             receiveBuffer = receiveBuffer ?? new byte[maximumBufferSize];
             try
@@ -109,7 +109,6 @@ namespace FWIConnection
 
         public void Disconnect()
         {
-            connected = false;
             try
             {
                 receiver.Disconnect();
@@ -121,8 +120,5 @@ namespace FWIConnection
             }
         }
 
-        public string IP { get { return ipAddr; } }
-        public int Port { get { return port; } }
-        public bool IsConnected { get { return connected; } }
     }
 }

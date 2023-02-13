@@ -1,25 +1,21 @@
-﻿using System.Text;
-using FWIConnection;
-using FWIConnection.Message;
-using System.Threading;
-using CommandLine;
-using System.Diagnostics;
-using FWI;
+﻿using FWI;
+using FWI.Results;
 using FWI.Prompt;
-using System.Net.Sockets;
-using System.Reflection;
+using CommandLine;
+using System.Windows.Forms;
 
 namespace FWIClient
 {
     static public class Program
     {
-        public static Prompt? CurrentPrompt { get; set; }
-        public static readonly string Version = "0.6e";
-        public static readonly StandardInputStream stdIn = new();
-        public static readonly FormatStandardOutputStream stdOut = new();
-        public static bool VerboseMode { get; set; }
-        public static IOutputStream Out { get; private set; }
+        public const string PATH_CONFIG = "config.ini";
+        public static readonly string Version = "0.7";
+        public static FormController FormControl { get; private set; }
+        private static RemoteConsoleControl ConsoleControl { get; set; }
+        public static IInputStream StdIn { get; private set; }
+        public static IOutputStream StdOut { get; private set; }
         public static IInputStream In { get; private set; }
+        public static IOutputStream Out { get; private set; }
         public static IOutputStream VerboseOut
         {
             get {
@@ -27,108 +23,224 @@ namespace FWIClient
                 else return NullOutputStream.Instance;
             }
         }
+        public static bool AutoReload { get; set; }
+        public static bool VerboseMode { get; set; }
+        public static Prompt? CurrentPrompt { get; set; }
         public static ClientRunner? Runner { get; private set; }
+        static Config config;
+
+        public static bool ConsoleConnected() => ConsoleControl.Connected();
+        public static bool ConsoleConnected(int id) => ConsoleControl.Connected(id);
 
         static Program()
         {
-            Version = "0.6e";
-            Out = stdOut;
-            In = stdIn;
+            FormControl = new FormController();
+            ConsoleControl = new RemoteConsoleControl();
+
+            StdIn = new StandardInputStream();
+            StdOut = new FormatOutputStream(new StandardOutputStream());
+            In = StdIn;
+            Out = StdOut;
+            AutoReload = false;
+
+            config = new Config();
+
+            config.serverIP = "127.0.0.1";
+            config.serverPort = "7000";
+            config.afkTime = "10";
+            config.autoReload = true;
+            config.openConsoleWhenStartup = false;
+            config.debug = false;
         }
 
         [STAThread]
         static void Main(string[] args)
         {
-            Console.Title = "FWIClient";
-            Console.WriteLine($"FWI Client");
-            Console.WriteLine($"version: {Version}");
-            //ApplicationConfiguration.Initialize();
-            //Application.Run(new MainForm());
+            ApplicationConfiguration.Initialize();
+
+            var exist = config.Read(PATH_CONFIG);
+            if (!exist) config.Write(PATH_CONFIG);
 
             Parser.Default.ParseArguments<Options>(args)
                 .WithParsed(Run);
         }
 
-        static public void RunPromptOnRemoteConsole()
+        public static Config GetLastConfig() => config;
+        public static Result<ResultState, string> ChangeConfig(Config config)
         {
-            if (CurrentPrompt is null) return;
-            OpenRemoteConsole();
+            var result = new Result<ResultState, string>(ResultState.Normal);
+            if (!int.TryParse(config.afkTime, out _))
+            {
+                result.State = ResultState.HasProblem;
+                result += "잘못된 값: AFK Time";
+            }
 
-            Task task = new(() => {
-                try
-                {
-                    CurrentPrompt.Loop(In, Out);
-                }
-                catch (RemoteIODisconnectException)
-                {
-                    Out.WriteLine("prompt disconnected");
-                }
-            });
-            task.Start();
+            if (!int.TryParse(config.serverPort, out _))
+            {
+                result.State = ResultState.HasProblem;
+                result += "잘못된 값: port";
+            }
+            
+            if (result.State == ResultState.Normal)
+            {
+                Program.config = config;
+                config.Write(PATH_CONFIG);
+            }
+
+            return result;
         }
 
-        static public void OpenRemoteConsole()
+        public static void Reset()
         {
-            RemoteConsole.Open(7010);
-            var server = new SimpleConnection.Server(7010);
-            server.Accept();
-
-            var onDisconnect = () => {
-                In = stdIn;
-                Out = stdOut;
-            };
-
-            var remoteIn = new RemoteInputStream(server);
-            var remoteOut = new RemoteOutputStream(server);
-            remoteIn.OnDisconnect = onDisconnect;
-            remoteOut.OnDisconnect = onDisconnect;
-
-            remoteIn.ThrowWhenDisconnect = true;
-
-            In = remoteIn;
-            Out = remoteOut;
+            In = StdIn;
+            Out = StdOut;
         }
 
         static private void Run(Options options)
         {
-            Out.WriteLine($"Connection {options.IP}:{options.Port}");
-            Out.WriteLine($"Verbose : {options.Verbose}");
-            Out.WriteLine($"AFK Time : {options.AFK}min");
+            try
+            {
+                options.IP = config.serverIP;
+                options.Port = int.Parse(config.serverPort);
+                options.AutoReload = config.autoReload;
+                options.DebugMode = config.debug;
+                options.AFK = int.Parse(config.afkTime);
+                options.Target = !config.observerMode;
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Error occur while parsing config.ini");
+                Exit();
+                return;
+            }
+            catch (ArgumentNullException)
+            {
+                MessageBox.Show("Error occur while parsing config.ini");
+                Exit();
+                return;
+            }
+
+            if (config.openConsoleWhenStartup)
+            {
+                var id = OpenConsole();
+                while (!ConsoleConnected(id))
+                {
+
+                }
+                StdOut.WriteLine("RemoteConsole 연결됨");
+                Out.WriteLine("연결됨");
+            }
 
             if (options.Target) Out.WriteLine($"Mode: Target");
             else Out.WriteLine($"Mode: Observe");
             Out.Flush();
 
-            VerboseMode = options.Verbose;
 
-            Out.WriteLine("연결중...");
-            Out.Flush();
-            var task = new Task(() => { RunClient(options); });
+
+            VerboseMode = options.Verbose;
+            AutoReload = options.AutoReload;
+
+            var form = new MainForm();
+            var task = new Task(() => {
+                var reload = false;
+                do
+                {
+                    Out.WriteLine("연결중...");
+                    Out.Flush();
+                    var result = RunClient(options);
+
+                    switch(result)
+                    {
+                        case RunnerResult.ConnectionFailure:
+                            reload = AutoReload;
+                            if (reload)
+                            {
+                                form.ShowTip("연결 실패", "재시도 중...");
+                                Thread.Sleep(500);
+                            }
+                            break;
+
+                        case RunnerResult.Disconnected:
+                            reload = AutoReload;
+                            break;
+
+                        case RunnerResult.NormalTerminate:
+                            reload = false;
+                            break;
+                    }
+                }
+                while (reload);
+
+                if (!form.IsDisposed) form.Close();
+            });
             task.Start();
-            task.Wait();
+
+            Application.Run(form);
         }
 
-        static private void RunClient(Options options)
+        static private RunnerResult RunClient(Options options)
         {
-            var client = new Client(options.IP, options.Port);
+            var client = new FWIConnection.Client(options.IP, options.Port);
             var manager = new ClientManager(
                 client : client,
                 debugMode : options.DebugMode
             );
+
             var runner = new ClientRunner(
                 options: options,
                 client: client,
                 manager: manager
             );
-            runner.Run();
-
-            Exit();
+            return runner.Run();
         }
 
         static public void Exit()
         {
             if (Application.MessageLoop == true) Application.Exit();
             else Environment.Exit(1);
+        }
+
+        static public void RunPromptOnRemoteConsole()
+        {
+            if (CurrentPrompt is null) return;
+
+            if (!ConsoleConnected())
+            {
+                OpenConsole(
+                    onConnect: () =>
+                    {
+                        try
+                        {
+                            CurrentPrompt.Loop(In, Out);
+                        }
+                        catch (RemoteIODisconnectException)
+                        {
+                            Out.WriteLine("prompt disconnected");
+                        }
+                    }
+                );
+            }
+        }
+
+        static public int OpenConsole(Action? onConnect = null, Action? onDisconnect = null)
+        {
+            return ConsoleControl.Open(
+                onConnect: (server) =>
+                {
+                    var remoteIn = new RemoteInputStream(server);
+                    var remoteOut = new FormatOutputStream(new RemoteOutputStream(server));
+                    remoteIn.ThrowWhenDisconnect = true;
+                    In = remoteIn;
+                    Out = remoteOut;
+                    onConnect?.Invoke();
+                },
+                onDisconnect: () =>
+                {
+                    In = StdIn;
+                    Out = StdOut;
+                    onDisconnect?.Invoke();
+                }
+            );
         }
     }
 }

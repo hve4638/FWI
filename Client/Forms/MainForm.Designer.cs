@@ -31,38 +31,48 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
-            this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.showPromptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.showConsoleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openConfigToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.contextMenuStrip.SuspendLayout();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // notifyIcon
             // 
-            this.notifyIcon.ContextMenuStrip = this.contextMenuStrip;
+            this.notifyIcon.ContextMenuStrip = this.contextMenuStrip1;
             this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
-            this.notifyIcon.Text = "notifyIcon1";
+            this.notifyIcon.Text = "FWI";
             this.notifyIcon.Visible = true;
+            this.notifyIcon.DoubleClick += new System.EventHandler(this.notifyIcon_DoubleClick);
             // 
-            // contextMenuStrip
+            // contextMenuStrip1
             // 
-            this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showPromptToolStripMenuItem,
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showConsoleToolStripMenuItem,
+            this.openConfigToolStripMenuItem,
             this.exitToolStripMenuItem});
-            this.contextMenuStrip.Name = "contextMenuStrip";
-            this.contextMenuStrip.Size = new System.Drawing.Size(149, 48);
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(152, 70);
             // 
-            // showPromptToolStripMenuItem
+            // showConsoleToolStripMenuItem
             // 
-            this.showPromptToolStripMenuItem.Name = "showPromptToolStripMenuItem";
-            this.showPromptToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
-            this.showPromptToolStripMenuItem.Text = "Show prompt";
-            this.showPromptToolStripMenuItem.Click += new System.EventHandler(this.showPromptToolStripMenuItem_Click);
+            this.showConsoleToolStripMenuItem.Name = "showConsoleToolStripMenuItem";
+            this.showConsoleToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.showConsoleToolStripMenuItem.Text = "Show Console";
+            this.showConsoleToolStripMenuItem.Click += new System.EventHandler(this.showPromptToolStripMenuItem_Click);
+            // 
+            // openConfigToolStripMenuItem
+            // 
+            this.openConfigToolStripMenuItem.Name = "openConfigToolStripMenuItem";
+            this.openConfigToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+            this.openConfigToolStripMenuItem.Text = "Open Config";
+            this.openConfigToolStripMenuItem.Click += new System.EventHandler(this.openConfigToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -70,10 +80,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.BackColor = System.Drawing.SystemColors.ScrollBar;
+            this.ClientSize = new System.Drawing.Size(516, 457);
             this.Name = "MainForm";
-            this.Text = "Form1";
-            this.contextMenuStrip.ResumeLayout(false);
+            this.Text = "속성";
+            this.Load += new System.EventHandler(this.MainForm_Load);
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -81,8 +93,9 @@
         #endregion
 
         private NotifyIcon notifyIcon;
-        private ContextMenuStrip contextMenuStrip;
-        private ToolStripMenuItem showPromptToolStripMenuItem;
+        private ContextMenuStrip contextMenuStrip1;
+        private ToolStripMenuItem showConsoleToolStripMenuItem;
+        private ToolStripMenuItem openConfigToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem;
     }
 }

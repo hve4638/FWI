@@ -10,21 +10,17 @@ using System.Security.Policy;
 using FWI;
 using FWIConnection.Message;
 using System.Threading;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 
 namespace FWIClient
 {
     public class ClientManager
     {
         private readonly Client client;
-        private CancellationTokenSource? afkCancelToken;
-        private CancellationTokenSource? receiveCancelToken;
+        public ClientTask Tasker { get; set; }
         public ClientSender Sender { get; private set; }
         readonly ToBeTargetManager toBeTargetManager;
-        public bool IsAFK
-        {
-            get => Sender.IsAFK;
-            set { Sender.IsAFK = value; }
-        }
+        public bool Closed { get; private set; }
         public bool DebugMode {
             get => Sender.DebugMode;
             set { Sender.DebugMode = value; }
@@ -35,16 +31,18 @@ namespace FWIClient
             this.client = client;
             Sender = new ClientSender(client);
             DebugMode = debugMode;
-            IsAFK = false;
             toBeTargetManager = new();
-        }
+            Closed = false;
 
+            Tasker = new(client: client, sender: Sender);
+        }
+        
         public RequestResult<string> RequestToBeTarget()
         {
             var DeniedResult = (string message) => new RequestResult<string>(RequestResultState.Denied, message);
 
             if (!Sender.Connected) return DeniedResult("내부 요청 거절 - 연결되지 않음");
-            else if (Sender.IsTarget) return DeniedResult("내부 요청 거절 - 권한이 존재");
+            else if (Sender.IsTarget) return DeniedResult("내부 요청 거절 - 중복 요청 (권한 존재)");
             else
             {
                 toBeTargetManager.Reset();
@@ -85,68 +83,13 @@ namespace FWIClient
             return results;
         }
 
-        public Task ReceiveFromServerAsync()
-        {
-            var cancelToken = new CancellationTokenSource();
-
-            receiveCancelToken?.Cancel();
-            receiveCancelToken = cancelToken;
-
-            var task = new Task(() =>
+        public void Close() {
+            if (!Closed)
             {
-                while (!cancelToken.IsCancellationRequested)
-                {
-                    client.WaitForReceive();
-                }
-            });
-            task.Start();
-
-            return task;
-        }
-
-        public Task CheckAFKAsync(uint afkTime)
-        {
-            var cancelToken = new CancellationTokenSource();
-
-            afkCancelToken?.Cancel();
-            afkCancelToken = cancelToken;
-
-            var task = new Task(() => {
-                bool afk = false;
-                int noAFKTime = 0;
-                int sleepTime = 750;
-
-                while (!cancelToken.IsCancellationRequested)
-                {
-                    var current = AFKChecker.GetLastInputTime();
-
-                    if (afk)
-                    {
-                        if (current == 0) noAFKTime += sleepTime;
-                        else noAFKTime = 0;
-
-                        if (noAFKTime >= 2000)
-                        {
-                            Program.Out.WriteLine($"[D][I] No longer AFK");
-                            Sender.SendNoAFK(DateTime.Now);
-                            afk = false;
-                        }
-                    }
-                    else if (!IsAFK && current >= afkTime)
-                    {
-                        Program.Out.WriteLine($"[D][I] Now AFK");
-                        var now = DateTime.Now;
-                        var from = now - new TimeSpan(0, 0, (int)afkTime);
-                        Sender.SendAFK(from, now);
-                        afk = true;
-                        noAFKTime = 0;
-                    }
-                    Thread.Sleep(sleepTime);
-                }
-            }, cancelToken.Token);
-            task.Start();
-
-            return task;
+                Closed = true;
+                client.Disconnect();
+                Tasker.Clear();
+            }
         }
     }
 }

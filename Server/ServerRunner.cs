@@ -120,7 +120,7 @@ namespace FWIServer
             });
             prompt.DefaultOutputStream = Program.Out;
 
-            return prompt.LoopAsync();
+            return prompt.LoopAsync(Program.In, Program.Out);
         }
 
         public void RunChecker()

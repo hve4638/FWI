@@ -43,6 +43,12 @@ namespace FWIClient
                         break;
                 }
             });
+
+            prompt.Add("info", (args, output) => {
+                output.WriteLine("FWIClient");
+                output.WriteLine($"Version: {Program.Version}");
+                output.WriteLine($"IsTarget: {manager.Sender.IsTarget}");
+            });
             
             prompt.Add("echo", (args) => {
                 var str = args.GetArgs();

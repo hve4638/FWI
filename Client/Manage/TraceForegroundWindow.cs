@@ -12,6 +12,29 @@ namespace FWIClient
 {
     class TraceForegroundWindow
     {
+        string lastName;
+        string lastTitle;
+        public TraceForegroundWindow()
+        {
+            lastName = "";
+            lastTitle = "";
+        }
+        
+        public WindowInfo TrackingFWI()
+        {
+            while(true)
+            {
+                var wi = WICapture.GetForeground();
+
+                if (wi.Name != lastName || wi.Title != lastTitle)
+                {
+                    lastName = wi.Name;
+                    lastTitle = wi.Title;
+                    return wi;
+                }
+            }
+        }
+
         static public void Trace(Action<WindowInfo> onTrace, int traceInterval = 1000)
         {
             string pName = "", pTitle = "";

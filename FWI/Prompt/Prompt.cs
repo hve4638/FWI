@@ -14,15 +14,17 @@ namespace FWI.Prompt
         readonly Dictionary<string, Action<PromptArgs, IOutputStream>> commands;
         readonly Stack<IOutputStream> outputStreamStack;
         Action<PromptArgs, IOutputStream> commandDefault;
+        public bool UnhandleException { get; set; }
+        public IOutputStream DefaultOutputStream { get; set; }
+
         public Prompt()
         {
             outputStreamStack = new Stack<IOutputStream>();
             commands = new Dictionary<string, Action<PromptArgs, IOutputStream>>();
-            commandDefault = (args, output) => output.WriteLine("Unknown Command");
-
             DefaultOutputStream = new StandardOutputStream();
             UnhandleException = false;
 
+            commandDefault = (args, output) => output.WriteLine("Unknown Command");
             Add("help", (_) => {
                 foreach(var cmd in GetCommandList())
                 {
@@ -31,8 +33,6 @@ namespace FWI.Prompt
             });
         }
         
-        public bool UnhandleException { get; set; }
-        public IOutputStream DefaultOutputStream { get; set; }
         public Thread LoopAsync(IInputStream inputStream = null, IOutputStream outputStream = null)
         {
             var thread = new Thread(() => { Loop(inputStream); });
@@ -49,11 +49,11 @@ namespace FWI.Prompt
             {
                 while (true)
                 {
-                    Out.Write("$ ");
-                    Out.Flush();
+                    outputStream.Write("$ ");
+                    outputStream.Flush();
                     var cmd = inputStream.Read();
                     if (cmd is null || cmd == "") continue;
-                    else Execute(cmd);
+                    else Execute(cmd, outputStream);
                 }
             }
             finally
@@ -69,7 +69,10 @@ namespace FWI.Prompt
 
             Action<PromptArgs, IOutputStream> action;
             if (commands.ContainsKey(first)) action = commands[first];
-            else action = commandDefault;
+            else
+            {
+                action = commandDefault;
+            }
 
             lock(_Lock)
             {

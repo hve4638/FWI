@@ -119,11 +119,13 @@ namespace FWIServer
                 }
                 catch (TimeSequenceException e)
                 {
+                    results += SetAFK(e.Last + new TimeSpan(0,0,1));
+
                     var result = new Result<ServerResultState, string>(ServerResultState.NonFatalIssue);
                     result += "TimeSeqeunce 충돌";
                     result += $"Last - {e.Last}";
                     result += $"Input - {e.Input}";
-                    result += "처리 - 무시됨";
+                    result += "처리 - 충돌 시간 이후로 AFK 시간 조정";
 
                     results += result;
                 }

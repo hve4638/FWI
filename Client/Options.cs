@@ -10,7 +10,7 @@ namespace FWIClient
 {
     public class Options
     {
-        [Option('p', "port", Required = false, Default = 7000, HelpText = "Destination Port")]
+        [Option('p', "port", Required = false, Default = 7001, HelpText = "Destination Port")]
         public int Port { get; set; }
 
         [Option('d', "dest", Default = "127.0.0.1", HelpText = "Destination IP Address")]
@@ -18,9 +18,6 @@ namespace FWIClient
 
         [Option('v', "verbose", Default = false, HelpText = "Prints all messages to standard output.")]
         public bool Verbose { get; set; }
-
-        [Option('b', "background", Default = false, HelpText = "Running on background.")]
-        public bool Background { get; set; }
 
         [Option('t', "target", Default = false, HelpText = "Target")]
         public bool Target { get; set; }
@@ -30,5 +27,8 @@ namespace FWIClient
 
         [Option('x', "debug", Default = false, HelpText = "Debug Mode")]
         public bool DebugMode { get; set; }
+
+        [Option('a', "autoreload", Default = false, HelpText = "auto reload")]
+        public bool AutoReload { get; set; }
     }
 }

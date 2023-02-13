@@ -18,51 +18,64 @@ namespace FWIClient
         readonly Client client;
         readonly bool targetMode;
         readonly uint afkTime;
-        Threads threads;
 
         public ClientRunner(Options options, Client client, ClientManager manager)
         {
-            threads = new Threads();
             targetMode = options.Target;
             afkTime = (uint)(options.AFK * 60);
             this.manager = manager;
             this.client = client;
         }
 
-        public void Run()
+        public RunnerResult Run()
         {
-            threads.Clear();
+            RunnerResult? result = null;
             client.SetReceiver(new Receiver(manager: manager));
+            InitializePrompt();
 
-            var prompt = new Prompt();
-            InitializePrompt(prompt);
-            Program.CurrentPrompt = prompt;
+            bool wait = true;
 
-            var connectResult = TryConnect(5);
-            if (connectResult)
+            var task = new Task(() =>
             {
-                Program.Out.WriteLine($"[D][I] Connect: {client.IP}:{client.Port}");
+                Program.Out.WriteLine($"[D][I] 연결 시도...");
+                var connectResult = TryConnect(5);
+                if (connectResult)
+                {
+                    Program.Out.WriteLine($"[D][A] 연결됨 - {client.IP}:{client.Port}");
+
+                    manager.Tasker.CheckAFK(afkTime);
+                    manager.Tasker.BeginReceive();
+                    manager.Tasker.CheckConnected(
+                        onDisconnect: () => {
+                            Program.Out.WriteLine("[D][A] 연결이 종료되었습니다");
+
+                            result = RunnerResult.Disconnected;
+                            wait = false;
+                        }
+                    );
+
+                    if (targetMode) RequestToBeTarget();
+
+                    if (Program.ConsoleConnected())
+                    {
+                        Program.RunPromptOnRemoteConsole();
+                    }
+                }
+                else
+                {
+                    Program.Out.WriteLine("[D][A] 연결에 실패했습니다");
+
+                    result = RunnerResult.ConnectionFailure;
+                    wait = false;
+                }
                 Program.Out.Flush();
+            });
+            task.Start();
 
-                manager.CheckAFKAsync(afkTime);
-                
-                Program.RunPromptOnRemoteConsole();
+            while (wait) Thread.Sleep(300);
+            manager.Close();
 
-                if (targetMode) prompt.Execute("rt");
-                try
-                {
-                    client.ReceiveProgress();
-                }
-                finally
-                {
-                    threads.Interrupt();
-                }
-            }
-            else
-            {
-                Program.Out.WriteLine("[D][I] 연결에 실패했습니다");
-            }
-            Program.Out.Flush();
+            return result ?? RunnerResult.NormalTerminate;
         }
 
         public bool TryConnect(int tryCount = 1)
@@ -76,88 +89,31 @@ namespace FWIClient
 
         public void RequestToBeTarget(int interval = 1000)
         {
-            var thread = new Thread(
-                () => TraceForegroundWindow.Trace(
-                    onTrace: (wi) =>
-                    {
-                        if (manager.IsAFK) return;
-
-                        manager.Sender.SendWI(wi);
-                    },
-                    traceInterval: interval
-                )
-            );
-
             manager.RequestToBeTarget()
                 .WithAccepted((str) =>
                 {
                     Program.Out.WriteLine("[D][I] Target 지정됨");
-                    thread.Start();
+                    manager.Tasker.TrackingFWI(interval);
                 })
                 .WithDenied((str) => {
                     Program.Out.WriteLine("[D][I] Target 요청 실패");
                     Program.Out.WriteLine($" 사유 : {str}");
                 });
-
-            threads += thread;
         }
 
-        public void InitializePrompt(Prompt prompt)
+        public void InitializePrompt()
         {
+            var prompt = new Prompt();
             var promptInitializer = new PromptInitializer(client, manager);
             promptInitializer.Init(prompt);
             prompt.DefaultOutputStream = Program.Out;
+            Program.CurrentPrompt = prompt;
 
             prompt.Add("rt", (args, output) =>
             {
                 output.WriteLine("[D][I] Target 요청");
                 RequestToBeTarget();
             });
-        }
-
-        public void RunAFKChecker()
-        {
-            var thread = new Thread(() => {
-                bool afk = false;
-                int noAFKTime = 0;
-                int sleepTime = 750;
-
-                while (true)
-                {
-                    var current = AFKChecker.GetLastInputTime();
-
-                    if (afk)
-                    {
-                        if (current == 0) noAFKTime += sleepTime;
-                        else noAFKTime = 0;
-
-                        if (noAFKTime >= 2000)
-                        {
-                            Program.Out.WriteLine($"[D][I] No longer AFK");
-                            manager.Sender.SendNoAFK(DateTime.Now);
-                            afk = false;
-                        }
-                    }
-                    else if (!manager.IsAFK && current >= afkTime)
-                    {
-                        Program.Out.WriteLine($"[D][I] Now AFK");
-                        var now = DateTime.Now;
-                        var from = now - new TimeSpan(0, 0, (int)afkTime);
-                        manager.Sender.SendAFK(from, now);
-                        afk = true;
-                        noAFKTime = 0;
-                    }
-                    Thread.Sleep(sleepTime);
-                }
-            });
-            thread.Start();
-
-            threads += thread;
-        }
-
-        public void RunReceiver()
-        {
-
         }
     }
 }
