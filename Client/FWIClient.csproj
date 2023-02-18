@@ -15,12 +15,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="FWI">
-      <HintPath>..\FWI\bin\Release\FWI.dll</HintPath>
-    </Reference>
-    <Reference Include="FWIConnection">
-      <HintPath>..\FWIConnection\bin\Debug\FWIConnection.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\FWIConnection\FWIConnection.csproj" />
+    <ProjectReference Include="..\FWI\FWI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="SimpleConnection">
       <HintPath>..\lib\SimpleConnection.dll</HintPath>
     </Reference>

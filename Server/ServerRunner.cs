@@ -1,11 +1,6 @@
 ﻿using FWI;
 using FWI.Prompt;
 using FWIConnection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FWIServer
 {
@@ -48,7 +43,7 @@ namespace FWIServer
 
         public void Run()
         {
-            RunManager();
+            InitializeManager();
             RunPrompt();
             RunChecker();
 
@@ -56,7 +51,7 @@ namespace FWIServer
             thread.Join();
         }
 
-        public void RunManager()
+        public void InitializeManager()
         {
             fwiManager.SetPath(pathDict);
             fwiManager.LoadFilter();
@@ -79,7 +74,6 @@ namespace FWIServer
                 if (server.Verbose)
                 {
                     Program.Out.WriteLine($"[D][A] Log Added: {item.Name.PadCenter(25)} | {item.Title.Truncate(40)}");
-                    
                 }
             });
         }
@@ -125,14 +119,15 @@ namespace FWIServer
 
         public void RunChecker()
         {
-
-            var alertChecker = new IntervalThread(() => {
-                if (!serverManager.HasTarget)
-                {
-                    Program.Out.WriteLine("[D][A] 현재 Target 클라이언트가 없습니다.");
+            var alertChecker = new IntervalThread(
+                () => {
+                    if (!serverManager.HasTarget)
+                    {
+                        Program.Out.WriteLine("[D][A] 현재 Target 클라이언트가 없습니다.");
+                    }
                 }
-            });
-            alertChecker.Start(new TimeSpan(0, 5, 0));
+            );
+            alertChecker.Start(new TimeSpan(0,5,0), 5000);
         }
     }
 }

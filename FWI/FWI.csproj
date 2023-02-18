@@ -87,7 +87,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DateTimeParser.cs" />
     <Compile Include="Exceptions\ExceptionHandler.cs" />
     <Compile Include="IntervalThread.cs" />
     <Compile Include="AliasManager.cs" />

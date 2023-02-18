@@ -48,6 +48,9 @@
     <Compile Include="IReceiver.cs" />
     <Compile Include="Message\AFKMessage.cs" />
     <Compile Include="Message\DeserializeFailException.cs" />
+    <Compile Include="Message\ResponseRankMessage.cs" />
+    <Compile Include="Message\ResponseEchoMessage.cs" />
+    <Compile Include="Message\RequestEchoMessage.cs" />
     <Compile Include="Message\EchoMessage.cs" />
     <Compile Include="Message\ISerializableMessage.cs" />
     <Compile Include="Message\TextMessage.cs" />

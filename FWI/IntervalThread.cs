@@ -11,7 +11,7 @@ namespace FWI
     public class IntervalThread
     {
         Thread thread;
-        Action action;
+        readonly Action action;
 
         public IntervalThread(Action action)
         {
@@ -19,7 +19,7 @@ namespace FWI
             this.action = action;
         }
 
-        public void Start(TimeSpan interval)
+        public void Start(TimeSpan interval, int checkInterval = 100)
         {
             Stop();
 
@@ -34,6 +34,7 @@ namespace FWI
 
                         action();
                     }
+                    Thread.Sleep(checkInterval);
                 }
             });
             thread.Start();

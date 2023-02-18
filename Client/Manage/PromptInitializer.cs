@@ -79,11 +79,6 @@ namespace FWIClient
 
                 manager.Sender.SendServerCall(cmd);
             });
-
-            prompt.Add("request", (args, output) =>
-            {
-                output.WriteLine("request target");
-            });
         }
     }
 }

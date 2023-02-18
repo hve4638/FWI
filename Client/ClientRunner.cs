@@ -43,11 +43,14 @@ namespace FWIClient
                 {
                     Program.Out.WriteLine($"[D][A] 연결됨 - {client.IP}:{client.Port}");
 
+                    Program.CurrentForm?.SetTitle($"Connected [{client.IP}:{client.Port}]");
+
                     manager.Tasker.CheckAFK(afkTime);
                     manager.Tasker.BeginReceive();
                     manager.Tasker.CheckConnected(
                         onDisconnect: () => {
                             Program.Out.WriteLine("[D][A] 연결이 종료되었습니다");
+                            Program.CurrentForm?.SetTitle($"Disconnected");
 
                             result = RunnerResult.Disconnected;
                             wait = false;
@@ -64,6 +67,7 @@ namespace FWIClient
                 else
                 {
                     Program.Out.WriteLine("[D][A] 연결에 실패했습니다");
+                    Program.CurrentForm?.SetTitle($"Disconnected");
 
                     result = RunnerResult.ConnectionFailure;
                     wait = false;
@@ -100,7 +104,7 @@ namespace FWIClient
                     Program.Out.WriteLine($" 사유 : {str}");
                 });
         }
-
+        
         public void InitializePrompt()
         {
             var prompt = new Prompt();

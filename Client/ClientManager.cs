@@ -88,7 +88,7 @@ namespace FWIClient
             {
                 Closed = true;
                 client.Disconnect();
-                Tasker.Clear();
+                Tasker.CancelAll();
             }
         }
     }

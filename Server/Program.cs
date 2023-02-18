@@ -16,11 +16,10 @@ namespace FWIServer
 {
     static class Program
     {
-        static readonly string Version = "0.7";
+        static readonly string Version = "0.7b";
         static readonly DateTime runDateTime = DateTime.Now;
         static public readonly IInputStream stdIn = new StandardInputStream();
         static public readonly IOutputStream stdOut = new FormatStandardOutputStream();
-
         static public TimeSpan Elapsed => (DateTime.Now - runDateTime);
         static public bool VerboseMode { get; set; }
         static public IInputStream In => stdIn;

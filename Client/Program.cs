@@ -9,7 +9,7 @@ namespace FWIClient
     static public class Program
     {
         public const string PATH_CONFIG = "config.ini";
-        public static readonly string Version = "0.7";
+        public static readonly string Version = "0.7b";
         public static FormController FormControl { get; private set; }
         private static RemoteConsoleControl ConsoleControl { get; set; }
         public static IInputStream StdIn { get; private set; }
@@ -26,8 +26,12 @@ namespace FWIClient
         public static bool AutoReload { get; set; }
         public static bool VerboseMode { get; set; }
         public static Prompt? CurrentPrompt { get; set; }
+        public static MainForm? CurrentForm { get; set; }
         public static ClientRunner? Runner { get; private set; }
         static Config config;
+
+        public static CloseReason FormCloseReason { get; set; }
+        public static bool FormNormalExit { get; set; }
 
         public static bool ConsoleConnected() => ConsoleControl.Connected();
         public static bool ConsoleConnected(int id) => ConsoleControl.Connected(id);
@@ -109,13 +113,13 @@ namespace FWIClient
             }
             catch (FormatException)
             {
-                MessageBox.Show("Error occur while parsing config.ini");
+                MessageBox.Show("Error occur while parsing config.ini (parsing exception)");
                 Exit();
                 return;
             }
             catch (ArgumentNullException)
             {
-                MessageBox.Show("Error occur while parsing config.ini");
+                MessageBox.Show("Error occur while parsing config.ini (null exception)");
                 Exit();
                 return;
             }
@@ -135,12 +139,9 @@ namespace FWIClient
             else Out.WriteLine($"Mode: Observe");
             Out.Flush();
 
-
-
             VerboseMode = options.Verbose;
             AutoReload = options.AutoReload;
 
-            var form = new MainForm();
             var task = new Task(() => {
                 var reload = false;
                 do
@@ -155,7 +156,7 @@ namespace FWIClient
                             reload = AutoReload;
                             if (reload)
                             {
-                                form.ShowTip("연결 실패", "재시도 중...");
+                                CurrentForm?.ShowTip("연결 실패", "재시도 중...");
                                 Thread.Sleep(500);
                             }
                             break;
@@ -171,11 +172,20 @@ namespace FWIClient
                 }
                 while (reload);
 
-                if (!form.IsDisposed) form.Close();
+                CurrentForm?.TryNormalClose();
             });
             task.Start();
 
-            Application.Run(form);
+            while(true)
+            {
+                CurrentForm = new();
+                Application.Run(CurrentForm);
+                CurrentForm = null;
+
+                if (FormNormalExit) break;
+                else if (FormCloseReason == CloseReason.UserClosing) continue;
+                else break;
+            }
         }
 
         static private RunnerResult RunClient(Options options)

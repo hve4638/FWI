@@ -87,6 +87,7 @@ namespace FWI
         {
             return $"{date:yyyyMMddhhmmss}|{StringEncode(name)}|{StringEncode(title)}|{StringEncode(alias ?? "")}";
         }
+
         static public WindowInfo Decode(string encoded)
         {
             try

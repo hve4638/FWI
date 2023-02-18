@@ -25,6 +25,16 @@
         ServerCall = 98,
         Debug = 99,
 
+        RequestAlive = 100,
+        ResponseAlive = 200,
+
+        RequestEcho = 101,
+        ResponseEcho = 201,
+
+        //RequestRank = 111,
+        ResponseRank = 211,
+
+
         //Obsolete
         UpdateCurrentWI = 1001,
         RequestPrivillegeTrace = 1002,

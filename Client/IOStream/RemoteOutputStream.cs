@@ -21,21 +21,20 @@ namespace FWIClient
         }
         public void Write(string value)
         {
-            builder.Append(value);
+            if (!server.Connected) Disconnect();
+            else if(value.Length > 0)
+            {
+                server.Send(value);
+                builder.Clear();
+            }
         }
         public void WriteLine(string value)
         {
-            builder.Append(value);
-            builder.Append('\n');
+            Write($"{value}\n");
         }
         public void Flush()
         {
-            if (!server.Connected) Disconnect();
-            else if (builder.Length > 0)
-            {
-                server.Send(builder.ToString());
-                builder.Clear();
-            }
+
         }
     }
 }

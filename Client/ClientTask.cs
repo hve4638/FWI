@@ -19,10 +19,7 @@ namespace FWIClient
             this.client = client;
             Sender = sender;
         }
-        public void Clear()
-        {
-            tokens.Clear();
-        }
+        public void CancelAll() => tokens.Clear();
 
         public Task BeginReceive()
         {
@@ -45,15 +42,15 @@ namespace FWIClient
             var cancelToken = tokens.MakeNewToken("tracking-fwi");
 
             var task = new Task(() => {
-                var tracker = new TraceForegroundWindow();
+                var tracker = new FWITracker();
                 while (!cancelToken.IsCancellationRequested)
                 {
-                    var wi = tracker.TrackingFWI();
+                    var wi = tracker.Track();
                     if (!Sender.IsAFK)
                     {
                         Sender.SendWI(wi);
                     }
-                    
+
                     Thread.Sleep(interval);
                 }
             });

@@ -10,19 +10,35 @@ using System.Net.Sockets;
 
 namespace FWIClient
 {
-    class TraceForegroundWindow
+    class FWITracker
     {
         string lastName;
         string lastTitle;
-        public TraceForegroundWindow()
+        public FWITracker()
         {
             lastName = "";
             lastTitle = "";
         }
-        
-        public WindowInfo TrackingFWI()
+
+        public WindowInfo Track(int interval = 100)
         {
-            while(true)
+            while (true)
+            {
+                var wi = WICapture.GetForeground();
+
+                if (wi.Name != lastName || wi.Title != lastTitle)
+                {
+                    lastName = wi.Name;
+                    lastTitle = wi.Title;
+                    return wi;
+                }
+                Thread.Sleep(interval);
+            }
+        }
+
+        public WindowInfo Tracking(Func<WindowInfo, WindowInfo> filter)
+        {
+            while (true)
             {
                 var wi = WICapture.GetForeground();
 
@@ -35,7 +51,7 @@ namespace FWIClient
             }
         }
 
-        static public void Trace(Action<WindowInfo> onTrace, int traceInterval = 1000)
+        static public void TrackingAsync(Action<WindowInfo> onTrace, int traceInterval = 1000)
         {
             string pName = "", pTitle = "";
             try
