@@ -6,19 +6,28 @@ using System.Text;
 using System.Threading.Tasks;
 using FWI.Prompt;
 
-namespace FWITest.FWI
+namespace FWITest.FWIPrompt
 {
     [TestClass]
     public class PromptArgsTest
     {
         [TestMethod]
-        public void TestGetCMD()
+        public void TestCommand()
         {
-            var str = "echo".Split(' ');
-            var args = new PromptArgs(str);
+            var args = new PromptArgs("echo hello world");
+            var expected = "echo";
+            var actual = args.Command;
+            Assert.AreEqual(expected, actual);
+        }
 
-            var expected = str[0];
-            var actual = args.GetCMD();
+        [TestMethod]
+        public void TestCommandMulti()
+        {
+            var args = new PromptArgs("echo hello world");
+            args = args.Slice(1);
+
+            var expected = "echo hello";
+            var actual = args.Command;
             Assert.AreEqual(expected, actual);
         }
 
@@ -171,5 +180,60 @@ namespace FWITest.FWI
             Assert.AreEqual(expected, actual);
         }
 
+        [TestMethod]
+        public void TestSliceCount()
+        {
+            var arr = "echo 1 2 3 4 5".Split(' ');
+            var args = new PromptArgs(arr);
+
+            int expected, actual;
+            expected = 5;
+            actual = args.Count;
+            Assert.AreEqual(expected, actual);
+
+            args = args.Slice(1);
+            expected = 4;
+            actual = args.Count;
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void TestSlice()
+        {
+            var arr = "echo 1 2 3 4 5".Split(' ');
+            var args = new PromptArgs(arr);
+
+            string expected, actual;
+            expected = "1 2 3 4 5";
+            actual = args.GetArgs();
+            Assert.AreEqual(expected, actual);
+
+            args = args.Slice(1);
+            expected = "2 3 4 5";
+            actual = args.GetArgs();
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void TestSliceCommand()
+        {
+            var arr = "echo 1 2 3 4 5".Split(' ');
+
+            string expected, actual;
+            var args = new PromptArgs(arr);
+            expected = "echo";
+            actual = args.Command;
+            Assert.AreEqual(expected, actual);
+
+            args = args.Slice(1);
+            expected = "echo 1";
+            actual = args.Command;
+            Assert.AreEqual(expected, actual);
+
+            args = args.Slice(1);
+            expected = "echo 1 2";
+            actual = args.Command;
+            Assert.AreEqual(expected, actual);
+        }
     }
 }

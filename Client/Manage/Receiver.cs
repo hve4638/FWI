@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using FWIConnection.Message;
+using FWI.Message;
 using FWI.Results;
 
 namespace FWIClient

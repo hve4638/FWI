@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FWIConnection.Message
+namespace FWI.Message
 {
-    public class RequestRankMessage : ISerializableMessage
+    /*
+    public class ResponseRankMessage : ISerializableMessage
     {
-        public readonly static short Op = (short)MessageOp.RequestRank;
+        public readonly static short Op = (short)MessageOp.ResponseRank;
+        public readonly Dictionary<int, >
 
         public byte[] Serialize() => Serialize(false);
         public byte[] Serialize(bool debug = false)
@@ -23,12 +25,12 @@ namespace FWIConnection.Message
             return writer.ToBytes();
         }
 
-        public static RequestRankMessage Deserialize(ByteReader reader)
+        public static ResponseRankMessage Deserialize(ByteReader reader)
         {
-            var message = new RequestRankMessage();
+            var message = new ResponseRankMessage();
             if (reader.ReadShort() != Op) throw new DeserializeFailException();
 
             return message;
         }
-    }
+    }*/
 }

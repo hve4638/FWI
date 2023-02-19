@@ -8,7 +8,7 @@ using FWIConnection;
 using FWI.Results;
 using System.Security.Policy;
 using FWI;
-using FWIConnection.Message;
+using FWI.Message;
 
 
 namespace FWIClient

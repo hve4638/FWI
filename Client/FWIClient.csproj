@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FWIConnection\FWIConnection.csproj" />
     <ProjectReference Include="..\FWI\FWI.csproj" />
   </ItemGroup>
 
@@ -26,7 +25,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy &quot;$(SolutionDir)lib\RemoteConsole.exe&quot; &quot;$(TargetDir)&quot;" />
+    <Exec Command="copy &quot;$(SolutionDir)lib\FWIConsole.exe&quot; &quot;$(TargetDir)&quot;" />
   </Target>
 
 </Project>

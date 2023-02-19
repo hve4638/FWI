@@ -2,6 +2,9 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{0F70BA71-7854-4CBD-828B-892BA67019F7}</ProjectGuid>
@@ -24,11 +27,12 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -98,8 +102,32 @@
     <Compile Include="IOStream\OutputStream.cs" />
     <Compile Include="IOStream\FormatStandardOutputStream.cs" />
     <Compile Include="IOStream\StandardInputStream.cs" />
+    <Compile Include="Message\Serializer\AFKMessage.cs" />
+    <Compile Include="Message\Serializer\DeserializeFailException.cs" />
+    <Compile Include="Message\Serializer\EchoMessage.cs" />
+    <Compile Include="Message\Serializer\ISerializableMessage.cs" />
+    <Compile Include="Message\MessageOp.cs" />
+    <Compile Include="Message\Serializer\NoAFKMessage.cs" />
+    <Compile Include="Message\Serializer\RequestEchoMessage.cs" />
+    <Compile Include="Message\Serializer\RequestRankMessage.cs" />
+    <Compile Include="Message\Serializer\RequestTimelineMessage.cs" />
+    <Compile Include="Message\Serializer\RequestToBeTargetMessage.cs" />
+    <Compile Include="Message\Serializer\ResponseEchoMessage.cs" />
+    <Compile Include="Message\Serializer\ResponseRankMessage.cs" />
+    <Compile Include="Message\Serializer\ResponseToBeTargetMessage.cs" />
+    <Compile Include="Message\Serializer\ServerCallMessage.cs" />
+    <Compile Include="Message\Serializer\TextMessage.cs" />
+    <Compile Include="Message\Serializer\UpdateWIMessage.cs" />
+    <Compile Include="Message\WIParser.cs" />
+    <Compile Include="Prompt\CommandDelegate.cs" />
     <Compile Include="Prompt\Prompt.cs" />
     <Compile Include="Prompt\PromptArgs.cs" />
+    <Compile Include="Prompt\PromptExecuter.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Results\LazyRequestResult.cs" />
     <Compile Include="Results\LazyRequestResultManager.cs" />
     <Compile Include="Results\ReadonlyResults.cs" />
@@ -134,7 +162,16 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\FWIConnection\FWIConnection.csproj">
+      <Project>{169aeec7-a761-4974-8216-06c5893b90a2}</Project>
+      <Name>FWIConnection</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -32,7 +32,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -98,6 +98,7 @@
     <Compile Include="FWI\AliasMapTest.cs" />
     <Compile Include="Date.cs" />
     <Compile Include="FWI\DateRangeTest.cs" />
+    <Compile Include="FWI\Prompt\PromptExecuterTest.cs" />
     <Compile Include="FWI\Rank\DateRankTest.cs" />
     <Compile Include="FWI\IgnoreMapTest.cs" />
     <Compile Include="FWI\LazyRequestResultTest.cs" />
@@ -108,8 +109,8 @@
     <Compile Include="FWITest\MockStreamReader.cs" />
     <Compile Include="FWITest\MockStreamTest.cs" />
     <Compile Include="FWITest\MockStreamWriter.cs" />
-    <Compile Include="FWI\PromptArgsTest.cs" />
-    <Compile Include="FWI\PromptTest.cs" />
+    <Compile Include="FWI\Prompt\PromptArgsTest.cs" />
+    <Compile Include="FWI\Prompt\PromptTest.cs" />
     <Compile Include="FWI\Rank\RankTest.cs" />
     <Compile Include="Learning\ParsingTest.cs" />
     <Compile Include="FWI\StringExtenderTest.cs" />

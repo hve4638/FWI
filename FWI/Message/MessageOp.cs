@@ -1,4 +1,4 @@
-﻿namespace FWIConnection
+﻿namespace FWI.Message
 {
     public enum MessageOp : short
     {

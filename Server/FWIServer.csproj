@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FWIConnection\FWIConnection.csproj" />
     <ProjectReference Include="..\FWI\FWI.csproj" />
   </ItemGroup>
 

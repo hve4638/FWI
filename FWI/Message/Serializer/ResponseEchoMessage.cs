@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FWIConnection;
 
-namespace FWIConnection.Message
+namespace FWI.Message
 {
-    public class RequestEchoMessage : ISerializableMessage
+    public class ResponseEchoMessage : ISerializableMessage
     {
-        public readonly static short Op = (short)MessageOp.RequestEcho;
+        public readonly static short Op = (short)MessageOp.ResponseEcho;
         public int Id { get; set; }
         public string Text { get; set; }
 
@@ -29,9 +30,9 @@ namespace FWIConnection.Message
             return writer.ToBytes();
         }
 
-        public static RequestEchoMessage Deserialize(ByteReader reader)
+        public static ResponseEchoMessage Deserialize(ByteReader reader)
         {
-            var echoMessage = new RequestEchoMessage();
+            var echoMessage = new ResponseEchoMessage();
             if (reader.ReadShort() != Op) throw new DeserializeFailException();
             echoMessage.Id = reader.ReadInt();
             echoMessage.Text = reader.ReadText();

@@ -26,7 +26,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FWITest", "FWITest\FWITest.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FWI", "FWI\FWI.csproj", "{0F70BA71-7854-4CBD-828B-892BA67019F7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RemoteConsole", "RemoteConsole\RemoteConsole.csproj", "{79CEC1D7-897B-4B6D-A866-3FFBAA797197}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FWIConsole", "RemoteConsole\FWIConsole.csproj", "{79CEC1D7-897B-4B6D-A866-3FFBAA797197}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

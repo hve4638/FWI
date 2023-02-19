@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using FWIConnection;
 
-namespace FWIConnection
+namespace FWI
 {
     static public class WIParser
     {

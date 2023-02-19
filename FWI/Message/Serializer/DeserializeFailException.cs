@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FWIConnection.Message
+namespace FWI.Message
 {
     public class DeserializeFailException : Exception
     {

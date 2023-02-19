@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FWI.Prompt;
 
-namespace FWITest.FWI
+namespace FWITest.FWIPrompt
 {
     [TestClass]
     public class PromptTest
@@ -29,7 +29,7 @@ namespace FWITest.FWI
         {
             var prompt = new Prompt();
 
-            prompt.Add("echo", () => { });
+            prompt.Add("echo", (a, b) => { });
 
             var expected = new List<string> { "echo", "help" };
             var actual = prompt.GetCommandList();
@@ -44,7 +44,7 @@ namespace FWITest.FWI
             var prompt = new Prompt();
             bool mustTrue = false;
 
-            prompt.Add("call", () => {
+            prompt.Add("call", (a, b) => {
                 mustTrue = true;
             });
 
@@ -60,7 +60,7 @@ namespace FWITest.FWI
             string[] expected = { "hello", "world" };
             string[] actual = { "", "" };
 
-            prompt.Add("call", (args) =>
+            prompt.Add("call", (args, output) =>
             {
                 actual[0] = args[0];
                 actual[1] = args[1];
@@ -77,7 +77,7 @@ namespace FWITest.FWI
             int[] expected = { 1, 2, 3, 4 };
             int[] actual = { 0, 0, 0, 0 };
 
-            prompt.Add("call", (args) =>
+            prompt.Add("call", (args, output) =>
             {
                 actual[0] = args.GetArgInt(0);
                 actual[1] = args.GetArgInt(1);

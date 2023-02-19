@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FWI;
 using FWIConnection;
-using FWIConnection.Message;
+using FWI.Message;
 
 namespace FWIServer
 {

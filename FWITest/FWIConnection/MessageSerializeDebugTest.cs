@@ -1,5 +1,5 @@
 ﻿using FWIConnection;
-using FWIConnection.Message;
+using FWI.Message;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;

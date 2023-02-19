@@ -33,5 +33,10 @@ namespace FWI
             else if (right) return input.Substring(0, maxLength) + "...";
             else return "..." + input.Substring(input.Length-maxLength, maxLength);
         }
+
+        public static Queue<string> ToQueue(this string[] obj)
+        {
+            return new Queue<string>(obj);
+        }
     }
 }

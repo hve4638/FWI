@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FWIConnection;
 
-namespace FWIConnection.Message
+namespace FWI.Message
 {
-    public class TextMessage : ISerializableMessage
+    public class EchoMessage : ISerializableMessage
     {
-        public readonly static short Op = (short)MessageOp.Message;
+        public readonly static short Op = (short)MessageOp.Echo;
         public string Text { get; set; }
 
         public byte[] Serialize() => Serialize(false);
@@ -21,18 +21,20 @@ namespace FWIConnection.Message
 
             if (debug)
             {
-                writer.WriteString($"#Message");
+                writer.Write($"#Echo");
+                writer.Write($"?{Text}");
             }
+
             return writer.ToBytes();
         }
 
-        public static TextMessage Deserialize(ByteReader reader)
+        public static EchoMessage Deserialize(ByteReader reader)
         {
-            var message = new TextMessage();
+            var echoMessage = new EchoMessage();
             if (reader.ReadShort() != Op) throw new DeserializeFailException();
-            
-            message.Text = reader.ReadText();
-            return message;
+            echoMessage.Text = reader.ReadText();
+
+            return echoMessage;
         }
     }
 }

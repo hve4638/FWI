@@ -11,21 +11,49 @@ namespace FWI.Prompt
     public class PromptArgs
     {
         readonly string[] rawArgs;
+        int beginIndex;
+        int endIndex;
+        int BeginIndex
+        {
+            get { return beginIndex; }
+            set {
+                if (value < rawArgs.Length) beginIndex = value;
+                beginIndex = (value < rawArgs.Length) ? value : rawArgs.Length;
+            }
+        }
+
+        public PromptArgs(string text) : this(text.Split(' '))
+        {
+            
+        }
+
         public PromptArgs(string[] rawArgs)
         {
             this.rawArgs = rawArgs;
+            BeginIndex = 1;
+            endIndex = rawArgs.Length;
         }
         
-        public string GetCMD() { return rawArgs[0]; }
+        public string GetCommand()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            for(var i = 0; i < beginIndex; i++)
+            {
+                sb.Append(rawArgs[i]);
+                sb.Append(" ");
+            }
+            return sb.ToString().Trim();
+        }
 
         public bool HasArg(int index)
         {
-            return (index >= 0 && index + 1 < rawArgs.Length);
+            return (index >= 0 && index < Count);
         }
 
         public string GetArg(int index, string def = null)
         {
-            if (index >= 0 && index + 1 < rawArgs.Length) return rawArgs[index + 1];
+            if (HasArg(index)) return rawArgs[index + beginIndex];
             else if (def == null) throw new IndexOutOfRangeException();
             return def;
         }
@@ -38,29 +66,20 @@ namespace FWI.Prompt
             else return (int)def;
         }
 
-        public string GetArgs(int begin = 0)
-        {
-            var sliced = SliceArgs(begin);
-            return string.Join(" ", sliced);
-        }
+        public string GetArgs(int begin = 0) => GetArgs(begin, Count);
         public string GetArgs(int begin, int end)
         {
-            var sliced = SliceArgs(begin, end);
-            return string.Join(" ", sliced);
-        }
+            StringBuilder builder = new StringBuilder();
+            for(var i = begin; i < end; i++)
+            {
+                if (HasArg(i))
+                {
+                    builder.Append(GetArg(i));
+                    builder.Append(" ");
+                }
+            }
 
-        IEnumerable<string> SliceArgs(int begin = 0)
-        {
-            if (begin < 0) throw new IndexOutOfRangeException();
-
-            return rawArgs.Skip(begin + 1);
-        }
-
-        IEnumerable<string> SliceArgs(int begin, int end)
-        {
-            var sliced = SliceArgs(begin);
-
-            return sliced.Take(end - begin);
+            return builder.ToString().Trim();
         }
 
         public string this[int index]
@@ -68,7 +87,18 @@ namespace FWI.Prompt
             get { return GetArg(index); }
         }
 
-        public int Count => (rawArgs.Length - 1);
+        public PromptArgs Slice(int begin)
+        {
+            var sliced = new PromptArgs(rawArgs)
+            {
+                BeginIndex = BeginIndex + begin,
+            };
+
+            return sliced;
+        }
+
+        public int Count => (endIndex - BeginIndex);
+        public string Command => GetCommand();
 
         public override string ToString()
         {

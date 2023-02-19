@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FWI.Prompt;
 using FWIConnection;
-using FWIConnection.Message;
+using FWI.Message;
 using System.Collections;
 
 namespace FWIClient
@@ -21,7 +21,7 @@ namespace FWIClient
 
         public void Init(Prompt prompt)
         {
-            prompt.Add("exit", (_) => {
+            prompt.Add("exit", (args, output) => {
                 Program.Exit();
             });
 
@@ -50,30 +50,30 @@ namespace FWIClient
                 output.WriteLine($"IsTarget: {manager.Sender.IsTarget}");
             });
             
-            prompt.Add("echo", (args) => {
+            prompt.Add("echo", (args, output) => {
                 var str = args.GetArgs();
 
                 manager.Sender.SendEcho(str);
             });
 
-            prompt.Add("message", (args) =>
+            prompt.Add("message", (args, output) =>
             {
                 var text = args.GetArgs();
 
                 manager.Sender.SendMessage(text);
             });
 
-            prompt.Add("rank", (args) =>
+            prompt.Add("rank", (args, output) =>
             {
                 manager.Sender.SendRequestRank();
             });
 
-            prompt.Add("timeline", (args) =>
+            prompt.Add("timeline", (args, output) =>
             {
                 manager.Sender.SendRequestTimeline();
             });
 
-            prompt.Add("call", (args) =>
+            prompt.Add("call", (args, output) =>
             {
                 var cmd = args.GetArgs();
 

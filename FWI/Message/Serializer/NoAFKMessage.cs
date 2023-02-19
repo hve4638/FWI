@@ -1,29 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FWIConnection;
 
-namespace FWIConnection.Message
+namespace FWI.Message
 {
-    public class AFKMessage : ISerializableMessage
+    public class NoAFKMessage : ISerializableMessage
     {
-        public readonly static short Op = (short)MessageOp.SetAFK;
+        public readonly static short Op = (short)MessageOp.SetNoAFK;
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
 
         public byte[] Serialize() => Serialize(false);
-        public byte[] Serialize(bool debug)
+        public byte[] Serialize(bool debug = false)
         {
             var writer = new ByteWriter();
-            writer.WriteShort(Op);
+            writer.Write(Op);
             writer.WriteDateTime(FromDate);
             writer.WriteDateTime(ToDate);
-
             if (debug)
             {
-                writer.Write($"#AFK");
+                writer.Write($"#NoAFK");
                 writer.Write($"?{FromDate}");
                 writer.Write($"?{ToDate}");
             }
@@ -31,9 +30,9 @@ namespace FWIConnection.Message
             return writer.ToBytes();
         }
 
-        public static AFKMessage Deserialize(ByteReader reader)
+        public static NoAFKMessage Deserialize(ByteReader reader)
         {
-            var message = new AFKMessage();
+            var message = new NoAFKMessage();
             if (reader.ReadShort() != Op) throw new DeserializeFailException();
 
             reader.ReadDateTime(out DateTime fromDate);

@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FWI.Prompt;
 using FWIConnection;
-using FWIConnection.Message;
+using FWI.Message;
 
 namespace FWIClient
 {

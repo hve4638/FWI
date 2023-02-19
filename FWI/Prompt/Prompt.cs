@@ -25,10 +25,10 @@ namespace FWI.Prompt
             UnhandleException = false;
 
             commandDefault = (args, output) => output.WriteLine("Unknown Command");
-            Add("help", (_) => {
+            Add("help", (args, output) => {
                 foreach(var cmd in GetCommandList())
                 {
-                    Out.WriteLine($"- {cmd}");
+                    output.WriteLine($"- {cmd}");
                 }
             });
         }
@@ -65,7 +65,7 @@ namespace FWI.Prompt
         public void Execute(string cmd, IOutputStream outputStream = null)
         {
             var args = new PromptArgs(cmd.Split(' '));
-            var first = args.GetCMD();
+            var first = args.Command;
 
             Action<PromptArgs, IOutputStream> action;
             if (commands.ContainsKey(first)) action = commands[first];
@@ -120,15 +120,7 @@ namespace FWI.Prompt
                 throw new NotImplementedException();
             }
         }
-        public void Add(string cmd, Action action)
-        {
-            Add(cmd, (args, output) => { action(); });
-        }
 
-        public void Add(string cmd, Action<PromptArgs> action)
-        {
-            Add(cmd, (args, output) => action(args));
-        }
         public void Add(string cmd, Action<PromptArgs, IOutputStream> action)
         {
             if (commands.ContainsKey(cmd)) commands.Remove(cmd);
