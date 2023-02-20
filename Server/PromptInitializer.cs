@@ -132,10 +132,10 @@ namespace FWIServer
                         }
                 }
             });
-            prompt.Add("client", "show client");
-            prompt.Add("lastwi", "show lastwi");
-            prompt.Add("timeline", "show timeline");
-            prompt.Add("rank", "show rank");
+            prompt.AddRedirect("client", "show client");
+            prompt.AddRedirect("lastwi", "show lastwi");
+            prompt.AddRedirect("timeline", "show timeline");
+            prompt.AddRedirect("rank", "show rank");
 
             prompt.Add("uptime", (_, output) =>
             {

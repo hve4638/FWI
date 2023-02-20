@@ -1,49 +1,49 @@
 ﻿using System;
+using System.CodeDom.Compiler;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FWI;
+using static System.Net.Mime.MediaTypeNames;
+#nullable enable
 
 namespace FWI.Prompt
 {
     public class Prompt
     {
         private static readonly object _Lock = new object();
-        readonly Dictionary<string, Action<PromptArgs, IOutputStream>> commands;
+        readonly PromptExecuter executer;
         readonly Stack<IOutputStream> outputStreamStack;
-        Action<PromptArgs, IOutputStream> commandDefault;
+        public CommandDelegate? OnNotExecuted { get; set; }
         public bool UnhandleException { get; set; }
         public IOutputStream DefaultOutputStream { get; set; }
+        public IOutputStream OutputStream { get; set; }
 
         public Prompt()
         {
             outputStreamStack = new Stack<IOutputStream>();
-            commands = new Dictionary<string, Action<PromptArgs, IOutputStream>>();
-            DefaultOutputStream = new StandardOutputStream();
-            UnhandleException = false;
+            executer = new PromptExecuter();
 
-            commandDefault = (args, output) => output.WriteLine("Unknown Command");
-            Add("help", (args, output) => {
-                foreach(var cmd in GetCommandList())
-                {
-                    output.WriteLine($"- {cmd}");
-                }
-            });
+            OutputStream = NullOutputStream.Instance;
+            DefaultOutputStream = new StandardOutputStream();
+            OnNotExecuted = (args, output) => output.WriteLine("Unknown Command");
+            UnhandleException = false;
         }
         
-        public Thread LoopAsync(IInputStream inputStream = null, IOutputStream outputStream = null)
+        public Task LoopAsync(IInputStream inputStream, IOutputStream outputStream)
         {
-            var thread = new Thread(() => { Loop(inputStream); });
-            thread.Start();
+            var task = new Task(() => Loop(inputStream, outputStream));
+            task.Start();
 
-            return thread;
+            return task;
         }
 
-        public void Loop(IInputStream inputStream = null, IOutputStream outputStream = null)
+        public void Loop(IInputStream inputStream, IOutputStream outputStream)
         {
-            outputStream = outputStream ?? DefaultOutputStream;
+            outputStream ??= DefaultOutputStream;
             outputStreamStack.Push(outputStream);
             try
             {
@@ -51,8 +51,8 @@ namespace FWI.Prompt
                 {
                     outputStream.Write("$ ");
                     outputStream.Flush();
-                    var cmd = inputStream.Read();
-                    if (cmd is null || cmd == "") continue;
+                    var cmd = inputStream?.Read() ?? "";
+                    if (cmd == "") continue;
                     else Execute(cmd, outputStream);
                 }
             }
@@ -62,27 +62,21 @@ namespace FWI.Prompt
             }
         }
 
-        public void Execute(string cmd, IOutputStream outputStream = null)
+        public void Execute(string cmd, IOutputStream? outputStream = null)
         {
-            var args = new PromptArgs(cmd.Split(' '));
-            var first = args.Command;
-
-            Action<PromptArgs, IOutputStream> action;
-            if (commands.ContainsKey(first)) action = commands[first];
-            else
-            {
-                action = commandDefault;
-            }
+            var args = new PromptArgs(cmd);
 
             lock(_Lock)
             {
-                var currentOutputStream = outputStream ?? DefaultOutputStream;
-                outputStreamStack.Push(currentOutputStream);
+                var output = outputStream ?? DefaultOutputStream;
+                outputStreamStack.Push(output);
 
                 try
                 {
-                    action(args, currentOutputStream);
-                    Out?.Flush();
+                    var executed = executer.Execute(args, output);
+                    if (!executed) OnNotExecuted?.Invoke(args, output);
+
+                    output?.Flush();
                 }
                 catch (Exception e)
                 {
@@ -92,11 +86,11 @@ namespace FWI.Prompt
                     }
                     else
                     {
-                        Out.WriteLine("[D][W] Prompt 명령 실행중 오류가 발생했습니다.");
-                        Out.WriteLine($"-------------------------------");
-                        Out.WriteLine($"{e}");
-                        Out.WriteLine($"-------------------------------");
-                        Out.Flush();
+                        output.WriteLine("[D][W] Prompt 명령 실행중 오류가 발생했습니다.");
+                        output.WriteLine($"-------------------------------");
+                        output.WriteLine($"{e}");
+                        output.WriteLine($"-------------------------------");
+                        output.Flush();
                     }
                 }
                 finally
@@ -106,40 +100,37 @@ namespace FWI.Prompt
             }
         }
 
-        public void Add(string cmd, string redirectTo)
+        public bool Add(string text, CommandDelegate action)
         {
-            if (cmd.Split(' ').Length == 1)
+            var commands = text.Split(' ').ToQueue();
+
+            return executer.AddCommand(commands, action);
+        }
+
+        public void AddRedirect(string text, string redirectTo)
+        {
+            Add(text, (args, output) => {
+                if (args.Count > 0) Execute($"{redirectTo} {args.GetArgs()}", output);
+                else Execute(redirectTo, output);
+            });
+        }
+
+        public List<string> GetCommands(string cmd = "")
+        {
+            if (cmd.Length == 0)
             {
-                Add(cmd, (args, output) =>
-                {
-                    Execute(redirectTo, output);
-                });
+                return executer.GetCommands();
             }
             else
             {
-                throw new NotImplementedException();
+                var queue = cmd.Split(' ').ToQueue();
+                return executer.GetCommands(queue);
             }
         }
 
-        public void Add(string cmd, Action<PromptArgs, IOutputStream> action)
+        public List<string> GetCommands(Queue<string> queue)
         {
-            if (commands.ContainsKey(cmd)) commands.Remove(cmd);
-
-            commands.Add(cmd, action);
-        }
-        public void AddDefault(Action<PromptArgs, IOutputStream> action)
-        {
-            commandDefault = action;
-        }
-
-        public List<string> GetCommandList()
-        {
-            var list = new List<string>();
-            foreach(var cmd in commands.Keys)
-            {
-                list.Add(cmd);
-            }
-            return list;
+            return executer.GetCommands(queue);
         }
 
         public IOutputStream Out => outputStreamStack.LastOrDefault();

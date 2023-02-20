@@ -78,7 +78,7 @@ namespace FWIServer
             });
         }
 
-        public Thread RunPrompt()
+        public Task RunPrompt()
         {
             var promptInitializer = new PromptInitializer(
                 fwiManager: fwiManager,

@@ -17,14 +17,16 @@ namespace FWI.Prompt
         {
             get { return beginIndex; }
             set {
-                if (value < rawArgs.Length) beginIndex = value;
+                if (value < 1) beginIndex = 1;
+                else if (value < rawArgs.Length) beginIndex = value;
+                else beginIndex = rawArgs.Length;
                 beginIndex = (value < rawArgs.Length) ? value : rawArgs.Length;
             }
         }
 
         public PromptArgs(string text) : this(text.Split(' '))
         {
-            
+
         }
 
         public PromptArgs(string[] rawArgs)
@@ -32,18 +34,6 @@ namespace FWI.Prompt
             this.rawArgs = rawArgs;
             BeginIndex = 1;
             endIndex = rawArgs.Length;
-        }
-        
-        public string GetCommand()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            for(var i = 0; i < beginIndex; i++)
-            {
-                sb.Append(rawArgs[i]);
-                sb.Append(" ");
-            }
-            return sb.ToString().Trim();
         }
 
         public bool HasArg(int index)
@@ -58,7 +48,7 @@ namespace FWI.Prompt
             return def;
         }
 
-        public int GetArgInt(int index, int? def=null)
+        public int GetArgInt(int index, int? def = null)
         {
             var arg = GetArg(index);
             if (int.TryParse(arg, out int result)) return result;
@@ -70,7 +60,7 @@ namespace FWI.Prompt
         public string GetArgs(int begin, int end)
         {
             StringBuilder builder = new StringBuilder();
-            for(var i = begin; i < end; i++)
+            for (var i = begin; i < end; i++)
             {
                 if (HasArg(i))
                 {
@@ -98,7 +88,27 @@ namespace FWI.Prompt
         }
 
         public int Count => (endIndex - BeginIndex);
-        public string Command => GetCommand();
+        public string Command
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+
+                for (var i = 0; i < beginIndex; i++)
+                {
+                    sb.Append(rawArgs[i]);
+                    sb.Append(" ");
+                }
+                return sb.ToString().Trim();
+            }
+        }
+        public string CommandLastWord
+        {
+            get
+            {
+                return rawArgs[beginIndex-1];
+            }
+        }
 
         public override string ToString()
         {

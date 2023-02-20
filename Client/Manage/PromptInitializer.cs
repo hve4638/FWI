@@ -21,6 +21,13 @@ namespace FWIClient
 
         public void Init(Prompt prompt)
         {
+            prompt.Add("help", (args, output) => {
+                foreach (var cmd in prompt.GetCommands())
+                {
+                    output.WriteLine($"- {cmd}");
+                }
+            });
+
             prompt.Add("exit", (args, output) => {
                 Program.Exit();
             });

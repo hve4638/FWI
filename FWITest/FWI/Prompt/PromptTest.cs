@@ -17,8 +17,8 @@ namespace FWITest.FWIPrompt
         {
             var prompt = new Prompt();
 
-            var expected = new List<string> { "help" };
-            var actual = prompt.GetCommandList();
+            var expected = new List<string>();
+            var actual = prompt.GetCommands();
             expected.Sort();
             actual.Sort();
             CollectionAssert.AreEqual(expected, actual);
@@ -29,10 +29,10 @@ namespace FWITest.FWIPrompt
         {
             var prompt = new Prompt();
 
-            prompt.Add("echo", (a, b) => { });
+            prompt.Add("echo", (args, output) => { });
 
-            var expected = new List<string> { "echo", "help" };
-            var actual = prompt.GetCommandList();
+            var expected = new List<string> { "echo" };
+            var actual = prompt.GetCommands();
             expected.Sort();
             actual.Sort();
             CollectionAssert.AreEqual(expected, actual);
@@ -42,32 +42,46 @@ namespace FWITest.FWIPrompt
         public void TestExecute()
         {
             var prompt = new Prompt();
-            bool mustTrue = false;
+            bool result = false;
 
-            prompt.Add("call", (a, b) => {
-                mustTrue = true;
-            });
+            prompt.Add("settrue", (args, output) => result = true);
+            prompt.Add("setfalse", (args, output) => result = false);
+            prompt.Execute("settrue");
+            Assert.IsTrue(result);
 
-            prompt.Execute("call");
+            prompt.Execute("setfalse");
+            Assert.IsFalse(result);
+        }
 
-            Assert.IsTrue(mustTrue);
+        [TestMethod]
+        public void TestExecuteMultiWord()
+        {
+            var prompt = new Prompt();
+            bool result = false;
+
+            prompt.Add("set true", (args, output) => result = true);
+            prompt.Add("set false", (args, output) => result = false);
+            prompt.Execute("set true");
+            Assert.IsTrue(result);
+
+            prompt.Execute("set false");
+            Assert.IsFalse(result);
         }
 
         [TestMethod]
         public void TestExecuteWithArgs()
         {
             var prompt = new Prompt();
-            string[] expected = { "hello", "world" };
-            string[] actual = { "", "" };
+            string expected = "hello world";
+            string actual = "";
 
-            prompt.Add("call", (args, output) =>
+            prompt.Add("set", (args, output) =>
             {
-                actual[0] = args[0];
-                actual[1] = args[1];
+                actual = args.GetArgs();
             });
-            prompt.Execute("call hello world");
+            prompt.Execute("set hello world");
 
-            CollectionAssert.AreEqual(expected, actual);
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
@@ -77,16 +91,47 @@ namespace FWITest.FWIPrompt
             int[] expected = { 1, 2, 3, 4 };
             int[] actual = { 0, 0, 0, 0 };
 
-            prompt.Add("call", (args, output) =>
+            prompt.Add("set", (args, output) =>
             {
                 actual[0] = args.GetArgInt(0);
                 actual[1] = args.GetArgInt(1);
                 actual[2] = args.GetArgInt(2);
                 actual[3] = args.GetArgInt(3);
             });
-            prompt.Execute("call 1 2 3 4");
+            prompt.Execute("set 1 2 3 4");
 
             CollectionAssert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void TestNotExecuted()
+        {
+            var prompt = new Prompt();
+            bool result = false;
+
+            prompt.OnNotExecuted = (args, output) => result = false;
+            prompt.Add("set", (args, output) => result = true);
+            prompt.Execute("set");
+            Assert.IsTrue(result);
+
+            prompt.Execute("nocommand");
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void TestRedirection()
+        {
+            var prompt = new Prompt();
+            int result = -1;
+
+            prompt.Add("result set", (args, output) => result = args.GetArgInt(0));
+            prompt.AddRedirect("set", "result set");
+
+            prompt.Execute("result set 5");
+            Assert.AreEqual(5, result);
+
+            prompt.Execute("set 10");
+            Assert.AreEqual(10, result);
         }
     }
 }

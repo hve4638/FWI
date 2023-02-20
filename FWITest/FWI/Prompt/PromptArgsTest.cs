@@ -14,19 +14,10 @@ namespace FWITest.FWIPrompt
         [TestMethod]
         public void TestCommand()
         {
-            var args = new PromptArgs("echo hello world");
-            var expected = "echo";
-            var actual = args.Command;
-            Assert.AreEqual(expected, actual);
-        }
+            var str = "echo".Split(' ');
+            var args = new PromptArgs(str);
 
-        [TestMethod]
-        public void TestCommandMulti()
-        {
-            var args = new PromptArgs("echo hello world");
-            args = args.Slice(1);
-
-            var expected = "echo hello";
+            var expected = str[0];
             var actual = args.Command;
             Assert.AreEqual(expected, actual);
         }
@@ -181,58 +172,71 @@ namespace FWITest.FWIPrompt
         }
 
         [TestMethod]
-        public void TestSliceCount()
-        {
-            var arr = "echo 1 2 3 4 5".Split(' ');
-            var args = new PromptArgs(arr);
-
-            int expected, actual;
-            expected = 5;
-            actual = args.Count;
-            Assert.AreEqual(expected, actual);
-
-            args = args.Slice(1);
-            expected = 4;
-            actual = args.Count;
-            Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
         public void TestSlice()
         {
-            var arr = "echo 1 2 3 4 5".Split(' ');
-            var args = new PromptArgs(arr);
+            var args = new PromptArgs("echo 1 2 3 4 5");
 
-            string expected, actual;
-            expected = "1 2 3 4 5";
-            actual = args.GetArgs();
-            Assert.AreEqual(expected, actual);
+            string eCommand, eArgs;
+            eCommand = "echo";
+            eArgs = "1 2 3 4 5";
+            Assert.AreEqual(eCommand, args.Command);
+            Assert.AreEqual(eArgs, args.GetArgs());
 
             args = args.Slice(1);
-            expected = "2 3 4 5";
-            actual = args.GetArgs();
-            Assert.AreEqual(expected, actual);
+            eCommand = "echo 1";
+            eArgs = "2 3 4 5";
+            Assert.AreEqual(eCommand, args.Command);
+            Assert.AreEqual(eArgs, args.GetArgs());
+
+            args = args.Slice(2);
+            eCommand = "echo 1 2 3";
+            eArgs = "4 5";
+            Assert.AreEqual(eCommand, args.Command);
+            Assert.AreEqual(eArgs, args.GetArgs());
         }
 
         [TestMethod]
-        public void TestSliceCommand()
+        public void TestSliceReverse()
         {
-            var arr = "echo 1 2 3 4 5".Split(' ');
+            var args = new PromptArgs("echo 1 2 3 4 5");
+
+            string eCommand, eArgs;
+            eCommand = "echo";
+            eArgs = "1 2 3 4 5";
+            Assert.AreEqual(eCommand, args.Command);
+            Assert.AreEqual(eArgs, args.GetArgs());
+
+            args = args.Slice(3);
+            eCommand = "echo 1 2 3";
+            eArgs = "4 5";
+            Assert.AreEqual(eCommand, args.Command);
+            Assert.AreEqual(eArgs, args.GetArgs());
+
+            args = args.Slice(-1);
+            eCommand = "echo 1 2";
+            eArgs = "3 4 5";
+            Assert.AreEqual(eCommand, args.Command);
+            Assert.AreEqual(eArgs, args.GetArgs());
+        }
+
+        [TestMethod]
+        public void TestCommandLastWord()
+        {
+            var args = new PromptArgs("echo 1 2 3 4 5");
 
             string expected, actual;
-            var args = new PromptArgs(arr);
             expected = "echo";
-            actual = args.Command;
+            actual = args.CommandLastWord;
             Assert.AreEqual(expected, actual);
 
             args = args.Slice(1);
-            expected = "echo 1";
-            actual = args.Command;
+            expected = "1";
+            actual = args.CommandLastWord;
             Assert.AreEqual(expected, actual);
 
-            args = args.Slice(1);
-            expected = "echo 1 2";
-            actual = args.Command;
+            args = args.Slice(2);
+            expected = "3";
+            actual = args.CommandLastWord;
             Assert.AreEqual(expected, actual);
         }
     }

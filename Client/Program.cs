@@ -47,14 +47,15 @@ namespace FWIClient
             Out = StdOut;
             AutoReload = false;
 
-            config = new Config();
-
-            config.serverIP = "127.0.0.1";
-            config.serverPort = "7000";
-            config.afkTime = "10";
-            config.autoReload = true;
-            config.openConsoleWhenStartup = false;
-            config.debug = false;
+            config = new()
+            {
+                serverIP = "127.0.0.1",
+                serverPort = "7000",
+                afkTime = "10",
+                autoReload = true,
+                openConsoleWhenStartup = false,
+                debug = false
+            };
         }
 
         [STAThread]
@@ -82,7 +83,7 @@ namespace FWIClient
             if (!int.TryParse(config.serverPort, out _))
             {
                 result.State = ResultState.HasProblem;
-                result += "잘못된 값: port";
+                result += "잘못된 값: Port";
             }
             
             if (result.State == ResultState.Normal)
@@ -129,7 +130,7 @@ namespace FWIClient
                 var id = OpenConsole();
                 while (!ConsoleConnected(id))
                 {
-
+                    Thread.Sleep(10);
                 }
                 StdOut.WriteLine("RemoteConsole 연결됨");
                 Out.WriteLine("연결됨");

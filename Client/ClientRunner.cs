@@ -113,7 +113,7 @@ namespace FWIClient
             prompt.DefaultOutputStream = Program.Out;
             Program.CurrentPrompt = prompt;
 
-            prompt.Add("rt", (args, output) =>
+            prompt.Add("request target", (args, output) =>
             {
                 output.WriteLine("[D][I] Target 요청");
                 RequestToBeTarget();
