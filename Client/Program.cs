@@ -9,20 +9,14 @@ namespace FWIClient
     static public class Program
     {
         public const string PATH_CONFIG = "config.ini";
-        public static readonly string Version = "0.7b";
+        public static readonly string Version = "0.7c";
         public static FormController FormControl { get; private set; }
         private static RemoteConsoleControl ConsoleControl { get; set; }
         public static IInputStream StdIn { get; private set; }
         public static IOutputStream StdOut { get; private set; }
         public static IInputStream In { get; private set; }
         public static IOutputStream Out { get; private set; }
-        public static IOutputStream VerboseOut
-        {
-            get {
-                if (VerboseMode) return Out;
-                else return NullOutputStream.Instance;
-            }
-        }
+        public static IOutputStream VerboseOut => (VerboseMode) ? Out : NullOutputStream.Instance;
         public static bool AutoReload { get; set; }
         public static bool VerboseMode { get; set; }
         public static Prompt? CurrentPrompt { get; set; }

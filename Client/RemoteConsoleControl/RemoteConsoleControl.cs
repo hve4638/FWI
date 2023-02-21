@@ -11,21 +11,20 @@ namespace FWIClient
         {
             if (Connected()) return -1;
             var currentId = lastId++;
-            RemoteConsole.Open(7010);
+            RemoteConsole.Open(17010);
 
             var task = new Task(() => {
-                var server = new SimpleConnection.Server(7010);
+                var server = new SimpleConnection.Server(17010);
                 server.Accept();
 
                 connectId = currentId;
                 onConnect?.Invoke(server);
 
-                while (!server.Connected)
-                {
-                    Thread.Sleep(100);
-                }
+                while (server.Connected) Thread.Sleep(100);
+
                 connectId = 0;
                 onDisconnect?.Invoke();
+                server.Close();
             });
             task.Start();
             return currentId;

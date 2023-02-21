@@ -14,7 +14,7 @@ namespace FWIClient
         {
             Process process = new();
             process.StartInfo.UseShellExecute = true;
-            process.StartInfo.FileName = @".\RemoteConsole.exe";
+            process.StartInfo.FileName = @".\FWIConsole.exe";
             process.StartInfo.Arguments = $"127.0.0.1 {port}";
             process.StartInfo.CreateNoWindow = false;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;

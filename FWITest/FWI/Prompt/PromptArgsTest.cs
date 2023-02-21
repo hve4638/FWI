@@ -196,7 +196,7 @@ namespace FWITest.FWIPrompt
         }
 
         [TestMethod]
-        public void TestSliceReverse()
+        public void TestSliceNegative()
         {
             var args = new PromptArgs("echo 1 2 3 4 5");
 
@@ -225,10 +225,6 @@ namespace FWITest.FWIPrompt
             var args = new PromptArgs("echo 1 2 3 4 5");
 
             string expected, actual;
-            expected = "echo";
-            actual = args.CommandLastWord;
-            Assert.AreEqual(expected, actual);
-
             args = args.Slice(1);
             expected = "1";
             actual = args.CommandLastWord;
@@ -238,6 +234,21 @@ namespace FWITest.FWIPrompt
             expected = "3";
             actual = args.CommandLastWord;
             Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void TestSliceSafe()
+        {
+            var args = new PromptArgs("echo 1 2 3 4 5");
+
+            string eCommand, eLast, eArgs;
+            args = args.Slice(-1);
+            eCommand = "echo";
+            eLast = "echo";
+            eArgs = "1 2 3 4 5";
+            Assert.AreEqual(eLast, args.CommandLastWord);
+            Assert.AreEqual(eCommand, args.Command);
+            Assert.AreEqual(eArgs, args.GetArgs());
         }
     }
 }

@@ -20,7 +20,6 @@ namespace FWI.Prompt
                 if (value < 1) beginIndex = 1;
                 else if (value < rawArgs.Length) beginIndex = value;
                 else beginIndex = rawArgs.Length;
-                beginIndex = (value < rawArgs.Length) ? value : rawArgs.Length;
             }
         }
 

@@ -8,10 +8,7 @@
 
 [ ] Timeline capture interval / display interval 만들기
 
-
 ### 클라이언트
-
-[ ] 백그라운드 실행 & Form 추가
 
 [ ] 강제 종료하는 대신, 정상 종료하기
 
