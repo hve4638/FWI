@@ -12,6 +12,20 @@ namespace FWITest.FWIConnection
     public class BrBwTest
     {
         [TestMethod]
+        public void TestBoolean()
+        {
+            var bw = new ByteWriter();
+            bw.WriteBoolean(true);
+            bw.WriteBoolean(false);
+            bw.WriteBoolean(true);
+
+            var br = new ByteReader(bw);
+            Assert.IsTrue(br.ReadBoolean());
+            Assert.IsFalse(br.ReadBoolean());
+            Assert.IsTrue(br.ReadBoolean());
+        }
+
+        [TestMethod]
         public void TestRWShort()
         {
             var bw = new ByteWriter();
@@ -147,6 +161,17 @@ namespace FWITest.FWIConnection
             var br = new ByteReader(bw);
             CollectionAssert.AreEqual(bytes, br.PeekBytes());
             CollectionAssert.AreEqual(bytes, br.ReadBytes());
+        }
+
+        [TestMethod]
+        public void TestPeekBoolean()
+        {
+            var bw = new ByteWriter();
+            bw.WriteBoolean(true);
+
+            var br = new ByteReader(bw);
+            Assert.IsTrue(br.PeekBoolean());
+            Assert.IsTrue(br.ReadBoolean());
         }
     }
 }

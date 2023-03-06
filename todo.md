@@ -8,9 +8,9 @@
 
 [ ] Timeline capture interval / display interval 만들기
 
-### 클라이언트
+[ ] 타임라인 
 
-[ ] 강제 종료하는 대신, 정상 종료하기
+### 클라이언트
 
 [ ] 서버로부터 AFK 처리 시간 받기
 

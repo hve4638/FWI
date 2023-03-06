@@ -15,6 +15,7 @@ namespace FWIClient
 {
     public class ClientSender
     {
+        static readonly Random nonceGenerater = new(DateTime.Now.Millisecond);
         readonly Client client;
         public bool Connected { get; set; }
         public bool IsTarget { get; set; }
@@ -24,6 +25,11 @@ namespace FWIClient
         public ClientSender(Client client)
         {
             this.client = client;
+        }
+        
+        public static int GetNonce()
+        {
+            return nonceGenerater.Next(1, int.MaxValue);
         }
 
         public void Send(ISerializableMessage serializableMessage)
@@ -108,14 +114,32 @@ namespace FWIClient
             }
         }
 
-        public void SendRequestTimeline()
+        public void SendTimelineRequest()
         {
             if (!Connected) return;
             else
             {
-                var message = new RequestTimelineMessage();
+                var message = new TimelineRequest();
 
                 Send(message);
+            }
+        }
+
+        public async Task<TimelineResponse> SendRequestTimeline(DateTime? begin = null, DateTime? end = null)
+        {
+            if (!Connected) return TimelineResponse.Fail();
+            else
+            {
+                var requestMessage = new TimelineRequest()
+                {
+                    Id = GetNonce(),
+                    BeginDate = begin,
+                    EndDate = end,
+                };
+
+                Send(requestMessage);
+
+                return TimelineResponse.Fail();
             }
         }
 

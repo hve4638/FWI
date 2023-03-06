@@ -62,10 +62,10 @@ namespace FWITest.FWIConnection
         [TestMethod]
         public void TestRequestTimeline()
         {
-            var original = new RequestTimelineMessage();
+            var original = new TimelineRequest();
             var bytes = original.Serialize();
             var reader = new ByteReader(bytes);
-            RequestTimelineMessage.Deserialize(reader);
+            TimelineRequest.Deserialize(reader);
         }
 
         [TestMethod]

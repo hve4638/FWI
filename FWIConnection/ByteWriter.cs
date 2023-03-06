@@ -24,6 +24,7 @@ namespace FWIConnection
             WriteString(str);
         }
 
+        public void Write(bool b) => WriteBoolean(b);
         public void Write(short num) => WriteShort(num);
         public void Write(int num) => WriteInt(num);
         public void Write(string str) => WriteString(str);
@@ -33,6 +34,11 @@ namespace FWIConnection
             WriteBytes(bw.ToBytes());
         }
 
+        public void WriteBoolean(bool b)
+        {
+            byte[] bytes = BitConverter.GetBytes(b);
+            buf.AddRange(bytes);
+        }
         public void WriteShort(short num)
         {
             byte[] bytes = BitConverter.GetBytes(num);

@@ -48,7 +48,6 @@ namespace FWIClient
             data["General"]["startupconsole"] = config.openConsoleWhenStartup ? "1" : "0";
             data["General"]["debug"] = config.debug ? "1" : "0";
 
-
             var parser = new FileIniDataParser();
             parser.WriteFile("config.ini", data);
         }

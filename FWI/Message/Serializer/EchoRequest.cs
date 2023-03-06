@@ -7,7 +7,7 @@ using FWIConnection;
 
 namespace FWI.Message
 {
-    public class RequestEchoMessage : ISerializableMessage
+    public class EchoRequest : ISerializableMessage
     {
         public readonly static short Op = (short)MessageOp.RequestEcho;
         public int Id { get; set; }
@@ -30,9 +30,9 @@ namespace FWI.Message
             return writer.ToBytes();
         }
 
-        public static RequestEchoMessage Deserialize(ByteReader reader)
+        public static EchoRequest Deserialize(ByteReader reader)
         {
-            var echoMessage = new RequestEchoMessage();
+            var echoMessage = new EchoRequest();
             if (reader.ReadShort() != Op) throw new DeserializeFailException();
             echoMessage.Id = reader.ReadInt();
             echoMessage.Text = reader.ReadText();

@@ -95,7 +95,7 @@ namespace FWIClient
             Out = StdOut;
         }
 
-        static private void Run(Options options)
+        static void Run(Options options)
         {
             try
             {
@@ -126,16 +126,19 @@ namespace FWIClient
                 {
                     Thread.Sleep(10);
                 }
+
                 StdOut.WriteLine("RemoteConsole 연결됨");
                 Out.WriteLine("연결됨");
             }
 
-            if (options.Target) Out.WriteLine($"Mode: Target");
+            
+
+            if (config.observerMode) Out.WriteLine($"Mode: Target");
             else Out.WriteLine($"Mode: Observe");
             Out.Flush();
 
             VerboseMode = options.Verbose;
-            AutoReload = options.AutoReload;
+            AutoReload = config.autoReload;
 
             var task = new Task(() => {
                 var reload = false;
@@ -183,7 +186,7 @@ namespace FWIClient
             }
         }
 
-        static private RunnerResult RunClient(Options options)
+        static RunnerResult RunClient(Options options)
         {
             var client = new FWIConnection.Client(options.IP, options.Port);
             var manager = new ClientManager(
@@ -199,13 +202,13 @@ namespace FWIClient
             return runner.Run();
         }
 
-        static public void Exit()
+        public static void Exit()
         {
             if (Application.MessageLoop == true) Application.Exit();
             else Environment.Exit(1);
         }
 
-        static public void RunPromptOnRemoteConsole()
+        public static void RunPromptOnRemoteConsole()
         {
             if (CurrentPrompt is null) return;
 
@@ -220,14 +223,14 @@ namespace FWIClient
                         }
                         catch (RemoteIODisconnectException)
                         {
-                            Out.WriteLine("prompt disconnected");
+                            
                         }
                     }
                 );
             }
         }
 
-        static public int OpenConsole(Action? onConnect = null, Action? onDisconnect = null)
+        public static int OpenConsole(Action? onConnect = null, Action? onDisconnect = null)
         {
             return ConsoleControl.Open(
                 onConnect: (server) =>

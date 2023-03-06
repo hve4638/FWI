@@ -32,8 +32,12 @@ namespace FWIConnection
         {
 
         }
-
-
+        
+        public bool PeekBoolean()
+        {
+            bool b = BitConverter.ToBoolean(buf, Offset);
+            return b;
+        }
         public byte[] PeekBytes()
         {
             int? length = null;
@@ -88,7 +92,6 @@ namespace FWIConnection
             return data;
         }
 
-
         public byte[] ReadBytes(int? length = null)
         {
             length = length ?? (size - Offset);
@@ -96,6 +99,12 @@ namespace FWIConnection
             Offset += data.Length;
 
             return data;
+        }
+        public bool ReadBoolean()
+        {
+            var b = PeekBoolean();
+            Offset += 1;
+            return b;
         }
         public short ReadShort()
         {
