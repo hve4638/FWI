@@ -1,6 +1,7 @@
 ﻿using FWI;
 using FWI.Prompt;
 using FWIConnection;
+using HUtility;
 
 namespace FWIServer
 {
@@ -119,13 +120,14 @@ namespace FWIServer
 
         public void RunChecker()
         {
-            var alertChecker = new IntervalThread(
-                () => {
+            var alertChecker = new AlarmTask(
+                action: () => {
                     if (!serverManager.HasTarget)
                     {
                         Program.Out.WriteLine("[D][A] 현재 Target 클라이언트가 없습니다.");
                     }
-                }
+                },
+                loop: true
             );
             alertChecker.Start(new TimeSpan(0,5,0), 5000);
         }

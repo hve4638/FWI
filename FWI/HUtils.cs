@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HUtility;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -19,7 +20,7 @@ namespace FWI
             else if (intersection == dateRange) return list;
             else
             {
-                var dr = new DynamicDateRange(dateRange.End, dateRange.End);
+                var dr = new MutableDateRange(dateRange.End, dateRange.End);
                 int? st = null;
                 int? ed = null;
 

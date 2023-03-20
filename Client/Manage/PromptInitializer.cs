@@ -75,9 +75,9 @@ namespace FWIClient
                 manager.Sender.SendRequestRank();
             });
 
-            prompt.Add("timeline", (args, output) =>
+            prompt.Add("timeline", async (args, output) =>
             {
-                manager.Sender.SendRequestTimeline();
+                await manager.Sender.SendRequestTimeline();
             });
 
             prompt.Add("call", (args, output) =>

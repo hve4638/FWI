@@ -7,9 +7,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FWI
+namespace HUtility
 {
-    static public class ExceptionHandler
+    static public class UnhandleExceptionHandler
     {
         [DllImport("Dbghelp.dll")]
         static extern bool MiniDumpWriteDump(IntPtr hProcess, uint ProcessId, IntPtr hFile, int DumpType, ref MINIDUMP_EXCEPTION_INFORMATION ExceptionParam, IntPtr UserStreamParam, IntPtr CallbackParam);
@@ -34,7 +34,7 @@ namespace FWI
         const int MiniDumpNormal = 0x00000000; // 최소한의 스택 정보만 남기는 플래그
         const int MiniDumpWithFullMemory = 0x00000002; // 모든 스택 정보와, 스레드, 메모리 상태 정보를 남기는 플래그
 
-        public static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        public static void SenderEvent(object sender, UnhandledExceptionEventArgs e)
         {
             // 덤프 파일 이름(각자 원하는대로 변경)
             string dirPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);

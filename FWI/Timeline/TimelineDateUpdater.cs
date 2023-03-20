@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 
 namespace FWI
 {
-    public delegate DateTime DateTimeDelegate();
-    public class TimelineDateUpdater : TimelineUpdater
+    public class TimelineDateUpdater : ITimelineUpdater
     {
-        static readonly DateTimeDelegate getDateTimeDef = () => DateTime.Now;
-        DateTimeDelegate getDateTime;
+        
+        static readonly Func<DateTime> getDateTimeDef = () => DateTime.Now;
+        Func<DateTime> getDateTime;
         readonly Dictionary<string, WindowInfo> windowInfoDic;
         readonly Rank rank;
         DateTime begin, end;
         DateTime last;
         WindowInfo lastWI;
-        OnEndDelegate onEnd;
+        Action<WindowInfo> onEnd;
 
         public TimelineDateUpdater() : this(begin: DateTime.MinValue, end: DateTime.MaxValue) 
         {
@@ -55,7 +55,7 @@ namespace FWI
             }
         }
 
-        public void SetOnEnd(OnEndDelegate onEnd)
+        public void SetOnEnd(Action<WindowInfo> onEnd)
         {
             this.onEnd = onEnd;
         }

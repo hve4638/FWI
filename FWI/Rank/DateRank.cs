@@ -13,6 +13,9 @@ using FWI.Exceptions;
 
 namespace FWI
 {
+    /// <summary>
+    /// Date를 포함한 WindowInfo 정보를 가진 Rank Wrap
+    /// </summary>
     public class DateRank
     {
         readonly Dictionary<string, WindowInfo> WIs;

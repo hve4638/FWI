@@ -4,15 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FWI
+namespace HUtility
 {
-    internal class DynamicDateRange : DateRange
+    public class MutableDateRange : DateRange
     {
-        public DynamicDateRange(DateTime begin, DateTime end) : base(begin, end)
+        public MutableDateRange(DateTime begin, DateTime end) : base(begin, end)
         {
-
+            
         }
-
         public new DateTime Begin
         {
             get { return begin; }

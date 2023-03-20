@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 namespace FWI
 {
     public delegate void OnEndDelegate(WindowInfo item);
-    public interface TimelineUpdater
+
+    public interface ITimelineUpdater
     {
-        void SetOnEnd(OnEndDelegate onEnd);
+        void SetOnEnd(Action<WindowInfo> onEnd);
         TimeSpan Add(WindowInfo wi);
         bool IsEnd(DateTime current);
         bool IsEnd();

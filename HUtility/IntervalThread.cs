@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-
-namespace FWI
+namespace HUtility
 {
+    [Obsolete]
     public class IntervalThread
     {
         Thread thread;

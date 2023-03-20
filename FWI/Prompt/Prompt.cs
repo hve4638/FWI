@@ -6,8 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using FWI;
-using static System.Net.Mime.MediaTypeNames;
+using HUtility;
 #nullable enable
 
 namespace FWI.Prompt

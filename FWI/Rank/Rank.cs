@@ -11,7 +11,7 @@ namespace FWI
     public class Rank
     {
         int currentHashCode;
-        Dictionary<string, TimeSpan> rankDict;
+        readonly Dictionary<string, TimeSpan> rankDict;
 
         public Rank()
         {
@@ -29,9 +29,11 @@ namespace FWI
         /// Rank 1을 가져옵니다.
         /// </summary>
         public string One() => GetRank(1);
-
         public bool HasOne() => rankDict.Count > 0;
 
+        /// <summary>
+        /// value 등수의 값을 가져옵니다
+        /// </summary>
         public bool TryGetRank(int value, out string output) => TryGetRank(value, out output, out _);
         /// <summary>
         /// value 등수의 값을 가져옵니다
@@ -87,6 +89,13 @@ namespace FWI
             else throw new RankNotFoundException();
         }
 
+        public void Add(Rank other)
+        {
+            foreach(var item in other.rankDict)
+            {
+                Add(item.Key, item.Value);
+            }
+        }
         public void Add(WindowInfo wi, TimeSpan duration) => Add(wi.Name, duration);
         public void Add(string name, TimeSpan duration)
         {
@@ -103,9 +112,8 @@ namespace FWI
 
         public void Import(string filename)
         {
-            var reader = new StreamReader(filename);
+            using var reader = new StreamReader(filename);
             Import(reader);
-            reader.Close();
         }
         public void Import(StreamReader reader)
         {
@@ -139,10 +147,10 @@ namespace FWI
 
         public void Export(string filename)
         {
-            var writer = new StreamWriter(filename);
+            using var writer = new StreamWriter(filename);
             Export(writer);
-            writer.Close();
         }
+
         public void Export(StreamWriter writer)
         {
             foreach(var name in rankDict.Keys)
@@ -168,7 +176,6 @@ namespace FWI
             }
             else return false;
         }
-
         public int GetContentsHash() => currentHashCode;
         public override int GetHashCode() => base.GetHashCode();
     }

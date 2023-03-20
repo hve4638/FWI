@@ -52,10 +52,11 @@ namespace FWI
 
         public static void WriteDateTimeNullable(this ByteWriter bw, DateTime? date)
         {
-            if (date is null) bw.WriteBoolean(false);
+            if (date == null) bw.WriteBoolean(false);
+            else
             {
                 bw.WriteBoolean(true);
-                bw.WriteDateTime((DateTime)date!);
+                bw.WriteDateTime((DateTime)date);
             }
         }
 

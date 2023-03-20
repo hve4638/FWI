@@ -1,19 +1,19 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿#if TEST
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FWI;
+using HUtility.Testing;
 
-namespace FWITest.FWITimeline
+namespace FWI.Test
 {
     [TestClass]
     public class TimelineDateUpdaterTest
     {
-
         [TestMethod]
-        public void TestGetOne()
+        public void One()
         {
             var begin = new DateTime(2022, 06, 01, 12, 00, 00);
             var end = new DateTime(2022, 06, 01, 12, 01, 00);
@@ -32,10 +32,10 @@ namespace FWITest.FWITimeline
         }
 
         [TestMethod]
-        public void TestGetOneNoItem()
+        public void OneNoItem()
         {
-            var begin = Date.MakeDateTime("000101 120000");
-            var end = Date.MakeDateTime("000101 120100");
+            var begin = TestUtils.MakeDateTime("000101 120000");
+            var end = TestUtils.MakeDateTime("000101 120100");
             var updater = new TimelineDateUpdater(begin: begin, end: end);
 
             try
@@ -51,15 +51,15 @@ namespace FWITest.FWITimeline
 
 
         [TestMethod]
-        public void TestOnEndListener()
+        public void OnEndListener()
         {
-            var begin = Date.MakeDateTime("000101 120000");
-            var end = Date.MakeDateTime("000101 120100");
+            var begin = TestUtils.MakeDateTime("000101 120000");
+            var end = TestUtils.MakeDateTime("000101 120100");
             WindowInfo[] items =
             {
-                new WindowInfo(name: "1", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name: "2", date: Date.MakeDateTime("000101 120050")),
-                new WindowInfo(name: "3", date: Date.MakeDateTime("000101 120110")),
+                new WindowInfo(name: "1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120050")),
+                new WindowInfo(name: "3", date: TestUtils.MakeDateTime("000101 120110")),
             };
 
             WindowInfo[] expected =
@@ -68,7 +68,7 @@ namespace FWITest.FWITimeline
             };
             var actual = new List<WindowInfo>();
 
-            TimelineUpdater updater = new TimelineDateUpdater(begin: begin, end: end);
+            ITimelineUpdater updater = new TimelineDateUpdater(begin: begin, end: end);
             updater.SetOnEnd((WindowInfo wi) => { actual.Add(wi); });
 
             foreach (var item in items) updater.Add(item);
@@ -77,11 +77,11 @@ namespace FWITest.FWITimeline
         }
 
         [TestMethod]
-        public void TestFillOnEndListener()
+        public void FillOnEndListener()
         {
-            var begin = Date.MakeDateTime("000101 120000");
-            var end = Date.MakeDateTime("000101 120100");
-            var item = new WindowInfo(name: "0", date: Date.MakeDateTime("000101 120005"));
+            var begin = TestUtils.MakeDateTime("000101 120000");
+            var end = TestUtils.MakeDateTime("000101 120100");
+            var item = new WindowInfo(name: "0", date: TestUtils.MakeDateTime("000101 120005"));
 
             var expected = item;
             WindowInfo actual = null;
@@ -96,16 +96,16 @@ namespace FWITest.FWITimeline
         }
 
         [TestMethod]
-        public void TestGetTotal()
+        public void GetTotal()
         {
-            
-            var begin = Date.MakeDateTime("000101 120000");
-            var end = Date.MakeDateTime("000101 120100");
+
+            var begin = TestUtils.MakeDateTime("000101 120000");
+            var end = TestUtils.MakeDateTime("000101 120100");
             var updater = new TimelineDateUpdater(begin: begin, end: end);
             WindowInfo[] array = {
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 115955")), 
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120030")),
-                new WindowInfo(name:"3", date: Date.MakeDateTime("000101 120115")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 115955")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120030")),
+                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120115")),
             };
 
             var total = new TimeSpan(0, 0, 0);
@@ -117,14 +117,14 @@ namespace FWITest.FWITimeline
 
 
         [TestMethod]
-        public void TestGetTime()
+        public void GetTime()
         {
-            var begin = Date.MakeDateTime("000101 120000");
-            var end = Date.MakeDateTime("000101 120100");
+            var begin = TestUtils.MakeDateTime("000101 120000");
+            var end = TestUtils.MakeDateTime("000101 120100");
             WindowInfo[] items = {
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120010")),
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120030")),
-                new WindowInfo(name:"3", date: Date.MakeDateTime("000101 120055")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120010")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120030")),
+                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120055")),
             };
 
             TimeSpan expected, actual;
@@ -148,16 +148,16 @@ namespace FWITest.FWITimeline
         }
 
         [TestMethod]
-        public void TestGetTimeWithInitWI()
+        public void GetTimeWithInitWI()
         {
-            var begin = Date.MakeDateTime("000101 120000");
-            var end = Date.MakeDateTime("000101 120100");
+            var begin = TestUtils.MakeDateTime("000101 120000");
+            var end = TestUtils.MakeDateTime("000101 120100");
             WindowInfo[] items = {
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120010")),
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120030")),
-                new WindowInfo(name:"3", date: Date.MakeDateTime("000101 120055")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120010")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120030")),
+                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120055")),
             };
-            WindowInfo initWI = new WindowInfo(name: "0", date: Date.MakeDateTime("000101 115930"));
+            WindowInfo initWI = new WindowInfo(name: "0", date: TestUtils.MakeDateTime("000101 115930"));
 
             TimeSpan expected, actual;
             var updater = new TimelineDateUpdater(begin: begin, end: end, initWI: initWI);
@@ -183,14 +183,14 @@ namespace FWITest.FWITimeline
         /// FillLast()로 마지막 넣은값으로 나머지 시간을 모두 채우기
         /// </summary>
         [TestMethod]
-        public void TestFillRemainTime()
+        public void FillRemainTime()
         {
-            var begin = Date.MakeDateTime("000101 120000");
-            var end = Date.MakeDateTime("000101 120100");
+            var begin = TestUtils.MakeDateTime("000101 120000");
+            var end = TestUtils.MakeDateTime("000101 120100");
             var updater = new TimelineDateUpdater(begin: begin, end: end);
             WindowInfo[] items = {
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120020")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120020")),
             };
             foreach (var item in items) updater.Add(item);
 
@@ -204,12 +204,12 @@ namespace FWITest.FWITimeline
         }
 
         [TestMethod]
-        public void TestInitWI()
+        public void InitWI()
         {
-            var begin = Date.MakeDateTime("000101 120000");
-            var end = Date.MakeDateTime("000101 120100");
+            var begin = TestUtils.MakeDateTime("000101 120000");
+            var end = TestUtils.MakeDateTime("000101 120100");
             var updater = new TimelineDateUpdater(begin: begin, end: end);
-            var item = new WindowInfo(name: "2", date: Date.MakeDateTime("000101 120045"));
+            var item = new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120045"));
             updater.Add(item);
 
             updater.FillLast();
@@ -222,14 +222,14 @@ namespace FWITest.FWITimeline
         }
 
         [TestMethod]
-        public void TestInitWI2()
+        public void InitWI2()
         {
-            var begin = Date.MakeDateTime("000101 120000");
-            var end = Date.MakeDateTime("000101 120100");
-            var initWI = new WindowInfo(name: "1", date: Date.MakeDateTime("000101 115000"));
+            var begin = TestUtils.MakeDateTime("000101 120000");
+            var end = TestUtils.MakeDateTime("000101 120100");
+            var initWI = new WindowInfo(name: "1", date: TestUtils.MakeDateTime("000101 115000"));
 
             var updater = new TimelineDateUpdater(begin: begin, end: end, initWI: initWI);
-            var item = new WindowInfo(name: "2", date: Date.MakeDateTime("000101 120015"));
+            var item = new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120015"));
             updater.Add(item);
 
             updater.FillLast();
@@ -242,14 +242,14 @@ namespace FWITest.FWITimeline
         }
 
         [TestMethod]
-        public void TestInitWI3()
+        public void InitWI3()
         {
-            var begin = Date.MakeDateTime("000101 120000");
-            var end = Date.MakeDateTime("000101 120100");
-            var initWI = new WindowInfo(name: "1", date: Date.MakeDateTime("000101 120005"));
+            var begin = TestUtils.MakeDateTime("000101 120000");
+            var end = TestUtils.MakeDateTime("000101 120100");
+            var initWI = new WindowInfo(name: "1", date: TestUtils.MakeDateTime("000101 120005"));
 
             var updater = new TimelineDateUpdater(begin: begin, end: end, initWI: initWI);
-            var item = new WindowInfo(name: "2", date: Date.MakeDateTime("000101 120015"));
+            var item = new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120015"));
             updater.Add(item);
 
             updater.FillLast();
@@ -262,13 +262,13 @@ namespace FWITest.FWITimeline
         }
 
         [TestMethod]
-        public void TestNoInitWI()
+        public void NoInitWI()
         {
-            var begin = Date.MakeDateTime("000101 120000");
-            var end = Date.MakeDateTime("000101 120100");
+            var begin = TestUtils.MakeDateTime("000101 120000");
+            var end = TestUtils.MakeDateTime("000101 120100");
 
             var updater = new TimelineDateUpdater(begin: begin, end: end);
-            var item = new WindowInfo(name: "2", date: Date.MakeDateTime("000101 120045"));
+            var item = new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120045"));
             updater.Add(item);
 
             updater.FillLast();
@@ -284,15 +284,15 @@ namespace FWITest.FWITimeline
         /// 같은 windowInfo가 여러번 들어와도 최초로 들어온 date를 가진 windowInfo를 리턴함
         /// </summary>
         [TestMethod]
-        public void TestIsAddedFirstWI()
+        public void IsAddedFirstWI()
         {
-            var begin = Date.MakeDateTime("000101 120000");
-            var end = Date.MakeDateTime("000101 120100");
+            var begin = TestUtils.MakeDateTime("000101 120000");
+            var end = TestUtils.MakeDateTime("000101 120100");
             var updater = new TimelineDateUpdater(begin: begin, end: end);
             WindowInfo[] items = {
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120020")),
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120040")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120020")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120040")),
             };
             foreach (var item in items) updater.Add(item);
             updater.FillLast();
@@ -303,19 +303,19 @@ namespace FWITest.FWITimeline
         }
 
         [TestMethod]
-        public void TestReset()
+        public void Reset()
         {
-            var begin = Date.MakeDateTime("000101 120000");
-            var end = Date.MakeDateTime("000101 120100");
+            var begin = TestUtils.MakeDateTime("000101 120000");
+            var end = TestUtils.MakeDateTime("000101 120100");
             WindowInfo[] items = {
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120020")),
-                new WindowInfo(name:"3", date: Date.MakeDateTime("000101 120105")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120020")),
+                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120105")),
             };
             WindowInfo[] items2 = {
-                new WindowInfo(name:"a", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"b", date: Date.MakeDateTime("000101 120050")),
-                new WindowInfo(name:"c", date: Date.MakeDateTime("000101 120100")),
+                new WindowInfo(name:"a", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name:"b", date: TestUtils.MakeDateTime("000101 120050")),
+                new WindowInfo(name:"c", date: TestUtils.MakeDateTime("000101 120100")),
             };
             WindowInfo expected, actual;
 
@@ -332,29 +332,27 @@ namespace FWITest.FWITimeline
             Assert.AreEqual(expected, actual, "second");
         }
 
-        /// <summary>
         /// 실사용에 가장 가까운 방법
-        /// </summary>
         [TestMethod]
-        public void TestActual()
+        public void Actual()
         {
             int callbackCount = 0;
-            DateTime current = Date.MakeDateTime("000101 120000");
+            DateTime current = TestUtils.MakeDateTime("000101 120000");
             TimeSpan interval = new TimeSpan(0, 1, 0);
             WindowInfo[] items = {
-                new WindowInfo(name:"0", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120020")),
+                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120020")),
 
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120105")),
-                new WindowInfo(name:"3", date: Date.MakeDateTime("000101 120110")),
-                new WindowInfo(name:"4", date: Date.MakeDateTime("000101 120120")),
-                new WindowInfo(name:"5", date: Date.MakeDateTime("000101 120155")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120105")),
+                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120110")),
+                new WindowInfo(name:"4", date: TestUtils.MakeDateTime("000101 120120")),
+                new WindowInfo(name:"5", date: TestUtils.MakeDateTime("000101 120155")),
 
-                new WindowInfo(name:"6", date: Date.MakeDateTime("000101 120245")),
+                new WindowInfo(name:"6", date: TestUtils.MakeDateTime("000101 120245")),
 
-                new WindowInfo(name:"7", date: Date.MakeDateTime("000101 120301")),
+                new WindowInfo(name:"7", date: TestUtils.MakeDateTime("000101 120301")),
 
-                new WindowInfo(name:"8", date: Date.MakeDateTime("000101 120610")),
+                new WindowInfo(name:"8", date: TestUtils.MakeDateTime("000101 120610")),
             };
             WindowInfo[] expected =
             {
@@ -365,11 +363,11 @@ namespace FWITest.FWITimeline
             };
             var actual = new List<WindowInfo>();
             WindowInfo last = new NoWindowInfo();
-            var updater = new TimelineDateUpdater(begin: current, end: current+interval);
+            var updater = new TimelineDateUpdater(begin: current, end: current + interval);
             updater.SetOnEnd((WindowInfo wi) =>
             {
                 var date = new DateTime(current.Year, current.Month, current.Day, current.Hour, current.Minute, 0);
-                updater.Reset(begin: date, end: date+interval, initWI:updater.Last);
+                updater.Reset(begin: date, end: date + interval, initWI: updater.Last);
                 updater.Add(last);
 
                 actual.Add(wi);
@@ -387,39 +385,5 @@ namespace FWITest.FWITimeline
             CollectionAssert.AreEqual(expected, actual);
         }
     }
-
-
-    [TestClass]
-    public class TimelineInstantUpdaterTest
-    {
-        [TestMethod]
-        public void TestGetOne()
-        {
-            TimelineUpdater updater = new TimelineInstantUpdater();
-            var expected = new WindowInfo(name: "1", date: Date.MakeDateTime("000101 120000"));
-
-            updater.Add(expected);
-
-            var actual = updater.One();
-            Assert.AreEqual(expected.Name, actual.Name);
-        }
-
-        [TestMethod]
-        public void TestOnEnd()
-        {
-            var expected = new List<WindowInfo>
-            {
-                new WindowInfo(name: "1", date: Date.MakeDate("000101")),
-                new WindowInfo(name: "2", date: Date.MakeDate("000102")),
-                new WindowInfo(name: "3", date: Date.MakeDate("000103")),
-            };
-            var actual = new List<WindowInfo>();
-            TimelineUpdater updater = new TimelineInstantUpdater();
-            updater.SetOnEnd((WindowInfo wi) => { actual.Add(wi); });
-
-            foreach (var item in expected) updater.Add(item);
-
-            CollectionAssert.AreEqual(expected, actual);
-        }
-    }
 }
+#endif

@@ -7,10 +7,9 @@ using System.Diagnostics;
 using CommandLine;
 using System.Net;
 using System.Net.Sockets;
-
 using YamlDotNet.RepresentationModel;
 using System.Reflection.Metadata;
-
+using HUtility;
 
 namespace FWIServer
 {
@@ -35,7 +34,7 @@ namespace FWIServer
 
         static void Main(string[] args)
         {
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(ExceptionHandler.CurrentDomain_UnhandledException);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(UnhandleExceptionHandler.SenderEvent);
 
             Console.Title = "FWIServer";
             Console.WriteLine($"FWI Server");

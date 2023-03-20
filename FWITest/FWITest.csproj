@@ -113,9 +113,6 @@
     <Compile Include="FWI\Prompt\PromptTest.cs" />
     <Compile Include="FWI\Rank\RankTest.cs" />
     <Compile Include="Learning\ParsingTest.cs" />
-    <Compile Include="FWI\StringExtenderTest.cs" />
-    <Compile Include="FWI\Timeline\TimelineTest.cs" />
-    <Compile Include="FWI\Timeline\TimelineUpdaterTest.cs" />
     <Compile Include="FWI\WindowInfoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FWI\SingleLoggerTest.cs" />
@@ -136,6 +133,10 @@
     <ProjectReference Include="..\FWI\FWI.csproj">
       <Project>{0f70ba71-7854-4cbd-828b-892ba67019f7}</Project>
       <Name>FWI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HUtility\HUtility.csproj">
+      <Project>{d5ba20da-14e4-4d14-8e2a-6cb3eaa49767}</Project>
+      <Name>HUtility</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

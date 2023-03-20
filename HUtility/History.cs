@@ -1,10 +1,11 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FWI
+namespace HUtility
 {
     public class History<T>
     {
@@ -46,6 +47,24 @@ namespace FWI
             history.Add(item);
 
             return history;
+        }
+
+        public T this[int index]
+        {
+            get
+            {
+                if (Count > index)
+                {
+                    var node = linked.First;
+                    for (int i = 0; i < index; i++) node = node.Next;
+
+                    return node.Value;
+                }
+                else
+                {
+                    throw new IndexOutOfRangeException();
+                }
+            }
         }
     }
 }

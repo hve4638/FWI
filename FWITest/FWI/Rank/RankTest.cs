@@ -172,6 +172,32 @@ namespace FWITest.FWIRank
             }
             Assert.Fail();
         }
+
+        [TestMethod]
+        public void TestAddRank()
+        {
+            Rank rank1 = new Rank();
+            rank1.Add("1st", new TimeSpan(0, 5, 00));
+            rank1.Add("2nd", new TimeSpan(0, 2, 00));
+            rank1.Add("3rd", new TimeSpan(0, 1, 00));
+
+            Rank rank2 = new Rank();
+            rank1.Add("1st", new TimeSpan(0, 0, 45));
+            rank1.Add("3rd", new TimeSpan(0, 0, 30));
+            rank1.Add("4th", new TimeSpan(0, 0, 10));
+
+            Rank expectedRank = new Rank();
+            expectedRank.Add("1st", new TimeSpan(0, 5, 45));
+            expectedRank.Add("2nd", new TimeSpan(0, 2, 00));
+            expectedRank.Add("3rd", new TimeSpan(0, 1, 30));
+            expectedRank.Add("4th", new TimeSpan(0, 0, 10));
+
+            Rank actualRank = new Rank();
+            actualRank.Add(rank1);
+            actualRank.Add(rank2);
+
+            Assert.AreEqual(expectedRank, actualRank);
+        }
     }
 
     [TestClass]

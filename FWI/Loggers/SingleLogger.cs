@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HUtility;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -32,7 +33,7 @@ namespace FWI {
         }
 
         public void SetLoggingInterval(int minutes=0) => timeline.SetInterval(minutes);
-        public void SetDateTimeDelegate(DateTimeDelegate dateTimeDelegate) => timeline.SetDateTimeDelegate(dateTimeDelegate);
+        public void SetDateTimeDelegate(Func<DateTime> dateTimeDelegate) => timeline.SetMenualDateTime(dateTimeDelegate);
         public Logger AppendWindowInfo(WindowInfo wi) => AddWI(wi);
         public Logger AddWI(WindowInfo wi)
         {

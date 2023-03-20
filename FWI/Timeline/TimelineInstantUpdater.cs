@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#nullable enable
 
 namespace FWI
 {
-    public class TimelineInstantUpdater : TimelineUpdater
+    public class TimelineInstantUpdater : ITimelineUpdater
     {
-        OnEndDelegate onEnd;
+        Action<WindowInfo>? onEnd;
         WindowInfo last;
         public TimelineInstantUpdater()
         {
             onEnd = null;
+            last = new NoWindowInfo();
         }
 
-        public void SetOnEnd(OnEndDelegate onEnd)
+        public void SetOnEnd(Action<WindowInfo> onEnd)
         {
             this.onEnd = onEnd;
         }

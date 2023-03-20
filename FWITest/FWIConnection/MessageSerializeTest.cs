@@ -63,6 +63,9 @@ namespace FWITest.FWIConnection
         public void TestRequestTimeline()
         {
             var original = new TimelineRequest();
+            original.BeginDate = DateTime.MinValue;
+            original.EndDate = DateTime.MaxValue;
+
             var bytes = original.Serialize();
             var reader = new ByteReader(bytes);
             TimelineRequest.Deserialize(reader);

@@ -12,6 +12,7 @@ using FWI.Message;
 using System.Xml.Linq;
 using YamlDotNet.Core.Tokens;
 using FWI.Results;
+using HUtility;
 
 namespace FWIServer
 {

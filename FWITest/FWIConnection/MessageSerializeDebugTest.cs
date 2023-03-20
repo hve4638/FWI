@@ -62,6 +62,7 @@ namespace FWITest.FWIConnection
         public void TestRequestTimeline()
         {
             var original = new TimelineRequest();
+
             var bytes = original.Serialize(debug: true);
             var reader = new ByteReader(bytes);
             TimelineRequest.Deserialize(reader);
