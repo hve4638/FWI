@@ -7,41 +7,41 @@ using System.Threading.Tasks;
 
 namespace HUtility
 {
-    internal class RankKeyFilterDictionary<T, S> : IRankDictionary<T>
+    internal class RankKeyFilterDictionary<T, K, S> : IRankDictionary<T, S>
     {
-        readonly IRankDictionary<S> rank;
-        readonly Dictionary<S, T> reverseDict;
-        readonly Func<T, S> onFilter;
+        readonly IRankDictionary<K, S> rank;
+        readonly Dictionary<K, T> reverseDict;
+        readonly Func<T, K> onFilter;
 
-        public RankKeyFilterDictionary(Func<T, S> keyFilter)
+        public RankKeyFilterDictionary(Func<T, K> keyFilter)
         {
-            rank = new RankDictionary<S>();
-            reverseDict = new Dictionary<S, T>();
+            rank = new RankDictionary<K, S>();
+            reverseDict = new Dictionary<K, T>();
             onFilter = keyFilter;
         }
 
-        S Filter(T key)
+        K Filter(T key)
         {
             var result = onFilter(key);
             if (!reverseDict.ContainsKey(result)) reverseDict.Add(result, key);
             
             return result;
         }
-        T Unfilter(S key) => reverseDict[key];
+        T Unfilter(K key) => reverseDict[key];
 
-        public TimeSpan Get(T item) => rank.Get(Filter(item));
+        public S Get(T item) => rank.Get(Filter(item));
         public bool Has(T item) => rank.Has(Filter(item));
         public bool Remove(T item) => rank.Remove(Filter(item));
-        public void Set(T key, TimeSpan value) => rank.Set(Filter(key), value);
+        public void Set(T key, S value) => rank.Set(Filter(key), value);
         public void Clear()
         {
             reverseDict.Clear();
             rank.Clear();
         }
 
-        public IEnumerator<(T, TimeSpan)> GetEnumerator()
+        public IEnumerator<(T, S)> GetEnumerator()
         {
-            foreach((S key, TimeSpan value) in rank)
+            foreach((K key, S value) in rank)
             {
                 yield return (Unfilter(key), value);
             }

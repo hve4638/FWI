@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace HUtility
 {
-    internal interface IRankDictionary<T> : IEnumerable<(T, TimeSpan)>
+    internal interface IRankDictionary<T, S> : IEnumerable<(T, S)>
     {
         bool Remove(T item);
         bool Has(T item);
-        void Set(T key, TimeSpan value);
-        TimeSpan Get(T key);
+        void Set(T key, S value);
+        S Get(T key);
         void Clear();
     }
 }

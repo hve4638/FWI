@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlarmTask.cs" />
+    <Compile Include="DataStructure\Rank\Exceptions\RankNotFoundException.cs" />
     <Compile Include="DataStructure\Rank\IRankDictionary.cs" />
     <Compile Include="DataStructure\Rank\IRankDictionaryExtender.cs" />
     <Compile Include="DataStructure\Rank\RankDictionary.cs" />

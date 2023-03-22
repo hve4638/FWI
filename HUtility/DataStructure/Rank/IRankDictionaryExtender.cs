@@ -8,7 +8,7 @@ namespace HUtility
 {
     public static class IRankDictionaryExtender
     {
-        internal static void Add<T>(this IRankDictionary<T> rankDictionary, T key, TimeSpan value)
+        internal static void Add<T>(this IRankDictionary<T, TimeSpan> rankDictionary, T key, TimeSpan value)
         {
             if (rankDictionary.Has(key))
             {
@@ -22,7 +22,7 @@ namespace HUtility
             }
         }
 
-        internal static void Copy<T>(this IRankDictionary<T> src, ref IRankDictionary<T> dest)
+        internal static void Copy<T>(this IRankDictionary<T, TimeSpan> src, ref IRankDictionary<T, TimeSpan> dest)
         {
             dest.Clear();
 

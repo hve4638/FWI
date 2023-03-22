@@ -8,14 +8,14 @@ using System.Xml.Linq;
 
 namespace HUtility
 {
-    public class Rank<T>
+    public class Rank<T, S> where S : IComparable<S>
     {
         int currentHash;
-        readonly Dictionary<T, TimeSpan> rankDict;
+        readonly Dictionary<T, S> rankDict;
 
         public Rank()
         {
-            rankDict = new Dictionary<T, TimeSpan>();
+            rankDict = new Dictionary<T, S>();
             Clear();
         }
         
@@ -29,11 +29,11 @@ namespace HUtility
         public bool HasOne() => rankDict.Count > 0;
 
         public bool TryGetRank(int value, out T output) => TryGetRank(value, out output, out _);
-        public bool TryGetRank(int value, out T output, out TimeSpan time)
+        public bool TryGetRank(int value, out T output, out S time)
         {
             int rank;
             int lastRank = 0;
-            TimeSpan duration;
+            S duration;
 
             output = default;
 
@@ -45,7 +45,7 @@ namespace HUtility
                     duration = rankDict[name];
                     foreach (var n in rankDict.Values)
                     {
-                        if (n > duration) rank++;
+                        if (n.CompareTo(duration) > 0) rank++;
                     }
 
                     if (rank == value)
@@ -64,7 +64,7 @@ namespace HUtility
 
             if (lastRank == 0)
             {
-                time = TimeSpan.Zero;
+                time = default;
                 return false;
             }
             else
@@ -79,19 +79,20 @@ namespace HUtility
             if (TryGetRank(value, out T result)) return result;
             else throw new RankNotFoundException();
         }
-
-        public void Add(Rank<T> other)
+        /*
+        public void Add(Rank<T, S> other)
         {
             foreach (var item in other.rankDict) Add(item.Key, item.Value);
         }
-        public void Add(T key, TimeSpan duration)
+        public void Add(T key, S duration)
         {
             if (rankDict.ContainsKey(key)) UpdateKeyHash(key);
-            else rankDict.Add(key, TimeSpan.Zero);
+            else rankDict.Add(key, default);
 
-            rankDict[key] += duration;
+            var p = rankDict[key];
+            var a = p + duration;
             UpdateKeyHash(key);
-        }
+        }*/
         void UpdateKeyHash(T key)
         {
             var hash = key.GetHashCode() * 7 + rankDict[key].GetHashCode();
@@ -103,9 +104,9 @@ namespace HUtility
 
         public override bool Equals(object obj)
         {
-            if (obj is Rank<T>)
+            if (obj is Rank<T, S>)
             {
-                Rank<T> other = obj as Rank<T>;
+                Rank<T, S> other = obj as Rank<T, S>;
                 return rankDict.SequenceEqual(other.rankDict);
             }
             else return false;
@@ -114,16 +115,5 @@ namespace HUtility
         public override int GetHashCode() => base.GetHashCode();
     }
 
-    public class RankNotFoundException : Exception
-    {
-        public RankNotFoundException() : base()
-        {
 
-        }
-
-        public RankNotFoundException(string message) : base(message)
-        {
-
-        }
-    }
 }
