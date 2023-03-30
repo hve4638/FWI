@@ -13,5 +13,7 @@ namespace HUtility
         void Set(T key, S value);
         S Get(T key);
         void Clear();
+        IOrderedEnumerable<KeyValuePair<T, S>> Ordered();
+        int Count { get; }
     }
 }

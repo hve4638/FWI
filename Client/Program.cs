@@ -1,6 +1,6 @@
 ﻿using FWI;
 using FWI.Results;
-using FWI.Prompt;
+using FWI.Commands;
 using CommandLine;
 using System.Windows.Forms;
 
@@ -19,7 +19,7 @@ namespace FWIClient
         public static IOutputStream VerboseOut => (VerboseMode) ? Out : NullOutputStream.Instance;
         public static bool AutoReload { get; set; }
         public static bool VerboseMode { get; set; }
-        public static Prompt? CurrentPrompt { get; set; }
+        public static Command? CurrentPrompt { get; set; }
         public static MainForm? CurrentForm { get; set; }
         public static ClientRunner? Runner { get; private set; }
         static Config config;

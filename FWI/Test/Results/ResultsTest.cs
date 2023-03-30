@@ -1,4 +1,5 @@
-﻿using FWI.Results;
+﻿#if TEST
+using FWI.Results;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FWITest.FWIResult
+namespace FWI.Test
 {
     [TestClass]
     public class ResultsTest
@@ -141,3 +142,4 @@ namespace FWITest.FWIResult
         }
     }
 }
+#endif

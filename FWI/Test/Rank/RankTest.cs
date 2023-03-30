@@ -1,12 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿#if TEST
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FWI;
+using HUtility.Testing;
 
-namespace FWITest.FWIRank
+namespace FWI.Test
 {
     [TestClass]
     public class RankTest
@@ -245,3 +247,4 @@ namespace FWITest.FWIRank
         }
     }
 }
+#endif

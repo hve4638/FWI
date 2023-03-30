@@ -1,31 +1,32 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿#if TEST
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FWI;
+using HUtility.Testing;
 using System.Collections.ObjectModel;
 
-namespace FWITest.FWI.FWISingleLogger
+namespace FWI.Test
 {
     [TestClass]
-    public class SingleLoggerTest
+    public class SingleLoggerLegacyTest
     {
         [TestMethod]
         public void TestGetLog()
         {
-            Logger logger = new SingleLogger();
+            ILogger logger = new LoggerLegacy();
             WindowInfo[] items = {
-                new WindowInfo(name: "1", date: Date.MakeDate("000101")),
-                new WindowInfo(name: "2", date: Date.MakeDate("000103")),
-                new WindowInfo(name: "3", date: Date.MakeDate("000105")),
-                new WindowInfo(name: "4", date: Date.MakeDate("000107")),
+                new WindowInfo(name: "1", date: TestUtils.MakeDate("000101")),
+                new WindowInfo(name: "2", date: TestUtils.MakeDate("000103")),
+                new WindowInfo(name: "3", date: TestUtils.MakeDate("000105")),
+                new WindowInfo(name: "4", date: TestUtils.MakeDate("000107")),
             };
-            foreach (var item in items) logger.AppendWindowInfo(item);
+            foreach (var item in items) logger.AddWI(item);
 
-            var range = Date.MakeDateRange("000101", "000103");
+            var range = TestUtils.MakeDateRange("000101", "000103");
             var actual = logger.GetLog(range);
 
             WindowInfo[] expected = { items[0], items[1] };
@@ -35,13 +36,13 @@ namespace FWITest.FWI.FWISingleLogger
         [TestMethod]
         public void TestGetLogInterval()
         {
-            DateTime current = Date.MakeDateTime("000101 120000");
-            var logger = new SingleLogger();
+            DateTime current = TestUtils.MakeDateTime("000101 120000");
+            var logger = new LoggerLegacy();
             WindowInfo[] items = {
-                new WindowInfo(name: "1", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name: "2", date: Date.MakeDateTime("000101 120010")),
-                new WindowInfo(name: "3", date: Date.MakeDateTime("000101 120045")),
-                new WindowInfo(name: "4", date: Date.MakeDateTime("000101 120110")),
+                new WindowInfo(name: "1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120010")),
+                new WindowInfo(name: "3", date: TestUtils.MakeDateTime("000101 120045")),
+                new WindowInfo(name: "4", date: TestUtils.MakeDateTime("000101 120110")),
             };
 
             logger.SetDateTimeDelegate(() => current);
@@ -50,9 +51,9 @@ namespace FWITest.FWI.FWISingleLogger
             foreach (var item in items)
             {
                 current = item.Date;
-                logger.AppendWindowInfo(item); 
+                logger.AddWI(item); 
             }
-            current = Date.MakeDateTime("000101 120300");
+            current = TestUtils.MakeDateTime("000101 120300");
 
             WindowInfo[] expected = { items[1], items[3] };
             var actual = logger.GetLog();
@@ -62,13 +63,13 @@ namespace FWITest.FWI.FWISingleLogger
         [TestMethod]
         public void TestGetLogInterval2()
         {
-            DateTime current = Date.MakeDateTime("000101 120000");
-            var logger = new SingleLogger();
+            DateTime current = TestUtils.MakeDateTime("000101 120000");
+            var logger = new LoggerLegacy();
             WindowInfo[] items = {
-                new WindowInfo(name: "1", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name: "2", date: Date.MakeDateTime("000101 120010")),
-                new WindowInfo(name: "3", date: Date.MakeDateTime("000101 120045")),
-                new WindowInfo(name: "4", date: Date.MakeDateTime("000101 120110")),
+                new WindowInfo(name: "1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120010")),
+                new WindowInfo(name: "3", date: TestUtils.MakeDateTime("000101 120045")),
+                new WindowInfo(name: "4", date: TestUtils.MakeDateTime("000101 120110")),
             };
 
             logger.SetDateTimeDelegate(() => current);
@@ -77,9 +78,9 @@ namespace FWITest.FWI.FWISingleLogger
             foreach (var item in items)
             {
                 current = item.Date;
-                logger.AppendWindowInfo(item);
+                logger.AddWI(item);
             }
-            current = Date.MakeDateTime("000101 120140");
+            current = TestUtils.MakeDateTime("000101 120140");
 
             WindowInfo[] expected = { items[1] };
             var actual = logger.GetLog();
@@ -93,14 +94,14 @@ namespace FWITest.FWI.FWISingleLogger
         [TestMethod]
         public void TestExportAndImport()
         {
-            Logger logger = new SingleLogger();
-            logger.AppendWindowInfo(new WindowInfo(name: "hello.exe", title: "hello", date: new DateTime(2022, 11, 27, 15, 10, 10)));
-            logger.AppendWindowInfo(new WindowInfo(name: "hello2.exe", title: "hello2", date: new DateTime(2022, 11, 27, 16, 20, 15)));
-            logger.AppendWindowInfo(new WindowInfo(name: "hello3.exe", title: "hello3", date: new DateTime(2022, 11, 27, 17, 03, 00)));
-            logger.AppendWindowInfo(new WindowInfo(name: "hello.exe", title: "hello", date: new DateTime(2022, 11, 28, 04, 10, 00)));
+            ILogger logger = new LoggerLegacy();
+            logger.AddWI(new WindowInfo(name: "hello.exe", title: "hello", date: new DateTime(2022, 11, 27, 15, 10, 10)));
+            logger.AddWI(new WindowInfo(name: "hello2.exe", title: "hello2", date: new DateTime(2022, 11, 27, 16, 20, 15)));
+            logger.AddWI(new WindowInfo(name: "hello3.exe", title: "hello3", date: new DateTime(2022, 11, 27, 17, 03, 00)));
+            logger.AddWI(new WindowInfo(name: "hello.exe", title: "hello", date: new DateTime(2022, 11, 28, 04, 10, 00)));
             logger.Export("test-log");
 
-            Logger logger2 = new SingleLogger();
+            ILogger logger2 = new LoggerLegacy();
             logger2.Import("test-log");
 
             var list1 = logger.GetLog();
@@ -127,15 +128,15 @@ namespace FWITest.FWI.FWISingleLogger
                 return result;
             }
             string fname = "test-log-export-and-import-random.txt";
-            Logger logger = new SingleLogger();
+            ILogger logger = new LoggerLegacy();
             for (int i = 0; i < 500; i++)
             {
                 date = getRandDate(date);
-                logger.AppendWindowInfo(new WindowInfo(name: getRandString(6), title: getRandString(4), date: date));
+                logger.AddWI(new WindowInfo(name: getRandString(6), title: getRandString(4), date: date));
             }
             logger.Export(fname);
 
-            Logger logger2 = new SingleLogger();
+            ILogger logger2 = new LoggerLegacy();
             logger2.Import(fname);
 
             var list1 = logger.GetLog();
@@ -164,8 +165,8 @@ namespace FWITest.FWI.FWISingleLogger
         [TestMethod]
         public void TestHash()
         {
-            var logger = new SingleLogger();
-            var logger2 = new SingleLogger();
+            var logger = new LoggerLegacy();
+            var logger2 = new LoggerLegacy();
 
             Assert.AreEqual(logger.GetContentsHashCode(), logger2.GetContentsHashCode());
         }
@@ -174,10 +175,10 @@ namespace FWITest.FWI.FWISingleLogger
         [TestMethod]
         public void TestHashNotEqual()
         {
-            var logger = new SingleLogger();
-            var logger2 = new SingleLogger();
-            logger2.AppendWindowInfo(new WindowInfo(name: "1", date: Date.MakeDateTime("000101 120000")));
-            logger2.AppendWindowInfo(new WindowInfo(name: "2", date: Date.MakeDateTime("000101 120010")));
+            var logger = new LoggerLegacy();
+            var logger2 = new LoggerLegacy();
+            logger2.AddWI(new WindowInfo(name: "1", date: TestUtils.MakeDateTime("000101 120000")));
+            logger2.AddWI(new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120010")));
 
 
             var expected = logger.GetContentsHashCode();
@@ -187,3 +188,4 @@ namespace FWITest.FWI.FWISingleLogger
     }
 }
 
+#endif

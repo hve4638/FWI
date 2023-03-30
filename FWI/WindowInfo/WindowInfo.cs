@@ -13,7 +13,6 @@ namespace FWI
         string name;
         string alias;
         DateTime date;
-
         public string Title
         {
             get { return title; }

@@ -7,19 +7,20 @@ using System.Text;
 using System.Threading.Tasks;
 using FWIConnection;
 using FWI;
-using FWI.Prompt;
+using FWI.Commands;
 using FWI.Message;
 using System.Xml.Linq;
 using YamlDotNet.Core.Tokens;
 using FWI.Results;
 using HUtility;
 
+
 namespace FWIServer
 {
     internal class Receiver : IReceiver
     {
         ServerManager manager;
-        Prompt prompt;
+        Command prompt;
         IPEndPoint? client;
         Socket? socket;
         Func<bool>? onVerbose;
@@ -28,7 +29,7 @@ namespace FWIServer
         
         public bool IsTarget { get; private set; }
 
-        public Receiver(ServerManager manager, Prompt prompt, Action<Receiver>? onConnect = null, Action<Receiver>? onDisconnect = null)
+        public Receiver(ServerManager manager, Command prompt, Action<Receiver>? onConnect = null, Action<Receiver>? onDisconnect = null)
         {
             this.manager = manager;
             this.prompt = prompt;

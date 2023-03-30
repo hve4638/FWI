@@ -9,22 +9,22 @@ using System.Threading.Tasks;
 using HUtility;
 #nullable enable
 
-namespace FWI.Prompt
+namespace FWI.Commands
 {
-    public class Prompt
+    public class Command
     {
         private static readonly object _Lock = new object();
-        readonly PromptExecuter executer;
+        readonly CommandExecuter executer;
         readonly Stack<IOutputStream> outputStreamStack;
         public CommandDelegate? OnNotExecuted { get; set; }
         public bool UnhandleException { get; set; }
         public IOutputStream DefaultOutputStream { get; set; }
         public IOutputStream OutputStream { get; set; }
 
-        public Prompt()
+        public Command()
         {
             outputStreamStack = new Stack<IOutputStream>();
-            executer = new PromptExecuter();
+            executer = new CommandExecuter();
 
             OutputStream = NullOutputStream.Instance;
             DefaultOutputStream = new StandardOutputStream();
@@ -63,7 +63,7 @@ namespace FWI.Prompt
 
         public void Execute(string cmd, IOutputStream? outputStream = null)
         {
-            var args = new PromptArgs(cmd);
+            var args = new CommandArgs(cmd);
 
             lock(_Lock)
             {

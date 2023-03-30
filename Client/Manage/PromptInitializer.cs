@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FWI.Prompt;
+using FWI.Commands;
 using FWIConnection;
 using FWI.Message;
 using System.Collections;
@@ -19,7 +19,7 @@ namespace FWIClient
             this.manager = manager;
         }
 
-        public void Init(Prompt prompt)
+        public void Init(Command prompt)
         {
             prompt.Add("help", (args, output) => {
                 foreach (var cmd in prompt.GetCommands())

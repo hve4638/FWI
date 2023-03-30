@@ -1,21 +1,22 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿#if TEST
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FWI.Prompt;
+using FWI.Commands;
 
-namespace FWITest.FWIPrompt
+namespace FWI.Test
 {
     [TestClass]
-    public class PromptArgsTest
+    public class CommandArgsTest
     {
         [TestMethod]
         public void TestCommand()
         {
             var str = "echo".Split(' ');
-            var args = new PromptArgs(str);
+            var args = new CommandArgs(str);
 
             var expected = str[0];
             var actual = args.Command;
@@ -26,7 +27,7 @@ namespace FWITest.FWIPrompt
         public void TestGetArg()
         {
             var arr = "echo hello world".Split(' ');
-            var args = new PromptArgs(arr);
+            var args = new CommandArgs(arr);
 
             string[] expectedArray = { "hello", "world" };
             foreach (var (i, expected) in expectedArray.Select((x, i) => (i, x)))
@@ -40,7 +41,7 @@ namespace FWITest.FWIPrompt
         public void TestIndexer()
         {
             var arr = "echo hello world".Split(' ');
-            var args = new PromptArgs(arr);
+            var args = new CommandArgs(arr);
 
             for(var i = 0; i < arr.Length-1; i++)
             {
@@ -55,7 +56,7 @@ namespace FWITest.FWIPrompt
         public void TestGetArgInt()
         {
             var arr = "echo 1 2 3".Split(' ');
-            var args = new PromptArgs(arr);
+            var args = new CommandArgs(arr);
 
             int[] expectedArray = { 1, 2, 3 };
             foreach (var (i, expected) in expectedArray.Select((x, i) => (i, x)))
@@ -69,7 +70,7 @@ namespace FWITest.FWIPrompt
         public void TestOutOfIndex()
         {
             var arr = "echo hello world".Split(' ');
-            var args = new PromptArgs(arr);
+            var args = new CommandArgs(arr);
             var catched = false;
 
             try
@@ -88,7 +89,7 @@ namespace FWITest.FWIPrompt
         public void TestOutOfIndexNegative()
         {
             var arr = "echo hello world".Split(' ');
-            var args = new PromptArgs(arr);
+            var args = new CommandArgs(arr);
             var catched = false;
 
             try
@@ -109,7 +110,7 @@ namespace FWITest.FWIPrompt
             string expected = "echo hello world";
 
             var arr = expected.Split(' ');
-            var args = new PromptArgs(arr);
+            var args = new CommandArgs(arr);
 
             var actual = args.ToString();
 
@@ -120,7 +121,7 @@ namespace FWITest.FWIPrompt
         public void TestGetArgsAll()
         {
             var arr = "echo i wanna be the guy".Split(' ');
-            var args = new PromptArgs(arr);
+            var args = new CommandArgs(arr);
 
             var expected = "i wanna be the guy";
             var actual = args.GetArgs();
@@ -131,7 +132,7 @@ namespace FWITest.FWIPrompt
         public void TestGetArgsSplit()
         {
             var arr = "echo i wanna be the guy".Split(' ');
-            var args = new PromptArgs(arr);
+            var args = new CommandArgs(arr);
 
             var expected = "wanna be the guy";
             var actual = args.GetArgs(1);
@@ -142,7 +143,7 @@ namespace FWITest.FWIPrompt
         public void TestGetArgsRange()
         {
             var arr = "echo i wanna be the guy".Split(' ');
-            var args = new PromptArgs(arr);
+            var args = new CommandArgs(arr);
 
             var expected = "wanna be";
             var actual = args.GetArgs(1, 3);
@@ -153,7 +154,7 @@ namespace FWITest.FWIPrompt
         public void TestGetArgsRange2()
         {
             var arr = "echo i wanna be the guy".Split(' ');
-            var args = new PromptArgs(arr);
+            var args = new CommandArgs(arr);
 
             var expected = "i wanna be the";
             var actual = args.GetArgs(0, 4);
@@ -164,7 +165,7 @@ namespace FWITest.FWIPrompt
         public void TestGetArgsResultNo()
         {
             var arr = "echo i wanna be the guy".Split(' ');
-            var args = new PromptArgs(arr);
+            var args = new CommandArgs(arr);
 
             var expected = "";
             var actual = args.GetArgs(15);
@@ -174,7 +175,7 @@ namespace FWITest.FWIPrompt
         [TestMethod]
         public void TestSlice()
         {
-            var args = new PromptArgs("echo 1 2 3 4 5");
+            var args = new CommandArgs("echo 1 2 3 4 5");
 
             string eCommand, eArgs;
             eCommand = "echo";
@@ -198,7 +199,7 @@ namespace FWITest.FWIPrompt
         [TestMethod]
         public void TestSliceNegative()
         {
-            var args = new PromptArgs("echo 1 2 3 4 5");
+            var args = new CommandArgs("echo 1 2 3 4 5");
 
             string eCommand, eArgs;
             eCommand = "echo";
@@ -222,7 +223,7 @@ namespace FWITest.FWIPrompt
         [TestMethod]
         public void TestCommandLastWord()
         {
-            var args = new PromptArgs("echo 1 2 3 4 5");
+            var args = new CommandArgs("echo 1 2 3 4 5");
 
             string expected, actual;
             args = args.Slice(1);
@@ -239,7 +240,7 @@ namespace FWITest.FWIPrompt
         [TestMethod]
         public void TestSliceSafe()
         {
-            var args = new PromptArgs("echo 1 2 3 4 5");
+            var args = new CommandArgs("echo 1 2 3 4 5");
 
             string eCommand, eLast, eArgs;
             args = args.Slice(-1);
@@ -252,3 +253,4 @@ namespace FWITest.FWIPrompt
         }
     }
 }
+#endif

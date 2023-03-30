@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace FWI.Prompt
+namespace FWI.Commands
 {
-    public class PromptExecuter
+    public class CommandExecuter
     {
-        readonly Dictionary<string, PromptExecuter> dict;
+        readonly Dictionary<string, CommandExecuter> dict;
         CommandDelegate? OnExecute { get; set; }
 
-        public PromptExecuter()
+        public CommandExecuter()
         {
-            dict = new Dictionary<string, PromptExecuter>();
+            dict = new Dictionary<string, CommandExecuter>();
         }
 
-        public bool Execute(PromptArgs args, IOutputStream output)
+        public bool Execute(CommandArgs args, IOutputStream output)
         {
             if (dict.TryGetValue(args.CommandLastWord, out var executer))
             {
@@ -57,15 +57,15 @@ namespace FWI.Prompt
             executer.OnExecute = command;
         }
 
-        public PromptExecuter FindExecuter(Queue<string> queue)
+        public CommandExecuter FindExecuter(Queue<string> queue)
         {
             if (queue.Count == 0) return this;
             else 
             {
                 var keyword = queue.Dequeue();
-                if (!dict.TryGetValue(keyword, out PromptExecuter executer))
+                if (!dict.TryGetValue(keyword, out CommandExecuter executer))
                 {
-                    executer = new PromptExecuter();
+                    executer = new CommandExecuter();
 
                     dict.Add(keyword, executer);
                 }

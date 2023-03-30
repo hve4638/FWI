@@ -192,7 +192,7 @@ namespace FWI.Test
 
             CustomAssert.AllEqual(results,
                 (x) => x,
-                (date) => timeline.FindNearestPast(date)
+                (date) => timeline.FindNearestFuture(date)
             );
         }
 

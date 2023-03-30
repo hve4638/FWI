@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HUtility
 {
@@ -21,7 +18,13 @@ namespace HUtility
         public S Get(T item) => dict[item];
         public void Set(T key, S value) => dict.Add(key, value);
         public void Clear() => dict.Clear();
-
+        public int Count => dict.Count;
+        public IOrderedEnumerable<KeyValuePair<T, S>> Ordered()
+        {
+            return from pair in dict
+                    orderby pair.Value ascending
+                    select pair;
+        }
         public IEnumerator<(T, S)> GetEnumerator()
         {
             foreach (var item in dict)

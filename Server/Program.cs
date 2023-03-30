@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using FWIConnection;
 using FWI;
-using FWI.Prompt;
+using FWI.Commands;
 using FWI.Exceptions;
 using System.Diagnostics;
 using CommandLine;
@@ -10,6 +10,7 @@ using System.Net.Sockets;
 using YamlDotNet.RepresentationModel;
 using System.Reflection.Metadata;
 using HUtility;
+using HUtility.Exceptions;
 
 namespace FWIServer
 {

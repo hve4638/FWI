@@ -1,7 +1,7 @@
 ﻿using FWI;
-using FWI.Prompt;
 using FWIConnection;
 using HUtility;
+using FWI.Commands;
 
 namespace FWIServer
 {
@@ -9,7 +9,7 @@ namespace FWIServer
     {
         readonly FWIManager fwiManager;
         readonly ServerManager serverManager;
-        readonly Prompt prompt;
+        readonly Command prompt;
         readonly Server server;
         readonly LinkedList<Receiver> sessionList;
         readonly Dictionary<string, string> pathDict;

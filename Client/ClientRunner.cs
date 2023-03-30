@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using FWI.Prompt;
+using FWI.Commands;
 using FWIConnection;
 using FWI.Message;
 
@@ -107,7 +107,7 @@ namespace FWIClient
         
         public void InitializePrompt()
         {
-            var prompt = new Prompt();
+            var prompt = new Command();
             var promptInitializer = new PromptInitializer(client, manager);
             promptInitializer.Init(prompt);
             prompt.DefaultOutputStream = Program.Out;

@@ -44,28 +44,41 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AlarmTask.cs" />
+    <Compile Include="DataStructure\Rank\IRank.cs" />
+    <Compile Include="DataStructure\Results\LazyRequestResult.cs" />
+    <Compile Include="DataStructure\Results\LazyRequestResultManager.cs" />
+    <Compile Include="DataStructure\Results\RequestResult.cs" />
+    <Compile Include="DataStructure\Results\Result.cs" />
+    <Compile Include="DataStructure\Results\StateResult.cs" />
+    <Compile Include="DataStructure\Results\Results.cs" />
+    <Compile Include="DataStructure\Results\ResultsParser.cs" />
+    <Compile Include="IComparableExtender.cs" />
+    <Compile Include="Tasks\AlarmTask.cs" />
     <Compile Include="DataStructure\Rank\Exceptions\RankNotFoundException.cs" />
     <Compile Include="DataStructure\Rank\IRankDictionary.cs" />
     <Compile Include="DataStructure\Rank\IRankDictionaryExtender.cs" />
     <Compile Include="DataStructure\Rank\RankDictionary.cs" />
     <Compile Include="DataStructure\Rank\RankKeyFilterDictionary.cs" />
-    <Compile Include="DateRange.cs" />
-    <Compile Include="MutableDateRange.cs" />
-    <Compile Include="History.cs" />
-    <Compile Include="IntervalThread.cs" />
+    <Compile Include="DataStructure\DataRange\DateRange.cs" />
+    <Compile Include="DataStructure\DataRange\MutableDateRange.cs" />
+    <Compile Include="DataStructure\History.cs" />
+    <Compile Include="Tasks\IntervalThread.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataStructure\Rank\Rank.cs" />
     <Compile Include="StringExtender.cs" />
     <Compile Include="Test\HistoryTest.cs" />
-    <Compile Include="Testing\MockStreamReader.cs" />
-    <Compile Include="Testing\MockStreamWriter.cs" />
+    <Compile Include="Testing\MockStream\MockStreamReader.cs" />
+    <Compile Include="Testing\MockStream\MockStreamWriter.cs" />
+    <Compile Include="Test\MockStreamTest.cs" />
+    <Compile Include="Test\Rank\RankTest.cs" />
+    <Compile Include="Test\Results\StateResultTest.cs" />
+    <Compile Include="Test\Results\ResultTest.cs" />
     <Compile Include="Test\StringExtenderTest.cs" />
     <Compile Include="Testing\CustomAssert.cs" />
     <Compile Include="Test\DateRangeTest.cs" />
-    <Compile Include="Test\RankDictionaryTest.cs" />
+    <Compile Include="Test\Rank\RankDictionaryTest.cs" />
     <Compile Include="Testing\TestUtils.cs" />
-    <Compile Include="UnhandleExceptionHandler.cs" />
+    <Compile Include="Exceptions\UnhandleExceptionHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

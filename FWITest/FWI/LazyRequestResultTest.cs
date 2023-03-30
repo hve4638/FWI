@@ -39,7 +39,6 @@ namespace FWITest.FWI
             Assert.AreEqual(expected, actual);
         }
 
-
         [TestMethod]
         public void TestNothing()
         {

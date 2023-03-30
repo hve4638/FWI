@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HUtility
 {
-    internal class RankKeyFilterDictionary<T, K, S> : IRankDictionary<T, S>
+    internal class RankKeyFilterDictionary<T, K, S>
     {
         readonly IRankDictionary<K, S> rank;
         readonly Dictionary<K, T> reverseDict;
@@ -46,6 +46,5 @@ namespace HUtility
                 yield return (Unfilter(key), value);
             }
         }
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

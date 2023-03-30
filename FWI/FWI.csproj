@@ -94,6 +94,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Loggers\SingleLogger.cs" />
     <Compile Include="SerializeType.cs" />
     <Compile Include="AliasMap.cs" />
     <Compile Include="IOStream\FormatOutputStream.cs" />
@@ -122,10 +123,10 @@
     <Compile Include="Message\Serializer\TextMessage.cs" />
     <Compile Include="Message\Serializer\UpdateWIMessage.cs" />
     <Compile Include="Message\WIParser.cs" />
-    <Compile Include="Prompt\CommandDelegate.cs" />
-    <Compile Include="Prompt\Prompt.cs" />
-    <Compile Include="Prompt\PromptArgs.cs" />
-    <Compile Include="Prompt\PromptExecuter.cs" />
+    <Compile Include="Commands\CommandDelegate.cs" />
+    <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\CommandArgs.cs" />
+    <Compile Include="Commands\CommandExecuter.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -133,7 +134,6 @@
     </Compile>
     <Compile Include="Results\LazyRequestResult.cs" />
     <Compile Include="Results\LazyRequestResultManager.cs" />
-    <Compile Include="Results\ReadonlyResults.cs" />
     <Compile Include="Results\RequestResult.cs" />
     <Compile Include="Results\RequestResultState.cs" />
     <Compile Include="Results\Results.cs" />
@@ -145,6 +145,13 @@
     <Compile Include="IgnoreManager.cs" />
     <Compile Include="Results\ResultsParser.cs" />
     <Compile Include="Results\ResultState.cs" />
+    <Compile Include="Test\Commands\CommandArgsTest.cs" />
+    <Compile Include="Test\Commands\CommandExecuterTest.cs" />
+    <Compile Include="Test\Commands\CommandTest.cs" />
+    <Compile Include="Test\Loggers\SingleLoggerLegacyTest.cs" />
+    <Compile Include="Test\Rank\DateRankTest.cs" />
+    <Compile Include="Test\Rank\RankTest.cs" />
+    <Compile Include="Test\Results\ResultsTest.cs" />
     <Compile Include="Test\TimelineSerializable\TimelineSerializableTest.cs" />
     <Compile Include="Test\TimelineUpdater\TimelineDateUpdaterTest.cs" />
     <Compile Include="Test\TimelineUpdater\TimelineInstantUpdaterTest.cs" />
@@ -159,13 +166,13 @@
     <Compile Include="Timeline\Serializable\TimelineSerializableSerializeExtender.cs" />
     <Compile Include="Timeline\TimelineInstantUpdater.cs" />
     <Compile Include="FWIManager.cs" />
-    <Compile Include="Loggers\Logger.cs" />
+    <Compile Include="Loggers\ILogger.cs" />
     <Compile Include="Timeline\Serializable\TimelineSerializable.cs" />
     <Compile Include="Timeline\TimelineSliced.cs" />
     <Compile Include="WindowInfo\AFKWindowInfo.cs" />
     <Compile Include="WindowInfo\NoWindowInfo.cs" />
     <Compile Include="Rank\Rank.cs" />
-    <Compile Include="Loggers\SingleLogger.cs" />
+    <Compile Include="Loggers\LoggerLegacy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Timeline\Timeline.cs" />
     <Compile Include="Timeline\TimelineDateUpdater.cs" />

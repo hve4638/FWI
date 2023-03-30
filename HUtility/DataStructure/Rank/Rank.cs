@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,99 +9,78 @@ using System.Xml.Linq;
 
 namespace HUtility
 {
-    public class Rank<T, S> where S : IComparable<S>
+    /// <typeparam name="T">랭크에 저장하고 비교할 대상</typeparam>
+    /// <typeparam name="S">순위를 비교하기 위한 값</typeparam>
+    public class Rank<T, S> : IRank<T, S> where S : IComparable<S>
     {
         int currentHash;
-        readonly Dictionary<T, S> rankDict;
-
+        readonly RankDictionary<T, S> rankDict;
         public Rank()
         {
-            rankDict = new Dictionary<T, S>();
-            Clear();
+            currentHash = -1;
+            rankDict = new RankDictionary<T, S>();
         }
-        
-        public void Clear()
+        public int Count => rankDict.Count;
+
+        public S this[T index]
         {
-            currentHash = 0;
-            rankDict.Clear();
+            get {
+                if (rankDict.Has(index)) return rankDict.Get(index);
+                else return default;
+            }
+            set {
+                if (rankDict.Has(index)) rankDict.Remove(index);
+
+                rankDict.Set(index, value);
+            }
         }
 
-        public T One() => GetRank(1);
-        public bool HasOne() => rankDict.Count > 0;
-
-        public bool TryGetRank(int value, out T output) => TryGetRank(value, out output, out _);
-        public bool TryGetRank(int value, out T output, out S time)
+        public T One()
         {
-            int rank;
-            int lastRank = 0;
-            S duration;
+            if (HasOne()) throw new ArgumentException("첫번째 순위 값이 없습니다");
 
-            output = default;
-
-            if (value <= rankDict.Count)
+            bool begin = true;
+            T one = default;
+            S oneTime = default;
+            foreach (var (t, s) in rankDict)
             {
-                foreach (var name in rankDict.Keys)
+                if (begin)
                 {
-                    rank = 1;
-                    duration = rankDict[name];
-                    foreach (var n in rankDict.Values)
-                    {
-                        if (n.CompareTo(duration) > 0) rank++;
-                    }
-
-                    if (rank == value)
-                    {
-                        output = name;
-                        time = rankDict[output];
-                        return true;
-                    }
-                    else if (rank < value && rank > lastRank)
-                    {
-                        lastRank = rank;
-                        output = name;
-                    }
+                    one = t;
+                    oneTime = s;
+                    begin = false;
+                }
+                else if (oneTime.CompareTo(s) <= 0)
+                {
+                    one = t;
+                    oneTime = s;
                 }
             }
+            return one;
+        }
+        public bool HasOne() => rankDict.Count >= 1;
 
-            if (lastRank == 0)
+        public bool TryGetRank(int value, out T output)
+        {
+            var sorted = rankDict.Ordered();
+            var index = 1;
+            foreach (var item in sorted)
             {
-                time = default;
-                return false;
+                if (index == value)
+                {
+                    output = item.Key;
+                    return true;
+                }
+                index++;
             }
-            else
-            {
-                time = rankDict[output];
-                return true;
-            }
+            output = default;
+            return false;
         }
 
         public T GetRank(int value)
         {
-            if (TryGetRank(value, out T result)) return result;
-            else throw new RankNotFoundException();
+            throw new NotImplementedException();
         }
-        /*
-        public void Add(Rank<T, S> other)
-        {
-            foreach (var item in other.rankDict) Add(item.Key, item.Value);
-        }
-        public void Add(T key, S duration)
-        {
-            if (rankDict.ContainsKey(key)) UpdateKeyHash(key);
-            else rankDict.Add(key, default);
-
-            var p = rankDict[key];
-            var a = p + duration;
-            UpdateKeyHash(key);
-        }*/
-        void UpdateKeyHash(T key)
-        {
-            var hash = key.GetHashCode() * 7 + rankDict[key].GetHashCode();
-
-            currentHash ^= hash;
-        }
-
-        public int Count => rankDict.Count;
 
         public override bool Equals(object obj)
         {
@@ -111,9 +91,8 @@ namespace HUtility
             }
             else return false;
         }
+
         public int GetContentsHash() => currentHash;
         public override int GetHashCode() => base.GetHashCode();
     }
-
-
 }

@@ -15,14 +15,14 @@ namespace FWI
         readonly Dictionary<string, string> pathDict;
         readonly AliasMap aliasMap;
         readonly IgnoreMap ignoreMap;
-        readonly Logger logger;
+        readonly ILogger logger;
 
         public string Signiture { get; set; }
         public int TraceCount { get; set; }
 
         public FWIManager(string signiture)
         {
-            logger = new SingleLogger();
+            logger = new LoggerLegacy();
             aliasMap = new AliasMap();
             ignoreMap = new IgnoreMap();
 
@@ -42,9 +42,9 @@ namespace FWI
         {
             foreach(var key in path.Keys) pathDict[key] = path[key];
             
-            if (logger is SingleLogger)
+            if (logger is LoggerLegacy)
             {
-                var singleLogger = logger as SingleLogger;
+                var singleLogger = logger as LoggerLegacy;
                 singleLogger.SetPath(pathDict);
             }
         }
@@ -67,7 +67,7 @@ namespace FWI
         /// <exception cref="TimeSequenceException"></exception>
         public FWIManager AddEmpty(DateTime date)
         {
-            logger.ClearLast(date);
+            logger.AddDefaultWI(date);
             return this;
         }
 

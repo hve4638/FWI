@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FWI.Prompt
+namespace FWI.Commands
 {
-    public class PromptArgs
+    public class CommandArgs
     {
         readonly string[] rawArgs;
         int beginIndex;
@@ -23,12 +23,12 @@ namespace FWI.Prompt
             }
         }
 
-        public PromptArgs(string text) : this(text.Split(' '))
+        public CommandArgs(string text) : this(text.Split(' '))
         {
 
         }
 
-        public PromptArgs(string[] rawArgs)
+        public CommandArgs(string[] rawArgs)
         {
             this.rawArgs = rawArgs;
             BeginIndex = 1;
@@ -76,9 +76,9 @@ namespace FWI.Prompt
             get { return GetArg(index); }
         }
 
-        public PromptArgs Slice(int begin)
+        public CommandArgs Slice(int begin)
         {
-            var sliced = new PromptArgs(rawArgs)
+            var sliced = new CommandArgs(rawArgs)
             {
                 BeginIndex = BeginIndex + begin,
             };

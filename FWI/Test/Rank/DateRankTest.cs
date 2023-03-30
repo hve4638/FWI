@@ -1,12 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿#if TEST
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FWI;
+using HUtility.Testing;
 
-namespace FWITest.FWIRank
+namespace FWI.Test
 {
     [TestClass]
     public class DateRankTest
@@ -16,9 +18,9 @@ namespace FWITest.FWIRank
         {
             WindowInfo[] items =
             {
-                new WindowInfo(name:"0", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120200")),
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120300")),
+                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
             };
             var rank = new DateRank();
 
@@ -39,9 +41,9 @@ namespace FWITest.FWIRank
         {
             WindowInfo[] items =
             {
-                new WindowInfo(name:"0", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120200")),
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120300")),
+                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
             };
             var rank = new DateRank();
 
@@ -63,14 +65,14 @@ namespace FWITest.FWIRank
         {
             WindowInfo[] items =
             {
-                new WindowInfo(name:"0", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120200")),
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120300")),
+                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
             };
             var rank = new DateRank();
 
             foreach (var item in items) rank.Add(item);
-            rank.AddLast(Date.MakeDateTime("000101 120330"));
+            rank.AddLast(TestUtils.MakeDateTime("000101 120330"));
 
             var expected = new Dictionary<int, RankResult<WindowInfo>>
             {
@@ -87,13 +89,13 @@ namespace FWITest.FWIRank
         [TestMethod]
         public void TestRankLast2()
         {
-            WindowInfo item = new WindowInfo(name:"0", date: Date.MakeDateTime("000101 120000"));
+            WindowInfo item = new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000"));
             var rank = new DateRank();
 
             rank.Add(item);
-            rank.AddLast(Date.MakeDateTime("000101 120100"));
-            rank.AddLast(Date.MakeDateTime("000101 120200"));
-            rank.AddLast(Date.MakeDateTime("000101 120300"));
+            rank.AddLast(TestUtils.MakeDateTime("000101 120100"));
+            rank.AddLast(TestUtils.MakeDateTime("000101 120200"));
+            rank.AddLast(TestUtils.MakeDateTime("000101 120300"));
 
             var expected = new Dictionary<int, RankResult<WindowInfo>>
             {
@@ -109,15 +111,15 @@ namespace FWITest.FWIRank
         {
             WindowInfo[] items =
             {
-                new WindowInfo(name:"0", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120200")),
-                new WindowInfo(name:"0", date: Date.MakeDateTime("000101 120300")),
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120400")),
+                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120300")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120400")),
             };
             var rank = new DateRank();
 
             foreach (var item in items) rank.Add(item);
-            rank.AddLast(Date.MakeDateTime("000101 120500"));
+            rank.AddLast(TestUtils.MakeDateTime("000101 120500"));
         }
 
         [TestMethod]
@@ -125,10 +127,10 @@ namespace FWITest.FWIRank
         {
             WindowInfo[] items =
             {
-                new WindowInfo(name:"0", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120200")),
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120300")),
-                new WindowInfo(name:"3", date: Date.MakeDateTime("000101 120100")),
+                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
+                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120100")),
             };
             var rank = new DateRank();
 
@@ -150,16 +152,16 @@ namespace FWITest.FWIRank
         {
             WindowInfo[] items =
             {
-                new WindowInfo(name:"0", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120200")),
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120300")),
+                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
             };
             var rank = new DateRank();
             foreach (var item in items) rank.Add(item);
 
             try
             {
-                rank.AddLast(Date.MakeDateTime("000101 120000"));
+                rank.AddLast(TestUtils.MakeDateTime("000101 120000"));
             }
             catch
             {
@@ -198,9 +200,9 @@ namespace FWITest.FWIRank
         {
             WindowInfo[] items =
             {
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120100")),
-                new WindowInfo(name:"3", date: Date.MakeDateTime("000101 120200")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120100")),
+                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120200")),
             };
             var eRank = new DateRank();
             foreach (var item in items) eRank.Add(item);
@@ -226,9 +228,9 @@ namespace FWITest.FWIRank
         {
             WindowInfo[] items =
             {
-                new WindowInfo(name:"1", date: Date.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"2", date: Date.MakeDateTime("000101 120100")),
-                new WindowInfo(name:"3", date: Date.MakeDateTime("000101 120200")),
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120100")),
+                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120200")),
             };
             var eRank = new DateRank();
             foreach (var item in items) eRank.Add(item);
@@ -243,3 +245,4 @@ namespace FWITest.FWIRank
         }
     }
 }
+#endif

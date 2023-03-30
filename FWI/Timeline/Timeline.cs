@@ -76,7 +76,7 @@ namespace FWI
             {
                 var date = new DateTime(current.Year, current.Month, current.Day, current.Hour, current.Minute, 0);
                 var dateUpdater = updater as TimelineDateUpdater;
-                var initWI = dateUpdater.Last;
+                var initWI = dateUpdater!.Last;
 
                 dateUpdater.Reset(begin: date, end: date + interval, initWI: initWI);
                 if (IsValidWI(lastWI)) dateUpdater.Add(lastWI);
@@ -156,7 +156,7 @@ namespace FWI
             if (updater is TimelineDateUpdater && updater.IsEnd(current))
             {
                 var dateUpdater = updater as TimelineDateUpdater;
-                dateUpdater.FillLast();
+                dateUpdater!.FillLast();
             }
         }
 
@@ -192,7 +192,7 @@ namespace FWI
         }
         public void Export(StreamWriter writer)
         {
-            foreach (WindowInfo wi in GetTimeline()) writer.WriteLine(wi.Encoding());
+            foreach (WindowInfo wi in GetAllWIs()) writer.WriteLine(wi.Encoding());
         }
 
         public void SetMenualDateTime(Func<DateTime> dateTimeDelegate)

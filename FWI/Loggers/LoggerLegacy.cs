@@ -8,46 +8,60 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace FWI
-{
-    public class SingleLogger : ILogger
+namespace FWI {
+    public class LoggerLegacy : ILogger
     {
-        // Logger에 저장하는 로그의 범위
-        // SingleLogger 단독으로 사용시 전체범위
-        readonly DateRange loggingRange;
+        int maximumSize;
         readonly Timeline timeline;
-        readonly Dictionary<int, DateRank> rankCache;
-        public SingleLogger(int maximumSize = 50, DateTime? date = null)
+        readonly DateRank rank;
+        readonly Dictionary<string, string> pathDict;
+        public LoggerLegacy(int maximumSize = 50, DateTime? date = null)
         {
-            loggingRange = new DateRange(DateTime.MinValue, DateTime.MaxValue);
             timeline = new Timeline();
+            rank = new DateRank();
+            this.maximumSize = maximumSize;
+            pathDict = new Dictionary<string, string>
+            {
+                ["rank"] = "fwi.logger.rank",
+                ["timeline"] = "fwi.logger.timeline",
+            };
         }
 
-        public void SetLoggingInterval(int minutes = 0) => timeline.SetInterval(minutes);
-        public void SetMenualDateTimeChanger(Func<DateTime> dateTimeDelegate) => timeline.SetMenualDateTime(dateTimeDelegate);
+        public void SetPath(Dictionary<string, string> path)
+        {
+            foreach (var key in path.Keys) pathDict[key] = path[key];
+        }
+
+        public void SetLoggingInterval(int minutes=0) => timeline.SetInterval(minutes);
+        public void SetDateTimeDelegate(Func<DateTime> dateTimeDelegate) => timeline.SetMenualDateTime(dateTimeDelegate);
         public ILogger AddWI(WindowInfo wi)
         {
+            rank.Add(wi);
             timeline.AddLog(wi);
             return this;
         }
         public ILogger AddDefaultWI(DateTime date)
         {
-            return AddAFK(date);
+            rank.ClearLast(date);
+            timeline.AddLog(new AFKWindowInfo(date));
+            return this;
         }
         public ILogger AddAFK(DateTime date)
         {
+            rank.ClearLast(date);
             timeline.AddLog(new AFKWindowInfo(date));
             return this;
         }
 
         public void SetOnLoggingListener(Action<WindowInfo> onLoggingListener) => timeline.SetOnAddListener(onLoggingListener);
 
-        public static SingleLogger operator +(SingleLogger logger, WindowInfo wi)
+        public static LoggerLegacy operator +(LoggerLegacy logger, WindowInfo wi)
         {
             logger.AddWI(wi);
             return logger;
         }
-        
+
+        public bool IsFull => (timeline.Count >= maximumSize);
         public int Length => timeline.Count;
         public int Count => timeline.Count;
 

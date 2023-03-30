@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FWI.Prompt
+namespace FWI.Commands
 {
-    public delegate void CommandDelegate(PromptArgs args, IOutputStream output);
+    public delegate void CommandDelegate(CommandArgs args, IOutputStream output);
 }

@@ -1,21 +1,22 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿#if TEST
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FWI.Prompt;
+using FWI.Commands;
 
-namespace FWITest.FWIPrompt
+namespace FWI.Test
 {
     [TestClass]
-    public class PromptTest
+    public class CommandTest
     {
         [TestMethod]
         public void TestGetEmpty()
         {
-            var prompt = new Prompt();
+            var prompt = new Command();
 
             var expected = new List<string>();
             var actual = prompt.GetCommands();
@@ -27,7 +28,7 @@ namespace FWITest.FWIPrompt
         [TestMethod]
         public void TestAdd()
         {
-            var prompt = new Prompt();
+            var prompt = new Command();
 
             prompt.Add("echo", (args, output) => { });
 
@@ -41,7 +42,7 @@ namespace FWITest.FWIPrompt
         [TestMethod]
         public void TestExecute()
         {
-            var prompt = new Prompt();
+            var prompt = new Command();
             bool result = false;
 
             prompt.Add("settrue", (args, output) => result = true);
@@ -56,7 +57,7 @@ namespace FWITest.FWIPrompt
         [TestMethod]
         public void TestExecuteMultiWord()
         {
-            var prompt = new Prompt();
+            var prompt = new Command();
             bool result = false;
 
             prompt.Add("set true", (args, output) => result = true);
@@ -71,7 +72,7 @@ namespace FWITest.FWIPrompt
         [TestMethod]
         public void TestExecuteWithArgs()
         {
-            var prompt = new Prompt();
+            var prompt = new Command();
             string expected = "hello world";
             string actual = "";
 
@@ -87,7 +88,7 @@ namespace FWITest.FWIPrompt
         [TestMethod]
         public void TestExecuteWithArgsInt()
         {
-            var prompt = new Prompt();
+            var prompt = new Command();
             int[] expected = { 1, 2, 3, 4 };
             int[] actual = { 0, 0, 0, 0 };
 
@@ -106,7 +107,7 @@ namespace FWITest.FWIPrompt
         [TestMethod]
         public void TestNotExecuted()
         {
-            var prompt = new Prompt();
+            var prompt = new Command();
             bool result = false;
 
             prompt.OnNotExecuted = (args, output) => result = false;
@@ -121,7 +122,7 @@ namespace FWITest.FWIPrompt
         [TestMethod]
         public void TestRedirection()
         {
-            var prompt = new Prompt();
+            var prompt = new Command();
             int result = -1;
 
             prompt.Add("result set", (args, output) => result = args.GetArgInt(0));
@@ -135,3 +136,4 @@ namespace FWITest.FWIPrompt
         }
     }
 }
+#endif

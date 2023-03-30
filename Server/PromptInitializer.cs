@@ -1,4 +1,4 @@
-﻿using FWI.Prompt;
+﻿using FWI.Commands;
 using FWI;
 using System;
 using System.Collections.Generic;
@@ -22,7 +22,7 @@ namespace FWIServer
             this.sessions = sessions;
         }
 
-        public void Initialize(Prompt prompt)
+        public void Initialize(Command prompt)
         {
             prompt.Add("load", (_, output) => {
                 fwiManager.Import(fwiManager.Signiture);
