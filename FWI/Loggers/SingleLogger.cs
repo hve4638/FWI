@@ -55,33 +55,29 @@ namespace FWI
         public ReadOnlyCollection<WindowInfo> GetLog(DateTime from, DateTime to) => GetLog(new DateRange(from, to));
         public ReadOnlyCollection<WindowInfo> GetLog(DateRange range) => timeline.GetWIs(range);
 
-        public Dictionary<int, RankResult<WindowInfo>> GetRanks() => GetRanks(1, rank.Count);
-        public Dictionary<int, RankResult<WindowInfo>> GetRanks(int beginRank = 1, int endRank = 1)
+        public Dictionary<int, RankResult<WindowInfo>> GetRanks()
         {
-            var ranks = rank.GetRanks(beginRank, endRank);
-
-            return ranks;
+            throw new NotImplementedException();
         }
 
-        public void Update(DateTime lastTime)
+        public Dictionary<int, RankResult<WindowInfo>> GetRanks(int beginRank, int endRank)
         {
-            rank.AddLast(lastTime);
+            throw new NotImplementedException();
         }
 
-        public void Import(string path)
+        public void Update(DateTime time)
         {
-            timeline.Import(pathDict["timeline"]);
-            rank.Import(pathDict["rank"]);
+            throw new NotImplementedException();
         }
 
-        public void Export(string path)
+        public void Import(string filename)
         {
-            timeline.Export(pathDict["timeline"]);
-            rank.Export(pathDict["rank"]);
+            throw new NotImplementedException();
         }
-        public int GetContentsHashCode()
+
+        public void Export(string filename)
         {
-            return rank.GetContentsHash() ^ timeline.GetContentsHashCode();
+            throw new NotImplementedException();
         }
     }
 }

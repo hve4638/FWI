@@ -68,6 +68,28 @@ namespace FWI.Test
             CollectionAssert.AreEqual(expected, actual);
         }
 
+        [TestMethod]
+        public void GetWIsSplit()
+        {
+            Timeline timeline = new Timeline();
+            WindowInfo[] items = {
+                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")), // 20min
+                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 122000")), // 30min
+                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 125000")), // 10min
+                new WindowInfo(name:"4", date: TestUtils.MakeDateTime("000101 130000")),
+            };
+            timeline.AddLog(items);
+
+            WindowInfo[] expected = {
+                items[0],
+                items[1],
+                items[2],
+            };
+            var range = TestUtils.MakeDateTimeRange("000101 120000", "000104 120000");
+            var actual = timeline.GetWIs(range);
+            CollectionAssert.AreEqual(expected, actual);
+        }
+
         // 잘못된 시간 순서로 값을 추가했을때 예외처리
         [TestMethod]
         public void ExceptionTimeSequence()

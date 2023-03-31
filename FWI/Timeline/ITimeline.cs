@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace FWI
 {
+    /// <summary>
+    /// WindowInfo 기록 타임라인
+    /// </summary>
     public interface ITimeline : ITimelineReadOnly
     {
         void AddLog(WindowInfo wi);

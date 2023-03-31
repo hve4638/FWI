@@ -22,7 +22,7 @@ namespace HUtility
         public IOrderedEnumerable<KeyValuePair<T, S>> Ordered()
         {
             return from pair in dict
-                    orderby pair.Value ascending
+                    orderby pair.Value descending
                     select pair;
         }
         public IEnumerator<(T, S)> GetEnumerator()

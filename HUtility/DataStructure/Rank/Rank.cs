@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,11 +14,9 @@ namespace HUtility
     /// <typeparam name="S">순위를 비교하기 위한 값</typeparam>
     public class Rank<T, S> : IRank<T, S> where S : IComparable<S>
     {
-        int currentHash;
         readonly RankDictionary<T, S> rankDict;
         public Rank()
         {
-            currentHash = -1;
             rankDict = new RankDictionary<T, S>();
         }
         public int Count => rankDict.Count;
@@ -37,7 +36,7 @@ namespace HUtility
 
         public T One()
         {
-            if (HasOne()) throw new ArgumentException("첫번째 순위 값이 없습니다");
+            if (!HasOne()) throw new ArgumentException("첫번째 순위 값이 없습니다");
 
             bool begin = true;
             T one = default;
@@ -79,7 +78,14 @@ namespace HUtility
 
         public T GetRank(int value)
         {
-            throw new NotImplementedException();
+            if (TryGetRank(value, out T result))
+            {
+                return result;
+            }
+            else
+            {
+                throw new ArgumentException($"{value}번째 순위 값이 없습니다");
+            }
         }
 
         public override bool Equals(object obj)
@@ -92,7 +98,24 @@ namespace HUtility
             else return false;
         }
 
-        public int GetContentsHash() => currentHash;
+        public void Clear()
+        {
+            rankDict.Clear();
+        }
+
         public override int GetHashCode() => base.GetHashCode();
+
+        public IEnumerator<(T, S)> GetEnumerator()
+        {
+            foreach (var pair in rankDict)
+            {
+                yield return (pair.Item1, pair.Item2);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }

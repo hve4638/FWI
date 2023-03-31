@@ -9,15 +9,13 @@ namespace FWI
 {
     public class WindowInfo
     {
-        string title;
+        public virtual WindowInfoType Type { get; set; }
+        public virtual string Title { get; set; }
         string name;
         string alias;
         DateTime date;
-        public string Title
-        {
-            get { return title; }
-            set { title = value; }
-        }
+        TimeSpan duration;
+
         public string Name
         {
             get { return name; }
@@ -32,6 +30,11 @@ namespace FWI
         {
             get { return date; }
             set { date = value; }
+        }
+        public TimeSpan Duration
+        {
+            get { return duration; }
+            set { duration = value; }
         }
 
         public string GetAliasOrName()

@@ -8,7 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace FWI {
+namespace FWI
+{
     public class LoggerLegacy : ILogger
     {
         int maximumSize;

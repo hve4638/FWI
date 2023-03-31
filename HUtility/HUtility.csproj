@@ -45,6 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataStructure\Rank\IRank.cs" />
+    <Compile Include="DataStructure\Rank\RankWithConverter.cs" />
+    <Compile Include="DataStructure\Rank\RankWithConverterExtneder.cs" />
     <Compile Include="DataStructure\Results\LazyRequestResult.cs" />
     <Compile Include="DataStructure\Results\LazyRequestResultManager.cs" />
     <Compile Include="DataStructure\Results\RequestResult.cs" />
@@ -70,6 +72,7 @@
     <Compile Include="Testing\MockStream\MockStreamReader.cs" />
     <Compile Include="Testing\MockStream\MockStreamWriter.cs" />
     <Compile Include="Test\MockStreamTest.cs" />
+    <Compile Include="Test\Rank\RankWithConverterTest.cs" />
     <Compile Include="Test\Rank\RankTest.cs" />
     <Compile Include="Test\Results\StateResultTest.cs" />
     <Compile Include="Test\Results\ResultTest.cs" />

@@ -94,7 +94,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Loggers\RankWIExtender.cs" />
     <Compile Include="Loggers\SingleLogger.cs" />
+    <Compile Include="Loggers\TimelineRankCache\TimelineRankCache.cs" />
     <Compile Include="SerializeType.cs" />
     <Compile Include="AliasMap.cs" />
     <Compile Include="IOStream\FormatOutputStream.cs" />
@@ -152,6 +154,7 @@
     <Compile Include="Test\Rank\DateRankTest.cs" />
     <Compile Include="Test\Rank\RankTest.cs" />
     <Compile Include="Test\Results\ResultsTest.cs" />
+    <Compile Include="Test\TimelineRankCache\TimelineRankCacheTest.cs" />
     <Compile Include="Test\TimelineSerializable\TimelineSerializableTest.cs" />
     <Compile Include="Test\TimelineUpdater\TimelineDateUpdaterTest.cs" />
     <Compile Include="Test\TimelineUpdater\TimelineInstantUpdaterTest.cs" />
@@ -179,7 +182,9 @@
     <Compile Include="Timeline\ITimelineUpdater.cs" />
     <Compile Include="Version.cs" />
     <Compile Include="WindowInfo\WindowInfo.cs" />
+    <Compile Include="WindowInfo\WindowInfoExtender.cs" />
     <Compile Include="WindowInfo\WindowInfoSerializable.cs" />
+    <Compile Include="WindowInfo\WindowInfoType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

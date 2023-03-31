@@ -108,6 +108,7 @@
     <Compile Include="FWITest\MockStreamWriter.cs" />
     <Compile Include="Learning\ParsingTest.cs" />
     <Compile Include="FWI\WindowInfoTest.cs" />
+    <Compile Include="Logic\LogicTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Learning\YamlTest.cs" />
     <Compile Include="FWIConnection\BrBwExtenderTest.cs" />
