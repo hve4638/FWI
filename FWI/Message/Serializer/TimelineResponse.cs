@@ -10,7 +10,7 @@ namespace FWI.Message
     public class TimelineResponse : ResponseMessage, ISerializableMessage
     {
         public readonly static short Op = (short)MessageOp.ResponseTimeline;
-        public List<Tuple<WindowInfo, DateTime>> Timeline { get; set; }
+        public List<Tuple<WindowInfoLegacy, DateTime>> Timeline { get; set; }
 
         public byte[] Serialize() => Serialize(false);
         public byte[] Serialize(bool debug = false)
@@ -34,7 +34,7 @@ namespace FWI.Message
             var message = new TimelineResponse();
             var count = reader.ReadInt();
 
-            message.Timeline = new List<Tuple<WindowInfo, DateTime>>();
+            message.Timeline = new List<Tuple<WindowInfoLegacy, DateTime>>();
             for(var i = 0; i < count; i++)
             {
                 var date = reader.ReadDateTime();

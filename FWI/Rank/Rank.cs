@@ -96,7 +96,7 @@ namespace FWI
                 Add(item.Key, item.Value);
             }
         }
-        public void Add(WindowInfo wi, TimeSpan duration) => Add(wi.Name, duration);
+        public void Add(WindowInfoLegacy wi, TimeSpan duration) => Add(wi.Name, duration);
         public void Add(string name, TimeSpan duration)
         {
             if (rankDict.ContainsKey(name)) currentHashCode ^= GetItemHash(name, rankDict[name]);

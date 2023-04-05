@@ -148,7 +148,7 @@ namespace FWIServer
                 var title = message.Title;
                 var date = message.Date;
 
-                var wi = new WindowInfo(name: name, title: title, date: date);
+                var wi = new WindowInfoLegacy(name: name, title: title, date: date);
                 var results = manager.AddWI(wi);
 
                 foreach(var result in results)

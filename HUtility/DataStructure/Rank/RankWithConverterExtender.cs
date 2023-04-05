@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace HUtility
 {
-    public static class RankWithConverterExtneder
+    public static class RankWithConverterExtender
     {
         public static void Merge<K, T>(this Rank<K, T, int> rank, Rank<K, T, int> other)
         {
-            foreach (var (key, value) in other) rank[key] += value;
+            rank.Merge(other, (x, y) => x + y);
         }
 
         public static void Merge<K, T>(this Rank<K, T, TimeSpan> rank, Rank<K, T, TimeSpan> other)
         {
-            foreach (var (key, value) in other) rank[key] += value;
+            rank.Merge(other, (x, y) => x + y);
         }
     }
 }

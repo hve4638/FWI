@@ -18,11 +18,11 @@ namespace FWIClient
         [DllImport("user32.dll")]
         static extern bool IsHungAppWindow(IntPtr hWnd);
 
-        static public WindowInfo GetForeground()
+        static public WindowInfoLegacy GetForeground()
         {
             var p = GetProcessForeground(out var isHungAppWindow);
 
-            return new WindowInfo(name: p.ProcessName, title: p.MainWindowTitle, date: DateTime.Now);
+            return new WindowInfoLegacy(name: p.ProcessName, title: p.MainWindowTitle, date: DateTime.Now);
         }
 
         static Process GetProcessForeground(out bool isHungAppWindow)

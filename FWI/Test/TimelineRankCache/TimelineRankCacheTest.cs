@@ -20,12 +20,12 @@ namespace FWI.Test
             var timeline = new Timeline();
             var rankCache = new TimelineRankCache(timeline);
             rankCache.Interval = new TimeSpan(0, 30, 0);
-            WindowInfo[] wis =
+            WindowInfoLegacy[] wis =
             {
-                new WindowInfo(name: "A", date: TestUtils.MakeDateTime("220101 120000")), // 20min
-                new WindowInfo(name: "B", date: TestUtils.MakeDateTime("220101 122000")), // 30min
-                new WindowInfo(name: "C", date: TestUtils.MakeDateTime("220101 125000")), // 10min
-                new WindowInfo(name: "D", date: TestUtils.MakeDateTime("220101 130000")),
+                new WindowInfoLegacy(name: "A", date: TestUtils.MakeDateTime("220101 120000")), // 20min
+                new WindowInfoLegacy(name: "B", date: TestUtils.MakeDateTime("220101 122000")), // 30min
+                new WindowInfoLegacy(name: "C", date: TestUtils.MakeDateTime("220101 125000")), // 10min
+                new WindowInfoLegacy(name: "D", date: TestUtils.MakeDateTime("220101 130000")),
             };
             timeline.AddWIs(wis);
 

@@ -17,7 +17,6 @@ namespace FWI
         void AddLog(WindowInfo[] log);
         void AddLog(List<WindowInfo> log);
         void AddLog(ReadOnlyCollection<WindowInfo> log);
-
         void Import(StreamWriter stream, SerializeType type);
     }
 }

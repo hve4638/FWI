@@ -11,21 +11,21 @@ namespace FWI
 {
     static public class WIParser
     {
-        public static void WriteWI(this ByteWriter bw, WindowInfo wi)
+        public static void WriteWI(this ByteWriter bw, WindowInfoLegacy wi)
         {
             bw.WriteDateTime(wi.Date);
             bw.WriteText(wi.Title);
             bw.WriteText(wi.Name);
             bw.WriteText(wi.Alias);
         }
-        public static WindowInfo ReadWI(this ByteReader br)
+        public static WindowInfoLegacy ReadWI(this ByteReader br)
         {
             br.ReadDateTime(out DateTime date);
             br.ReadText(out string name);
             br.ReadText(out string title);
             br.ReadText(out string alias);
 
-            return new WindowInfo(name: name, alias: alias, title: title, date: date);
+            return new WindowInfoLegacy(name: name, alias: alias, title: title, date: date);
         }
 
         public static void WriteWI(this ByteWriter bw, string name, string title, DateTime date)

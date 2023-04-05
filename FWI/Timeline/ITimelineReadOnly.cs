@@ -11,7 +11,7 @@ namespace FWI
 {
     public interface ITimelineReadOnly
     {
-        WindowInfo? this[DateTime date] { get; }
+        WindowInfo this[DateTime date] { get; }
 
         ITimelineReadOnly Slice(DateRange range);
         ITimelineReadOnly Slice(DateTime start, DateTime end);

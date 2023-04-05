@@ -59,7 +59,7 @@ namespace FWIClient
             Send(message);
         }
 
-        public void SendWI(WindowInfo wi)
+        public void SendWI(WindowInfoLegacy wi)
         {
             if (!Connected) return;
             else if (!IsTarget) return;

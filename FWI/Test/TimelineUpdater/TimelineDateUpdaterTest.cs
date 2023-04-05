@@ -18,10 +18,10 @@ namespace FWI.Test
             var begin = new DateTime(2022, 06, 01, 12, 00, 00);
             var end = new DateTime(2022, 06, 01, 12, 01, 00);
             var updater = new TimelineDateUpdater(begin: begin, end: end);
-            WindowInfo[] items = {
-                new WindowInfo(title:"A", name:"a", date: new DateTime(2022,06,01, 12,00,01)),
-                new WindowInfo(title:"B", name:"b", date: new DateTime(2022,06,01, 12,00,40)),
-                new WindowInfo(title:"C", name:"c", date: new DateTime(2022,06,01, 12,00,50)),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(title:"A", name:"a", date: new DateTime(2022,06,01, 12,00,01)),
+                new WindowInfoLegacy(title:"B", name:"b", date: new DateTime(2022,06,01, 12,00,40)),
+                new WindowInfoLegacy(title:"C", name:"c", date: new DateTime(2022,06,01, 12,00,50)),
             };
 
             foreach (var item in items) updater.Add(item);
@@ -55,21 +55,21 @@ namespace FWI.Test
         {
             var begin = TestUtils.MakeDateTime("000101 120000");
             var end = TestUtils.MakeDateTime("000101 120100");
-            WindowInfo[] items =
+            WindowInfoLegacy[] items =
             {
-                new WindowInfo(name: "1", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120050")),
-                new WindowInfo(name: "3", date: TestUtils.MakeDateTime("000101 120110")),
+                new WindowInfoLegacy(name: "1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name: "2", date: TestUtils.MakeDateTime("000101 120050")),
+                new WindowInfoLegacy(name: "3", date: TestUtils.MakeDateTime("000101 120110")),
             };
 
-            WindowInfo[] expected =
+            WindowInfoLegacy[] expected =
             {
                 items[0],
             };
-            var actual = new List<WindowInfo>();
+            var actual = new List<WindowInfoLegacy>();
 
             ITimelineUpdater updater = new TimelineDateUpdater(begin: begin, end: end);
-            updater.SetOnEnd((WindowInfo wi) => { actual.Add(wi); });
+            updater.SetOnEnd((WindowInfoLegacy wi) => { actual.Add(wi); });
 
             foreach (var item in items) updater.Add(item);
 
@@ -81,13 +81,13 @@ namespace FWI.Test
         {
             var begin = TestUtils.MakeDateTime("000101 120000");
             var end = TestUtils.MakeDateTime("000101 120100");
-            var item = new WindowInfo(name: "0", date: TestUtils.MakeDateTime("000101 120005"));
+            var item = new WindowInfoLegacy(name: "0", date: TestUtils.MakeDateTime("000101 120005"));
 
             var expected = item;
-            WindowInfo actual = null;
+            WindowInfoLegacy actual = null;
 
             var updater = new TimelineDateUpdater(begin: begin, end: end);
-            updater.SetOnEnd((WindowInfo wi) => { actual = wi; });
+            updater.SetOnEnd((WindowInfoLegacy wi) => { actual = wi; });
             updater.Add(item);
 
             updater.FillLast();
@@ -102,10 +102,10 @@ namespace FWI.Test
             var begin = TestUtils.MakeDateTime("000101 120000");
             var end = TestUtils.MakeDateTime("000101 120100");
             var updater = new TimelineDateUpdater(begin: begin, end: end);
-            WindowInfo[] array = {
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 115955")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120030")),
-                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120115")),
+            WindowInfoLegacy[] array = {
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 115955")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120030")),
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDateTime("000101 120115")),
             };
 
             var total = new TimeSpan(0, 0, 0);
@@ -121,10 +121,10 @@ namespace FWI.Test
         {
             var begin = TestUtils.MakeDateTime("000101 120000");
             var end = TestUtils.MakeDateTime("000101 120100");
-            WindowInfo[] items = {
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120010")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120030")),
-                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120055")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120010")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120030")),
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDateTime("000101 120055")),
             };
 
             TimeSpan expected, actual;
@@ -152,12 +152,12 @@ namespace FWI.Test
         {
             var begin = TestUtils.MakeDateTime("000101 120000");
             var end = TestUtils.MakeDateTime("000101 120100");
-            WindowInfo[] items = {
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120010")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120030")),
-                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120055")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120010")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120030")),
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDateTime("000101 120055")),
             };
-            WindowInfo initWI = new WindowInfo(name: "0", date: TestUtils.MakeDateTime("000101 115930"));
+            WindowInfoLegacy initWI = new WindowInfoLegacy(name: "0", date: TestUtils.MakeDateTime("000101 115930"));
 
             TimeSpan expected, actual;
             var updater = new TimelineDateUpdater(begin: begin, end: end, initWI: initWI);
@@ -188,9 +188,9 @@ namespace FWI.Test
             var begin = TestUtils.MakeDateTime("000101 120000");
             var end = TestUtils.MakeDateTime("000101 120100");
             var updater = new TimelineDateUpdater(begin: begin, end: end);
-            WindowInfo[] items = {
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120020")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120020")),
             };
             foreach (var item in items) updater.Add(item);
 
@@ -209,7 +209,7 @@ namespace FWI.Test
             var begin = TestUtils.MakeDateTime("000101 120000");
             var end = TestUtils.MakeDateTime("000101 120100");
             var updater = new TimelineDateUpdater(begin: begin, end: end);
-            var item = new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120045"));
+            var item = new WindowInfoLegacy(name: "2", date: TestUtils.MakeDateTime("000101 120045"));
             updater.Add(item);
 
             updater.FillLast();
@@ -226,10 +226,10 @@ namespace FWI.Test
         {
             var begin = TestUtils.MakeDateTime("000101 120000");
             var end = TestUtils.MakeDateTime("000101 120100");
-            var initWI = new WindowInfo(name: "1", date: TestUtils.MakeDateTime("000101 115000"));
+            var initWI = new WindowInfoLegacy(name: "1", date: TestUtils.MakeDateTime("000101 115000"));
 
             var updater = new TimelineDateUpdater(begin: begin, end: end, initWI: initWI);
-            var item = new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120015"));
+            var item = new WindowInfoLegacy(name: "2", date: TestUtils.MakeDateTime("000101 120015"));
             updater.Add(item);
 
             updater.FillLast();
@@ -246,10 +246,10 @@ namespace FWI.Test
         {
             var begin = TestUtils.MakeDateTime("000101 120000");
             var end = TestUtils.MakeDateTime("000101 120100");
-            var initWI = new WindowInfo(name: "1", date: TestUtils.MakeDateTime("000101 120005"));
+            var initWI = new WindowInfoLegacy(name: "1", date: TestUtils.MakeDateTime("000101 120005"));
 
             var updater = new TimelineDateUpdater(begin: begin, end: end, initWI: initWI);
-            var item = new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120015"));
+            var item = new WindowInfoLegacy(name: "2", date: TestUtils.MakeDateTime("000101 120015"));
             updater.Add(item);
 
             updater.FillLast();
@@ -268,7 +268,7 @@ namespace FWI.Test
             var end = TestUtils.MakeDateTime("000101 120100");
 
             var updater = new TimelineDateUpdater(begin: begin, end: end);
-            var item = new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120045"));
+            var item = new WindowInfoLegacy(name: "2", date: TestUtils.MakeDateTime("000101 120045"));
             updater.Add(item);
 
             updater.FillLast();
@@ -289,10 +289,10 @@ namespace FWI.Test
             var begin = TestUtils.MakeDateTime("000101 120000");
             var end = TestUtils.MakeDateTime("000101 120100");
             var updater = new TimelineDateUpdater(begin: begin, end: end);
-            WindowInfo[] items = {
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120020")),
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120040")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120020")),
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120040")),
             };
             foreach (var item in items) updater.Add(item);
             updater.FillLast();
@@ -307,17 +307,17 @@ namespace FWI.Test
         {
             var begin = TestUtils.MakeDateTime("000101 120000");
             var end = TestUtils.MakeDateTime("000101 120100");
-            WindowInfo[] items = {
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120020")),
-                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120105")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120020")),
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDateTime("000101 120105")),
             };
-            WindowInfo[] items2 = {
-                new WindowInfo(name:"a", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"b", date: TestUtils.MakeDateTime("000101 120050")),
-                new WindowInfo(name:"c", date: TestUtils.MakeDateTime("000101 120100")),
+            WindowInfoLegacy[] items2 = {
+                new WindowInfoLegacy(name:"a", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"b", date: TestUtils.MakeDateTime("000101 120050")),
+                new WindowInfoLegacy(name:"c", date: TestUtils.MakeDateTime("000101 120100")),
             };
-            WindowInfo expected, actual;
+            WindowInfoLegacy expected, actual;
 
             var updater = new TimelineDateUpdater(begin: begin, end: end);
             foreach (var item in items) updater.Add(item);
@@ -339,32 +339,32 @@ namespace FWI.Test
             int callbackCount = 0;
             DateTime current = TestUtils.MakeDateTime("000101 120000");
             TimeSpan interval = new TimeSpan(0, 1, 0);
-            WindowInfo[] items = {
-                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120020")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120020")),
 
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120105")),
-                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120110")),
-                new WindowInfo(name:"4", date: TestUtils.MakeDateTime("000101 120120")),
-                new WindowInfo(name:"5", date: TestUtils.MakeDateTime("000101 120155")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120105")),
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDateTime("000101 120110")),
+                new WindowInfoLegacy(name:"4", date: TestUtils.MakeDateTime("000101 120120")),
+                new WindowInfoLegacy(name:"5", date: TestUtils.MakeDateTime("000101 120155")),
 
-                new WindowInfo(name:"6", date: TestUtils.MakeDateTime("000101 120245")),
+                new WindowInfoLegacy(name:"6", date: TestUtils.MakeDateTime("000101 120245")),
 
-                new WindowInfo(name:"7", date: TestUtils.MakeDateTime("000101 120301")),
+                new WindowInfoLegacy(name:"7", date: TestUtils.MakeDateTime("000101 120301")),
 
-                new WindowInfo(name:"8", date: TestUtils.MakeDateTime("000101 120610")),
+                new WindowInfoLegacy(name:"8", date: TestUtils.MakeDateTime("000101 120610")),
             };
-            WindowInfo[] expected =
+            WindowInfoLegacy[] expected =
             {
                 items[1],
                 items[4],
                 items[5],
                 items[7],
             };
-            var actual = new List<WindowInfo>();
-            WindowInfo last = new NoWindowInfo();
+            var actual = new List<WindowInfoLegacy>();
+            WindowInfoLegacy last = new NoWindowInfoLegacy();
             var updater = new TimelineDateUpdater(begin: current, end: current + interval);
-            updater.SetOnEnd((WindowInfo wi) =>
+            updater.SetOnEnd((WindowInfoLegacy wi) =>
             {
                 var date = new DateTime(current.Year, current.Month, current.Day, current.Hour, current.Minute, 0);
                 updater.Reset(begin: date, end: date + interval, initWI: updater.Last);

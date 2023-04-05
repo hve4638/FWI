@@ -16,7 +16,7 @@ namespace FWI.Test
         public void One()
         {
             ITimelineUpdater updater = new TimelineInstantUpdater();
-            var expected = new WindowInfo(name: "1", date: TestUtils.MakeDateTime("000101 120000"));
+            var expected = new WindowInfoLegacy(name: "1", date: TestUtils.MakeDateTime("000101 120000"));
 
             updater.Add(expected);
 
@@ -27,15 +27,15 @@ namespace FWI.Test
         [TestMethod]
         public void OnEnd()
         {
-            var expected = new List<WindowInfo>
+            var expected = new List<WindowInfoLegacy>
             {
-                new WindowInfo(name: "1", date: TestUtils.MakeDate("000101")),
-                new WindowInfo(name: "2", date: TestUtils.MakeDate("000102")),
-                new WindowInfo(name: "3", date: TestUtils.MakeDate("000103")),
+                new WindowInfoLegacy(name: "1", date: TestUtils.MakeDate("000101")),
+                new WindowInfoLegacy(name: "2", date: TestUtils.MakeDate("000102")),
+                new WindowInfoLegacy(name: "3", date: TestUtils.MakeDate("000103")),
             };
-            var actual = new List<WindowInfo>();
+            var actual = new List<WindowInfoLegacy>();
             ITimelineUpdater updater = new TimelineInstantUpdater();
-            updater.SetOnEnd((WindowInfo wi) => { actual.Add(wi); });
+            updater.SetOnEnd((WindowInfoLegacy wi) => { actual.Add(wi); });
 
             foreach (var item in expected) updater.Add(item);
 

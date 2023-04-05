@@ -28,8 +28,8 @@ namespace FWI.Test
         {
             var timeline = new Timeline();
             var timeline2 = new Timeline();
-            timeline2.AddLog(new WindowInfo(name: "1", date: TestUtils.MakeDateTime("000101 120000")));
-            timeline2.AddLog(new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120005")));
+            timeline2.AddLog(new WindowInfoLegacy(name: "1", date: TestUtils.MakeDateTime("000101 120000")));
+            timeline2.AddLog(new WindowInfoLegacy(name: "2", date: TestUtils.MakeDateTime("000101 120005")));
 
             Assert.AreNotEqual(timeline.GetHashCode(), timeline2.GetHashCode());
             Assert.AreNotEqual(timeline.GetContentsHashCode(), timeline2.GetContentsHashCode());

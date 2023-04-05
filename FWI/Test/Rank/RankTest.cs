@@ -16,10 +16,10 @@ namespace FWI.Test
         [TestMethod]
         public void TestRankEqual()
         {
-            var list = new List<(WindowInfo wi, TimeSpan time)>
+            var list = new List<(WindowInfoLegacy wi, TimeSpan time)>
             {
-                (new WindowInfo(title: "abc1", name: "abc1.exe"), new TimeSpan(00, 20, 10)),
-                (new WindowInfo(title: "abc2", name: "abc2.exe"), new TimeSpan(00, 50, 00)),
+                (new WindowInfoLegacy(title: "abc1", name: "abc1.exe"), new TimeSpan(00, 20, 10)),
+                (new WindowInfoLegacy(title: "abc2", name: "abc2.exe"), new TimeSpan(00, 50, 00)),
             };
 
             Rank rank = new Rank();
@@ -30,7 +30,7 @@ namespace FWI.Test
             Assert.AreEqual(rank, rank2);
         }
 
-        void AddToRank(Rank rank, List<(WindowInfo wi, TimeSpan time)> items)
+        void AddToRank(Rank rank, List<(WindowInfoLegacy wi, TimeSpan time)> items)
         {
             foreach(var (wi, time) in items) rank.Add(wi, time);
         }
@@ -39,7 +39,7 @@ namespace FWI.Test
         public void TestRankOne()
         {
             Rank rank = new Rank();
-            WindowInfo wi = new WindowInfo(title: "abc", name: "abc.exe");
+            WindowInfoLegacy wi = new WindowInfoLegacy(title: "abc", name: "abc.exe");
             rank.Add(wi, new TimeSpan(0, 20, 10));
 
             var res = rank.One();
@@ -50,8 +50,8 @@ namespace FWI.Test
         public void TestRankAddMulti()
         {
             Rank rank = new Rank();
-            WindowInfo wi1 = new WindowInfo(title: "abc", name: "abc.exe");
-            WindowInfo wi2 = new WindowInfo(title: "notepad", name: "notepade.exe");
+            WindowInfoLegacy wi1 = new WindowInfoLegacy(title: "abc", name: "abc.exe");
+            WindowInfoLegacy wi2 = new WindowInfoLegacy(title: "notepad", name: "notepade.exe");
             rank.Add(wi1, new TimeSpan(0, 10, 00));
             rank.Add(wi2, new TimeSpan(0, 5, 00));
 
@@ -241,7 +241,7 @@ namespace FWI.Test
         {
             var rank = new Rank();
             var rank2 = new Rank();
-            rank2.Add(new WindowInfo(name:"1"), new TimeSpan(0, 0, 10));
+            rank2.Add(new WindowInfoLegacy(name:"1"), new TimeSpan(0, 0, 10));
 
             Assert.AreNotEqual(rank.GetContentsHash(), rank2.GetContentsHash());
         }

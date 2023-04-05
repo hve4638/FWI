@@ -167,20 +167,21 @@
     <Compile Include="Timeline\ITimeline.cs" />
     <Compile Include="Timeline\Serializable\TimelineSerializableDeserializer.cs" />
     <Compile Include="Timeline\Serializable\TimelineSerializableSerializeExtender.cs" />
-    <Compile Include="Timeline\TimelineInstantUpdater.cs" />
+    <Compile Include="Timeline\Updater\TimelineInstantUpdater.cs" />
     <Compile Include="FWIManager.cs" />
     <Compile Include="Loggers\ILogger.cs" />
     <Compile Include="Timeline\Serializable\TimelineSerializable.cs" />
     <Compile Include="Timeline\TimelineSliced.cs" />
-    <Compile Include="WindowInfo\AFKWindowInfo.cs" />
-    <Compile Include="WindowInfo\NoWindowInfo.cs" />
+    <Compile Include="WindowInfo\WILegacy\AFKWindowInfoLegacy.cs" />
+    <Compile Include="WindowInfo\WILegacy\NoWindowInfoLegacy.cs" />
     <Compile Include="Rank\Rank.cs" />
     <Compile Include="Loggers\LoggerLegacy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Timeline\Timeline.cs" />
-    <Compile Include="Timeline\TimelineDateUpdater.cs" />
-    <Compile Include="Timeline\ITimelineUpdater.cs" />
+    <Compile Include="Timeline\Updater\TimelineDateUpdater.cs" />
+    <Compile Include="Timeline\Updater\ITimelineUpdater.cs" />
     <Compile Include="Version.cs" />
+    <Compile Include="WindowInfo\WILegacy\WindowInfoLegacy.cs" />
     <Compile Include="WindowInfo\WindowInfo.cs" />
     <Compile Include="WindowInfo\WindowInfoExtender.cs" />
     <Compile Include="WindowInfo\WindowInfoSerializable.cs" />
@@ -204,5 +205,6 @@
       <Name>HUtility</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

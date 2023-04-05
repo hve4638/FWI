@@ -74,7 +74,7 @@ namespace FWITest.FWI
             var manager = new AliasMap();
             manager.Add("make.exe", "MAKE");
 
-            var wi = new WindowInfo(name: "make.exe", title: "make");
+            var wi = new WindowInfoLegacy(name: "make.exe", title: "make");
             manager.Filter(ref wi);
 
             var expected = "MAKE";

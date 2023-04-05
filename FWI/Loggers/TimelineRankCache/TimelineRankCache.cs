@@ -8,6 +8,9 @@ using HUtility;
 
 namespace FWI
 {
+    /// <summary>
+    /// Timeline 로부터 Rank를 가져올때, 이미 가져온 정보를 특정 시간 단위로 캐싱하는 RankWrapper
+    /// </summary>
     internal class TimelineRankCache
     {
         readonly Dictionary<DateTime, Rank<WindowInfo, string, TimeSpan>> cache;
@@ -48,7 +51,7 @@ namespace FWI
             if (alignBegin < range.Begin)
             {
                 var subrank = target.ToRank(new DateRange(range.Begin, alignBegin));
-                rank.Merge(subrank);
+                rank.Merge(subrank, (x,y) => x+y);
             }
             if (alignEnd > range.End)
             {
@@ -90,6 +93,10 @@ namespace FWI
         {
             cache.Clear();
             target = timeline;
+        }
+        public void ClearCache()
+        {
+            cache.Clear();
         }
     }
 }

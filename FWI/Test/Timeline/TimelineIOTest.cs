@@ -16,11 +16,11 @@ namespace FWI.Test
         public void MockIO()
         {
             Timeline timeline = new Timeline();
-            WindowInfo[] items = {
-                new WindowInfo(name:"1", date: TestUtils.MakeDate("000101")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDate("000102")),
-                new WindowInfo(name:"3", date: TestUtils.MakeDate("000103")),
-                new WindowInfo(name:"4", date: TestUtils.MakeDate("000104")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDate("000101")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDate("000102")),
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDate("000103")),
+                new WindowInfoLegacy(name:"4", date: TestUtils.MakeDate("000104")),
             };
 
             MockStreamWriter writer = new MockStreamWriter();
@@ -43,11 +43,11 @@ namespace FWI.Test
         public void ActualIO()
         {
             Timeline timeline = new Timeline();
-            WindowInfo[] items = {
-                new WindowInfo(name:"1", date: TestUtils.MakeDate("000101")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDate("000102")),
-                new WindowInfo(name:"3", date: TestUtils.MakeDate("000103")),
-                new WindowInfo(name:"4", date: TestUtils.MakeDate("000104")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDate("000101")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDate("000102")),
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDate("000103")),
+                new WindowInfoLegacy(name:"4", date: TestUtils.MakeDate("000104")),
             };
 
             timeline.AddLog(items);

@@ -20,7 +20,7 @@ namespace FWIClient
             lastTitle = "";
         }
 
-        public WindowInfo Track(int interval = 100)
+        public WindowInfoLegacy Track(int interval = 100)
         {
             while (true)
             {
@@ -36,7 +36,7 @@ namespace FWIClient
             }
         }
 
-        public WindowInfo Tracking(Func<WindowInfo, WindowInfo> filter)
+        public WindowInfoLegacy Tracking(Func<WindowInfoLegacy, WindowInfoLegacy> filter)
         {
             while (true)
             {
@@ -51,7 +51,7 @@ namespace FWIClient
             }
         }
 
-        static public void TrackingAsync(Action<WindowInfo> onTrace, int traceInterval = 1000)
+        static public void TrackingAsync(Action<WindowInfoLegacy> onTrace, int traceInterval = 1000)
         {
             string pName = "", pTitle = "";
             try

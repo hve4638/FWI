@@ -25,10 +25,10 @@ namespace FWI.Test
             DateTime current = TestUtils.MakeDateTime("000101 120000");
             var timeline = GetIntervalTimeline(() => current);
 
-            WindowInfo[] items = {
-                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")), // [0] 40s V
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120040")), // [0] 10s
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120050")), // [0] 10s
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"0", date: TestUtils.MakeDateTime("000101 120000")), // [0] 40s V
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120040")), // [0] 10s
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120050")), // [0] 10s
             };
 
             current = TestUtils.MakeDateTime("000101 120000");
@@ -36,7 +36,7 @@ namespace FWI.Test
 
             current = TestUtils.MakeDateTime("000101 120130");
 
-            var expected = new List<WindowInfo>() { items[0] };
+            var expected = new List<WindowInfoLegacy>() { items[0] };
             var actual = timeline.GetAllWIs();
             CollectionAssert.AreEqual(expected, actual);
         }
@@ -47,11 +47,11 @@ namespace FWI.Test
             DateTime current = TestUtils.MakeDateTime("000101 120000");
             var timeline = GetIntervalTimeline(() => current);
 
-            WindowInfo[] items = {
-                new WindowInfo(name: "0", date: TestUtils.MakeDateTime("000101 120000")), // [0] 10s
-                new WindowInfo(name: "1", date: TestUtils.MakeDateTime("000101 120010")), // [0] 35s V
-                new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000101 120045")), // [0] 15s
-                new WindowInfo(name: "3", date: TestUtils.MakeDateTime("000101 120110")), // [1] 60s V
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name: "0", date: TestUtils.MakeDateTime("000101 120000")), // [0] 10s
+                new WindowInfoLegacy(name: "1", date: TestUtils.MakeDateTime("000101 120010")), // [0] 35s V
+                new WindowInfoLegacy(name: "2", date: TestUtils.MakeDateTime("000101 120045")), // [0] 15s
+                new WindowInfoLegacy(name: "3", date: TestUtils.MakeDateTime("000101 120110")), // [1] 60s V
             };
 
             foreach (var wi in items)
@@ -61,7 +61,7 @@ namespace FWI.Test
             }
             current = TestUtils.MakeDateTime("000101 120300");
 
-            var expected = new List<WindowInfo>() { items[1], items[3] };
+            var expected = new List<WindowInfoLegacy>() { items[1], items[3] };
             var actual = timeline.GetAllWIs();
             CollectionAssert.AreEqual(expected, actual);
         }
@@ -73,11 +73,11 @@ namespace FWI.Test
             var current = TestUtils.MakeDateTime("000101 120000");
             var timeline = GetIntervalTimeline(() => current);
 
-            WindowInfo[] items = {
-                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120001")), // [0] 40s V
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120040")), // [0] 20s 
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120105")), // [1] 5s  
-                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120150")), // [1] 45s 
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"0", date: TestUtils.MakeDateTime("000101 120001")), // [0] 40s V
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120040")), // [0] 20s 
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120105")), // [1] 5s  
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDateTime("000101 120150")), // [1] 45s 
             };
 
             foreach (var wi in items)
@@ -86,7 +86,7 @@ namespace FWI.Test
                 timeline.AddLog(wi);
             }
 
-            var expected = new List<WindowInfo>() { items[0] };
+            var expected = new List<WindowInfoLegacy>() { items[0] };
             var actual = timeline.GetAllWIs();
             CollectionAssert.AreEqual(expected, actual);
         }
@@ -98,10 +98,10 @@ namespace FWI.Test
             var current = TestUtils.MakeDateTime("000101 120000");
             var timeline = GetIntervalTimeline(() => current);
 
-            WindowInfo[] items = {
-                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")), // [0] 40s V
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120040")), // [0] 20s+60s+50s V
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120150")), // [2] 10s 
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"0", date: TestUtils.MakeDateTime("000101 120000")), // [0] 40s V
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120040")), // [0] 20s+60s+50s V
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120150")), // [2] 10s 
             };
 
             foreach (var wi in items)
@@ -111,7 +111,7 @@ namespace FWI.Test
             }
             current = TestUtils.MakeDateTime("000101 120200");
 
-            var expected = new List<WindowInfo>() { items[0], items[1] };
+            var expected = new List<WindowInfoLegacy>() { items[0], items[1] };
             var actual = timeline.GetAllWIs();
             CollectionAssert.AreEqual(expected, actual);
         }
@@ -122,10 +122,10 @@ namespace FWI.Test
             var current = TestUtils.MakeDateTime("000101 120000");
             var timeline = GetIntervalTimeline(() => current);
 
-            WindowInfo[] items = {
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")), // [0] 40s V 
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120040")), // [0] 20s+5s
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120105")), // [1] 55s V       (but duplicate)
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120000")), // [0] 40s V 
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120040")), // [0] 20s+5s
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120105")), // [1] 55s V       (but duplicate)
             };
 
             foreach (var wi in items)
@@ -135,7 +135,7 @@ namespace FWI.Test
             }
             current = TestUtils.MakeDateTime("000101 120200");
 
-            var expected = new List<WindowInfo>() { items[0] };
+            var expected = new List<WindowInfoLegacy>() { items[0] };
             var actual = timeline.GetAllWIs();
             CollectionAssert.AreEqual(expected, actual);
         }

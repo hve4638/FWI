@@ -18,15 +18,15 @@ namespace FWI
     /// </summary>
     public class DateRank
     {
-        readonly Dictionary<string, WindowInfo> WIs;
+        readonly Dictionary<string, WindowInfoLegacy> WIs;
         readonly Rank rank;
-        WindowInfo lastWI;
+        WindowInfoLegacy lastWI;
         DateTime lastTime;
 
         public DateRank()
         {
             rank = new Rank();
-            WIs = new Dictionary<string, WindowInfo>();
+            WIs = new Dictionary<string, WindowInfoLegacy>();
             Reset();
         }
 
@@ -38,7 +38,7 @@ namespace FWI
             lastTime = DateTime.MinValue;
         }
 
-        public void Add(WindowInfo wi)
+        public void Add(WindowInfoLegacy wi)
         {
             AddLast(wi.Date);
             AddToWIs(wi);
@@ -52,7 +52,7 @@ namespace FWI
             lastWI = null;
         }
 
-        void AddToWIs(WindowInfo wi)
+        void AddToWIs(WindowInfoLegacy wi)
         {
             if (!WIs.ContainsKey(wi.Name)) WIs.Add(wi.Name, wi);
         }
@@ -70,20 +70,20 @@ namespace FWI
             lastTime = date;
         }
 
-        public IEnumerable<WindowInfo> GetWIs()
+        public IEnumerable<WindowInfoLegacy> GetWIs()
         {
             return WIs.Values;
         }
 
-        public Dictionary<int, RankResult<WindowInfo>> GetRanks(int beginRank=1, int endRank=1)
+        public Dictionary<int, RankResult<WindowInfoLegacy>> GetRanks(int beginRank=1, int endRank=1)
         {
-            var rankResults = new Dictionary<int, RankResult<WindowInfo>>();
+            var rankResults = new Dictionary<int, RankResult<WindowInfoLegacy>>();
 
             for (int i = beginRank; i <= endRank; i++)
             {
                 if (rank.TryGetRank(i, out string name, out TimeSpan time))
                 {
-                    var rankResult = new RankResult<WindowInfo>(item: WIs[name], ranking: i, duration: time);
+                    var rankResult = new RankResult<WindowInfoLegacy>(item: WIs[name], ranking: i, duration: time);
                     rankResults.Add(i, rankResult);
                 }
             }
@@ -146,7 +146,7 @@ namespace FWI
             while (!wiReader.EndOfStream)
             {
                 var line = wiReader.ReadLine();
-                var item = WindowInfo.Decode(line);
+                var item = WindowInfoLegacy.Decode(line);
                 AddToWIs(item);
             }
         }

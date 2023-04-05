@@ -16,20 +16,20 @@ namespace FWI.Test
         [TestMethod]
         public void TestRankName()
         {
-            WindowInfo[] items =
+            WindowInfoLegacy[] items =
             {
-                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
+                new WindowInfoLegacy(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
             };
             var rank = new DateRank();
 
             foreach (var item in items) rank.Add(item);
 
-            var expected = new Dictionary<int, RankResult<WindowInfo>>
+            var expected = new Dictionary<int, RankResult<WindowInfoLegacy>>
             {
-                { 1, new RankResult<WindowInfo>(item: items[0], duration: TimeSpan.Zero, ranking: 1) },
-                { 2, new RankResult<WindowInfo>(item: items[1], duration: TimeSpan.Zero, ranking: 2) },
+                { 1, new RankResult<WindowInfoLegacy>(item: items[0], duration: TimeSpan.Zero, ranking: 1) },
+                { 2, new RankResult<WindowInfoLegacy>(item: items[1], duration: TimeSpan.Zero, ranking: 2) },
             };
             var actual = rank.GetRanks(beginRank: 1, endRank: 2);
 
@@ -39,20 +39,20 @@ namespace FWI.Test
         [TestMethod]
         public void TestRankDuration()
         {
-            WindowInfo[] items =
+            WindowInfoLegacy[] items =
             {
-                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
+                new WindowInfoLegacy(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
             };
             var rank = new DateRank();
 
             foreach (var item in items) rank.Add(item);
 
-            var expected = new Dictionary<int, RankResult<WindowInfo>>
+            var expected = new Dictionary<int, RankResult<WindowInfoLegacy>>
             {
-                { 1, new RankResult<WindowInfo>(item: items[1], duration: new TimeSpan(0,2,0), ranking: 1) },
-                { 2, new RankResult<WindowInfo>(item: items[0], duration: new TimeSpan(0,1,0), ranking: 2) },
+                { 1, new RankResult<WindowInfoLegacy>(item: items[1], duration: new TimeSpan(0,2,0), ranking: 1) },
+                { 2, new RankResult<WindowInfoLegacy>(item: items[0], duration: new TimeSpan(0,1,0), ranking: 2) },
             };
             var actual = rank.GetRanks(beginRank: 1, endRank: 2);
 
@@ -63,22 +63,22 @@ namespace FWI.Test
         [TestMethod]
         public void TestRankLast()
         {
-            WindowInfo[] items =
+            WindowInfoLegacy[] items =
             {
-                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
+                new WindowInfoLegacy(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
             };
             var rank = new DateRank();
 
             foreach (var item in items) rank.Add(item);
             rank.AddLast(TestUtils.MakeDateTime("000101 120330"));
 
-            var expected = new Dictionary<int, RankResult<WindowInfo>>
+            var expected = new Dictionary<int, RankResult<WindowInfoLegacy>>
             {
-                { 1, new RankResult<WindowInfo>(item: items[0], duration: new TimeSpan(0,2,0), ranking: 1) },
-                { 2, new RankResult<WindowInfo>(item: items[1], duration: new TimeSpan(0,1,0), ranking: 2) },
-                { 3, new RankResult<WindowInfo>(item: items[2], duration: new TimeSpan(0,0,30), ranking: 3) },
+                { 1, new RankResult<WindowInfoLegacy>(item: items[0], duration: new TimeSpan(0,2,0), ranking: 1) },
+                { 2, new RankResult<WindowInfoLegacy>(item: items[1], duration: new TimeSpan(0,1,0), ranking: 2) },
+                { 3, new RankResult<WindowInfoLegacy>(item: items[2], duration: new TimeSpan(0,0,30), ranking: 3) },
             };
             var actual = rank.GetRanks(beginRank: 1, endRank: 3);
 
@@ -89,7 +89,7 @@ namespace FWI.Test
         [TestMethod]
         public void TestRankLast2()
         {
-            WindowInfo item = new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000"));
+            WindowInfoLegacy item = new WindowInfoLegacy(name:"0", date: TestUtils.MakeDateTime("000101 120000"));
             var rank = new DateRank();
 
             rank.Add(item);
@@ -97,9 +97,9 @@ namespace FWI.Test
             rank.AddLast(TestUtils.MakeDateTime("000101 120200"));
             rank.AddLast(TestUtils.MakeDateTime("000101 120300"));
 
-            var expected = new Dictionary<int, RankResult<WindowInfo>>
+            var expected = new Dictionary<int, RankResult<WindowInfoLegacy>>
             {
-                { 1, new RankResult<WindowInfo>(item: item, duration: new TimeSpan(0,3,0), ranking: 1) },
+                { 1, new RankResult<WindowInfoLegacy>(item: item, duration: new TimeSpan(0,3,0), ranking: 1) },
             };
             var actual = rank.GetRanks(beginRank: 1, endRank: 1);
 
@@ -109,12 +109,12 @@ namespace FWI.Test
         [TestMethod]
         public void TestDuplication()
         {
-            WindowInfo[] items =
+            WindowInfoLegacy[] items =
             {
-                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
-                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120300")),
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120400")),
+                new WindowInfoLegacy(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfoLegacy(name:"0", date: TestUtils.MakeDateTime("000101 120300")),
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120400")),
             };
             var rank = new DateRank();
 
@@ -125,12 +125,12 @@ namespace FWI.Test
         [TestMethod]
         public void TestThrowTimeSequenceException()
         {
-            WindowInfo[] items =
+            WindowInfoLegacy[] items =
             {
-                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
-                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120100")),
+                new WindowInfoLegacy(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDateTime("000101 120100")),
             };
             var rank = new DateRank();
 
@@ -150,11 +150,11 @@ namespace FWI.Test
         [TestMethod]
         public void TestThrowTimeSequenceException2()
         {
-            WindowInfo[] items =
+            WindowInfoLegacy[] items =
             {
-                new WindowInfo(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
+                new WindowInfoLegacy(name:"0", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120300")),
             };
             var rank = new DateRank();
             foreach (var item in items) rank.Add(item);
@@ -198,11 +198,11 @@ namespace FWI.Test
         [TestMethod]
         public void TestExportAndImportContents()
         {
-            WindowInfo[] items =
+            WindowInfoLegacy[] items =
             {
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120100")),
-                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120100")),
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDateTime("000101 120200")),
             };
             var eRank = new DateRank();
             foreach (var item in items) eRank.Add(item);
@@ -226,11 +226,11 @@ namespace FWI.Test
         [TestMethod]
         public void TestExport()
         {
-            WindowInfo[] items =
+            WindowInfoLegacy[] items =
             {
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 120100")),
-                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 120200")),
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 120100")),
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDateTime("000101 120200")),
             };
             var eRank = new DateRank();
             foreach (var item in items) eRank.Add(item);

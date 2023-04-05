@@ -16,7 +16,7 @@ namespace FWI
         // SingleLogger 단독으로 사용시 전체범위
         readonly DateRange loggingRange;
         readonly Timeline timeline;
-        readonly Dictionary<int, DateRank> rankCache;
+        readonly TimelineRankCache rankCache;
         public SingleLogger(int maximumSize = 50, DateTime? date = null)
         {
             loggingRange = new DateRange(DateTime.MinValue, DateTime.MaxValue);
@@ -36,28 +36,23 @@ namespace FWI
         }
         public ILogger AddAFK(DateTime date)
         {
-            timeline.AddLog(new AFKWindowInfo(date));
+            var wi = WindowInfo.AFK;
+            wi.Date = date;
+            timeline.AddLog(wi);
             return this;
         }
 
         public void SetOnLoggingListener(Action<WindowInfo> onLoggingListener) => timeline.SetOnAddListener(onLoggingListener);
 
-        public static SingleLogger operator +(SingleLogger logger, WindowInfo wi)
-        {
-            logger.AddWI(wi);
-            return logger;
-        }
-        
         public int Length => timeline.Count;
         public int Count => timeline.Count;
 
-        public ReadOnlyCollection<WindowInfo> GetLog() => timeline.GetAllWIs();
-        public ReadOnlyCollection<WindowInfo> GetLog(DateTime from, DateTime to) => GetLog(new DateRange(from, to));
-        public ReadOnlyCollection<WindowInfo> GetLog(DateRange range) => timeline.GetWIs(range);
+        public ReadOnlyCollection<WindowInfo> GetTimeline() => timeline.GetAllWIs();
+        public ReadOnlyCollection<WindowInfo> GetTimeline(DateRange range) => timeline.GetWIs(range);
 
         public Dictionary<int, RankResult<WindowInfo>> GetRanks()
         {
-            throw new NotImplementedException();
+            return rankCache.GetRank(timeline.Range);
         }
 
         public Dictionary<int, RankResult<WindowInfo>> GetRanks(int beginRank, int endRank)
@@ -79,5 +74,11 @@ namespace FWI
         {
             throw new NotImplementedException();
         }
+
+
+        [Obsolete]
+        public ReadOnlyCollection<WindowInfo> GetLog() => GetTimeline();
+        [Obsolete]
+        public ReadOnlyCollection<WindowInfo> GetLog(DateRange range) => GetTimeline(range);
     }
 }

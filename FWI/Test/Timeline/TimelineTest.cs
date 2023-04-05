@@ -18,10 +18,10 @@ namespace FWI.Test
         {
             var timeline = new Timeline();
 
-            WindowInfo[] expected = {
-                new WindowInfo(name:"1", date: TestUtils.MakeDate("000101")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDate("000102")),
-                new WindowInfo(name:"3", date: TestUtils.MakeDate("000103")),
+            WindowInfoLegacy[] expected = {
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDate("000101")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDate("000102")),
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDate("000103")),
             };
             timeline.AddLog(expected);
 
@@ -33,14 +33,14 @@ namespace FWI.Test
         public void GetAllWIsIgnoreDuplicate()
         {
             Timeline timeline = new Timeline();
-            WindowInfo[] items = {
-                new WindowInfo(name:"1", date: TestUtils.MakeDate("000101")),
-                new WindowInfo(name:"1", date: TestUtils.MakeDate("000102")),
-                new WindowInfo(name:"1", date: TestUtils.MakeDate("000103")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDate("000101")),
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDate("000102")),
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDate("000103")),
             };
 
             timeline.AddLog(items);
-            WindowInfo[] expected = { items[0] };
+            WindowInfoLegacy[] expected = { items[0] };
 
             var actual = timeline.GetAllWIs();
             CollectionAssert.AreEqual(expected, actual);
@@ -50,15 +50,15 @@ namespace FWI.Test
         public void GetWIs()
         {
             Timeline timeline = new Timeline();
-            WindowInfo[] items = {
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000102 120000")),
-                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000103 123000")),
-                new WindowInfo(name:"4", date: TestUtils.MakeDateTime("000104 123000")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120000")),
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000102 120000")),
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDateTime("000103 123000")),
+                new WindowInfoLegacy(name:"4", date: TestUtils.MakeDateTime("000104 123000")),
             };
             timeline.AddLog(items);
 
-            WindowInfo[] expected = {
+            WindowInfoLegacy[] expected = {
                 items[0],
                 items[1],
                 items[2],
@@ -72,15 +72,15 @@ namespace FWI.Test
         public void GetWIsSplit()
         {
             Timeline timeline = new Timeline();
-            WindowInfo[] items = {
-                new WindowInfo(name:"1", date: TestUtils.MakeDateTime("000101 120000")), // 20min
-                new WindowInfo(name:"2", date: TestUtils.MakeDateTime("000101 122000")), // 30min
-                new WindowInfo(name:"3", date: TestUtils.MakeDateTime("000101 125000")), // 10min
-                new WindowInfo(name:"4", date: TestUtils.MakeDateTime("000101 130000")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name:"1", date: TestUtils.MakeDateTime("000101 120000")), // 20min
+                new WindowInfoLegacy(name:"2", date: TestUtils.MakeDateTime("000101 122000")), // 30min
+                new WindowInfoLegacy(name:"3", date: TestUtils.MakeDateTime("000101 125000")), // 10min
+                new WindowInfoLegacy(name:"4", date: TestUtils.MakeDateTime("000101 130000")),
             };
             timeline.AddLog(items);
 
-            WindowInfo[] expected = {
+            WindowInfoLegacy[] expected = {
                 items[0],
                 items[1],
                 items[2],
@@ -95,9 +95,9 @@ namespace FWI.Test
         public void ExceptionTimeSequence()
         {
             var timeline = new Timeline();
-            WindowInfo[] items = {
-                new WindowInfo(title:"2", name:"", date: TestUtils.MakeDate("000105")),
-                new WindowInfo(title:"1", name:"", date: TestUtils.MakeDate("000101")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(title:"2", name:"", date: TestUtils.MakeDate("000105")),
+                new WindowInfoLegacy(title:"1", name:"", date: TestUtils.MakeDate("000101")),
             };
 
             try
@@ -114,11 +114,11 @@ namespace FWI.Test
         [TestMethod]
         public void AddListenerWithNoInterval()
         {
-            WindowInfo expected = new WindowInfo(name: "1", date: TestUtils.MakeDate("000101"));
-            WindowInfo actual = null;
+            WindowInfoLegacy expected = new WindowInfoLegacy(name: "1", date: TestUtils.MakeDate("000101"));
+            WindowInfoLegacy actual = null;
 
             var timeline = new Timeline();
-            timeline.SetOnAddListener((WindowInfo item) => { actual = item; });
+            timeline.SetOnAddListener((WindowInfoLegacy item) => { actual = item; });
 
             timeline.AddLog(expected);
             Assert.AreEqual(expected, actual);
@@ -128,11 +128,11 @@ namespace FWI.Test
         public void Find()
         {
             var timeline = new Timeline();
-            WindowInfo[] items = {
-                new WindowInfo(name: "0", date: TestUtils.MakeDate("000101")),
-                new WindowInfo(name: "1", date: TestUtils.MakeDate("000102")),
-                new WindowInfo(name: "2", date: TestUtils.MakeDate("000103")),
-                new WindowInfo(name: "3", date: TestUtils.MakeDate("000104")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name: "0", date: TestUtils.MakeDate("000101")),
+                new WindowInfoLegacy(name: "1", date: TestUtils.MakeDate("000102")),
+                new WindowInfoLegacy(name: "2", date: TestUtils.MakeDate("000103")),
+                new WindowInfoLegacy(name: "3", date: TestUtils.MakeDate("000104")),
             };
             timeline.AddWIs(items);
 
@@ -155,10 +155,10 @@ namespace FWI.Test
         public void FindNearestPast()
         {
             var timeline = new Timeline();
-            WindowInfo[] items = {
-                new WindowInfo(name: "2", date: TestUtils.MakeDate("000201")),
-                new WindowInfo(name: "3", date: TestUtils.MakeDate("000301")),
-                new WindowInfo(name: "4", date: TestUtils.MakeDate("000401")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name: "2", date: TestUtils.MakeDate("000201")),
+                new WindowInfoLegacy(name: "3", date: TestUtils.MakeDate("000301")),
+                new WindowInfoLegacy(name: "4", date: TestUtils.MakeDate("000401")),
             };
             timeline.AddWIs(items);
 
@@ -188,10 +188,10 @@ namespace FWI.Test
         public void FindNearestFuture()
         {
             var timeline = new Timeline();
-            WindowInfo[] items = {
-                new WindowInfo(name: "2", date: TestUtils.MakeDate("000201")),
-                new WindowInfo(name: "3", date: TestUtils.MakeDate("000301")),
-                new WindowInfo(name: "4", date: TestUtils.MakeDate("000401")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name: "2", date: TestUtils.MakeDate("000201")),
+                new WindowInfoLegacy(name: "3", date: TestUtils.MakeDate("000301")),
+                new WindowInfoLegacy(name: "4", date: TestUtils.MakeDate("000401")),
             };
             timeline.AddWIs(items);
 
@@ -222,10 +222,10 @@ namespace FWI.Test
         public void FindNearest()
         {
             var timeline = new Timeline();
-            WindowInfo[] items = {
-                new WindowInfo(name: "0", date: TestUtils.MakeDateTime("000101 000000")),
-                new WindowInfo(name: "1", date: TestUtils.MakeDateTime("000102 000000")),
-                new WindowInfo(name: "2", date: TestUtils.MakeDateTime("000103 000000")),
+            WindowInfoLegacy[] items = {
+                new WindowInfoLegacy(name: "0", date: TestUtils.MakeDateTime("000101 000000")),
+                new WindowInfoLegacy(name: "1", date: TestUtils.MakeDateTime("000102 000000")),
+                new WindowInfoLegacy(name: "2", date: TestUtils.MakeDateTime("000103 000000")),
             };
             timeline.AddWIs(items);
 

@@ -10,6 +10,9 @@ using System.Xml.Linq;
 
 namespace HUtility
 {
+    /// <summary>
+    /// 
+    /// </summary>
     /// <typeparam name="T">랭크에 저장하고 비교할 대상</typeparam>
     /// <typeparam name="S">순위를 비교하기 위한 값</typeparam>
     public class Rank<T, S> : IRank<T, S> where S : IComparable<S>
@@ -116,6 +119,14 @@ namespace HUtility
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public void Merge(IRank<T, S> other, Func<S, S, S> onMerge)
+        {
+            foreach (var (key, value) in other)
+            {
+                this[key] = onMerge(this[key], value);
+            }
         }
     }
 }

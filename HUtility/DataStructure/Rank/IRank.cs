@@ -37,7 +37,12 @@ namespace HUtility
         /// <param name="output">해당 순위의 값 리턴</param>
         T GetRank(int value);
 
-
+        /// <summary>
+        /// onMerge()의 작동에 따라 두 Rank<T, S></T>
+        /// </summary>
+        /// <param name="rank"></param>
+        /// <param name="onMerge"></param>
+        void Merge(IRank<T, S> rank, Func<S, S, S> onMerge);
         
         S this[T index] { get; set; }
 

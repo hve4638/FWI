@@ -10,6 +10,7 @@ using System.Xml.Linq;
 
 namespace FWI
 {
+    /*
     public class LoggerLegacy : ILogger
     {
         int maximumSize;
@@ -35,7 +36,7 @@ namespace FWI
 
         public void SetLoggingInterval(int minutes=0) => timeline.SetInterval(minutes);
         public void SetDateTimeDelegate(Func<DateTime> dateTimeDelegate) => timeline.SetMenualDateTime(dateTimeDelegate);
-        public ILogger AddWI(WindowInfo wi)
+        public ILogger AddWI(WindowInfoLegacy wi)
         {
             rank.Add(wi);
             timeline.AddLog(wi);
@@ -44,19 +45,19 @@ namespace FWI
         public ILogger AddDefaultWI(DateTime date)
         {
             rank.ClearLast(date);
-            timeline.AddLog(new AFKWindowInfo(date));
+            timeline.AddLog(new AFKWindowInfoLegacy(date));
             return this;
         }
         public ILogger AddAFK(DateTime date)
         {
             rank.ClearLast(date);
-            timeline.AddLog(new AFKWindowInfo(date));
+            timeline.AddLog(new AFKWindowInfoLegacy(date));
             return this;
         }
 
-        public void SetOnLoggingListener(Action<WindowInfo> onLoggingListener) => timeline.SetOnAddListener(onLoggingListener);
+        public void SetOnLoggingListener(Action<WindowInfoLegacy> onLoggingListener) => timeline.SetOnAddListener(onLoggingListener);
 
-        public static LoggerLegacy operator +(LoggerLegacy logger, WindowInfo wi)
+        public static LoggerLegacy operator +(LoggerLegacy logger, WindowInfoLegacy wi)
         {
             logger.AddWI(wi);
             return logger;
@@ -66,12 +67,12 @@ namespace FWI
         public int Length => timeline.Count;
         public int Count => timeline.Count;
 
-        public ReadOnlyCollection<WindowInfo> GetLog() => timeline.GetAllWIs();
-        public ReadOnlyCollection<WindowInfo> GetLog(DateTime from, DateTime to) => GetLog(new DateRange(from, to));
-        public ReadOnlyCollection<WindowInfo> GetLog(DateRange range) => timeline.GetWIs(range);
+        public ReadOnlyCollection<WindowInfoLegacy> GetLog() => timeline.GetAllWIs();
+        public ReadOnlyCollection<WindowInfoLegacy> GetLog(DateTime from, DateTime to) => GetLog(new DateRange(from, to));
+        public ReadOnlyCollection<WindowInfoLegacy> GetLog(DateRange range) => timeline.GetWIs(range);
 
-        public Dictionary<int, RankResult<WindowInfo>> GetRanks() => GetRanks(1, rank.Count);
-        public Dictionary<int, RankResult<WindowInfo>> GetRanks(int beginRank = 1, int endRank = 1)
+        public Dictionary<int, RankResult<WindowInfoLegacy>> GetRanks() => GetRanks(1, rank.Count);
+        public Dictionary<int, RankResult<WindowInfoLegacy>> GetRanks(int beginRank = 1, int endRank = 1)
         {
             var ranks = rank.GetRanks(beginRank, endRank);
 
@@ -98,5 +99,5 @@ namespace FWI
         {
             return rank.GetContentsHash() ^ timeline.GetContentsHashCode();
         }
-    }
+    }*/
 }

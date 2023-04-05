@@ -14,7 +14,7 @@ namespace FWI
         public TimelineInstantUpdater()
         {
             onEnd = null;
-            last = new NoWindowInfo();
+            last = WindowInfo.NoWindow;
         }
 
         public void SetOnEnd(Action<WindowInfo> onEnd)
@@ -30,13 +30,9 @@ namespace FWI
         }
         public bool IsEnd() => true;
         public bool IsEnd(DateTime current) => true;
-        public bool Empty => last == null;
+        public bool Empty => last.IsEmpty();
 
-        public bool HasOne() => (last != null);
+        public bool HasOne() => last.IsEmpty();
         public WindowInfo One() => last;
-        public TimeSpan UpdateCurrent(DateTime current)
-        {
-            return TimeSpan.Zero;
-        }
     }
 }

@@ -46,7 +46,7 @@
   <ItemGroup>
     <Compile Include="DataStructure\Rank\IRank.cs" />
     <Compile Include="DataStructure\Rank\RankWithConverter.cs" />
-    <Compile Include="DataStructure\Rank\RankWithConverterExtneder.cs" />
+    <Compile Include="DataStructure\Rank\RankWithConverterExtender.cs" />
     <Compile Include="DataStructure\Results\LazyRequestResult.cs" />
     <Compile Include="DataStructure\Results\LazyRequestResultManager.cs" />
     <Compile Include="DataStructure\Results\RequestResult.cs" />
@@ -60,7 +60,6 @@
     <Compile Include="DataStructure\Rank\IRankDictionary.cs" />
     <Compile Include="DataStructure\Rank\IRankDictionaryExtender.cs" />
     <Compile Include="DataStructure\Rank\RankDictionary.cs" />
-    <Compile Include="DataStructure\Rank\RankKeyFilterDictionary.cs" />
     <Compile Include="DataStructure\DataRange\DateRange.cs" />
     <Compile Include="DataStructure\DataRange\MutableDateRange.cs" />
     <Compile Include="DataStructure\History.cs" />

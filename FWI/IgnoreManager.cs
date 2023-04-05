@@ -22,7 +22,7 @@ namespace FWI
             set.Add(name);
         }
 
-        public bool Contains(WindowInfo wi) => Contains(wi.Name);
+        public bool Contains(WindowInfoLegacy wi) => Contains(wi.Name);
         public bool Contains(string name) => set.Contains(name);
 
         public IgnoreMap Import(string filename)

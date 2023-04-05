@@ -30,8 +30,8 @@ namespace FWI
 
         public Timeline()
         {
-            lastWI = new NoWindowInfo();
-            lastAddedWI = new NoWindowInfo();
+            lastWI = WindowInfo.NoWindow;
+            lastAddedWI = WindowInfo.NoWindow;
             lastTime = DateTime.MinValue;
             timelineLog = new List<WindowInfo>();
             getCurrentDate = ()=>DateTime.Now;
@@ -79,11 +79,9 @@ namespace FWI
                 var initWI = dateUpdater!.Last;
 
                 dateUpdater.Reset(begin: date, end: date + interval, initWI: initWI);
-                if (IsValidWI(lastWI)) dateUpdater.Add(lastWI);
+                if (!lastWI.IsNoWindow()) dateUpdater.Add(lastWI);
             }
         }
-
-        static bool IsValidWI(WindowInfo wi) => !(wi == null || wi is NoWindowInfo);
 
         // 내부 리스트에 정보를 추가. 시간 순서 등 충돌요소를 체크하지 않음.
         public void AddLogForce(WindowInfo wi)
@@ -105,11 +103,14 @@ namespace FWI
         }
         public void AddLog(WindowInfo wi)
         {
-            if (wi.Date < lastTime) throw new TimeSequenceException()
+            if (wi.Date < lastTime)
+            {
+                throw new TimeSequenceException()
                 {
                     Last = lastTime,
                     Input = wi.Date,
                 };
+            }
             else if (IsLastWI(wi)) return;
             else
             {
@@ -180,8 +181,9 @@ namespace FWI
             while (!reader.EndOfStream)
             {
                 line = reader.ReadLine();
-                item = WindowInfo.Decode(line);
-                AddLogForce(item);
+                //item = WindowInfo.Decode(line);
+                //AddLogForce(item);
+                throw new NotImplementedException();
             }
         }
 
@@ -192,7 +194,8 @@ namespace FWI
         }
         public void Export(StreamWriter writer)
         {
-            foreach (WindowInfo wi in GetAllWIs()) writer.WriteLine(wi.Encoding());
+            //foreach (var wi in GetAllWIs()) writer.WriteLine(wi.Encoding());
+            throw new NotImplementedException();
         }
 
         public void SetMenualDateTime(Func<DateTime> dateTimeDelegate)
@@ -202,14 +205,6 @@ namespace FWI
 
         public DateTime GetCurrentDateTime() => getCurrentDate();
         public int Count => timelineLog.Count;
-
-        public WindowInfo this[DateTime date]
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
 
         public int Find(DateTime date)
         {
@@ -294,8 +289,8 @@ namespace FWI
         public int GetContentsHashCode()
         {
             int hash = initContentHash;
-            foreach(var item in timelineLog) hash ^= item.GetContentsHashCode();
-
+            //foreach(var item in timelineLog) hash ^= item.GetContentsHashCode();
+            throw new NotImplementedException();
             return hash;
         }
 
@@ -317,5 +312,7 @@ namespace FWI
             }
         }
         public int WICount => timelineLog.Count;
+
+        WindowInfo ITimelineReadOnly.this[DateTime date] => throw new NotImplementedException();
     }
 }

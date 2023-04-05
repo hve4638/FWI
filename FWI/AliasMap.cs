@@ -23,11 +23,11 @@ namespace FWI
             dict[key] = value;
         }
 
-        public void Filter(ref WindowInfo wi)
+        public void Filter(ref WindowInfoLegacy wi)
         {
             if (dict.ContainsKey(wi.Name)) wi.Alias = dict[wi.Name];
         }
-        public void Filter(IEnumerable<WindowInfo> enumerable)
+        public void Filter(IEnumerable<WindowInfoLegacy> enumerable)
         {
             foreach (var item in enumerable)
             {

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 #nullable enable
@@ -22,12 +23,12 @@ namespace FWI
             Range = range;
         }
 
-        public WindowInfo? this[DateTime date]
+        public WindowInfo this[DateTime date]
         {
             get
             {
                 if (Range.Contains(date)) return original[date];
-                else return null;
+                else throw new IndexOutOfRangeException();
             }
         }
 
@@ -46,7 +47,7 @@ namespace FWI
             var count = 0;
             for (int i = 2; i <= 6 && i < count; i++)
             {
-                yield return new NoWindowInfo();
+                yield return WindowInfo.NoWindow;
             }
         }
 

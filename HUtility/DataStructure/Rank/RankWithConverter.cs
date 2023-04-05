@@ -101,5 +101,15 @@ namespace HUtility
         {
             return GetEnumerator();
         }
+
+        public void Merge(IRank<K, S> other, Func<S, S, S> onMerge)
+        {
+            foreach (var (key, value) in other) this[key] = onMerge(this[key], value);
+        }
+
+        public void Merge(Rank<K, T, S> other, Func<S, S, S> onMerge)
+        {
+            foreach (var (key, value) in other) this[key] = onMerge(this[key], value);
+        }
     }
 }

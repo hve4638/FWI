@@ -13,8 +13,8 @@ namespace FWITest.FWI
         [TestMethod]
         public void TestHashNotEqual()
         {
-            var wi = new WindowInfo(name: "1");
-            var wi2 = new WindowInfo(name: "1");
+            var wi = new WindowInfoLegacy(name: "1");
+            var wi2 = new WindowInfoLegacy(name: "1");
 
             Assert.AreNotEqual(wi.GetHashCode(), wi2.GetHashCode());
         }
@@ -22,9 +22,9 @@ namespace FWITest.FWI
         [TestMethod]
         public void TestEqual()
         {
-            var wi = new WindowInfo(name: "1", date: Date.MakeDate("000101"));
-            var wi2 = new WindowInfo(name: "1", date: Date.MakeDate("000101"));
-            var wi3 = new WindowInfo(name: "2", date: Date.MakeDate("000101"));
+            var wi = new WindowInfoLegacy(name: "1", date: Date.MakeDate("000101"));
+            var wi2 = new WindowInfoLegacy(name: "1", date: Date.MakeDate("000101"));
+            var wi3 = new WindowInfoLegacy(name: "2", date: Date.MakeDate("000101"));
 
             Assert.AreEqual(wi, wi2);
             Assert.AreNotEqual(wi, wi3);
@@ -33,9 +33,9 @@ namespace FWITest.FWI
         [TestMethod]
         public void TestContentsHashEqual()
         {
-            var wi = new WindowInfo(name: "1", date: Date.MakeDate("000101"));
-            var wi2 = new WindowInfo(name: "1", date: Date.MakeDate("000101"));
-            var wi3 = new WindowInfo(name: "5", date: Date.MakeDate("000101"));
+            var wi = new WindowInfoLegacy(name: "1", date: Date.MakeDate("000101"));
+            var wi2 = new WindowInfoLegacy(name: "1", date: Date.MakeDate("000101"));
+            var wi3 = new WindowInfoLegacy(name: "5", date: Date.MakeDate("000101"));
 
             Assert.AreEqual(wi.GetContentsHashCode(), wi2.GetContentsHashCode());
             Assert.AreNotEqual(wi.GetContentsHashCode(), wi3.GetContentsHashCode());
@@ -44,8 +44,8 @@ namespace FWITest.FWI
         [TestMethod]
         public void TestNoWIHash()
         {
-            var wi = new NoWindowInfo();
-            var wi2 = new NoWindowInfo();
+            var wi = new NoWindowInfoLegacy();
+            var wi2 = new NoWindowInfoLegacy();
 
             Assert.AreEqual(wi, wi2);
         }
@@ -53,8 +53,8 @@ namespace FWITest.FWI
         [TestMethod]
         public void TestNoWIContentsHash()
         {
-            var wi = new NoWindowInfo();
-            var wi2 = new NoWindowInfo();
+            var wi = new NoWindowInfoLegacy();
+            var wi2 = new NoWindowInfoLegacy();
 
             Assert.AreEqual(wi.GetContentsHashCode(), wi2.GetContentsHashCode());
         }
@@ -67,9 +67,9 @@ namespace FWITest.FWI
         public void TestEncodeDecode()
         {
             DateTime date = new DateTime(2000, 1, 1, 12, 30, 12);
-            WindowInfo wi = new WindowInfo(title: "hello", name: "hello.exe", alias: "hi", date: date);
+            WindowInfoLegacy wi = new WindowInfoLegacy(title: "hello", name: "hello.exe", alias: "hi", date: date);
             string encoded = wi.Encoding();
-            WindowInfo decodedWi = WindowInfo.Decode(encoded);
+            WindowInfoLegacy decodedWi = WindowInfoLegacy.Decode(encoded);
 
             Assert.IsTrue(wi == decodedWi);
         }
@@ -77,19 +77,19 @@ namespace FWITest.FWI
         public void TestValidEqualOperator()
         {
             DateTime date = new DateTime(2000, 1, 1, 12, 30, 12);
-            WindowInfo wi1 = new WindowInfo(title: "hello", name: "hello.exe", alias: "hi", date: date);
-            WindowInfo wi2 = new WindowInfo(title: "hello", name: "hello.exe", alias: "hi", date: date);
+            WindowInfoLegacy wi1 = new WindowInfoLegacy(title: "hello", name: "hello.exe", alias: "hi", date: date);
+            WindowInfoLegacy wi2 = new WindowInfoLegacy(title: "hello", name: "hello.exe", alias: "hi", date: date);
 
             Assert.AreEqual(wi1, wi2);
         }
         [TestMethod]
         public void TestMapContains()
         {
-            Dictionary<WindowInfo, bool> dict = new Dictionary<WindowInfo, bool>();
-            WindowInfo w1, w2;
+            Dictionary<WindowInfoLegacy, bool> dict = new Dictionary<WindowInfoLegacy, bool>();
+            WindowInfoLegacy w1, w2;
             var date = new DateTime();
-            w1 = new WindowInfo(title: "hello", name: "hello.exe", alias: "hi", date: date);
-            w2 = new WindowInfo(title: "hello", name: "hello.exe", alias: "hi", date: date);
+            w1 = new WindowInfoLegacy(title: "hello", name: "hello.exe", alias: "hi", date: date);
+            w2 = new WindowInfoLegacy(title: "hello", name: "hello.exe", alias: "hi", date: date);
 
             dict.Add(w1, false);
 
@@ -101,9 +101,9 @@ namespace FWITest.FWI
         public void TestEndodeSplitWord()
         {
             DateTime date = Date.MakeDateTime("000101 123000");
-            WindowInfo wi = new WindowInfo(name: "Split|Split", alias: "hi", date: date);
+            WindowInfoLegacy wi = new WindowInfoLegacy(name: "Split|Split", alias: "hi", date: date);
             string encoded = wi.Encoding();
-            WindowInfo decodedWi = WindowInfo.Decode(encoded);
+            WindowInfoLegacy decodedWi = WindowInfoLegacy.Decode(encoded);
 
             Assert.IsTrue(wi == decodedWi);
         }

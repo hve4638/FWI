@@ -1,4 +1,5 @@
 ﻿using FWI.Results;
+using HUtility;
 using Microsoft.SqlServer.Server;
 using System;
 using System.Collections.Generic;
@@ -50,7 +51,7 @@ namespace FWI
         }
 
         /// <exception cref="TimeSequenceException"></exception>
-        public Result<ResultState, string> AddWI(WindowInfo wi)
+        public Result<ResultState, string> AddWI(WindowInfoLegacy wi)
         {
             var results = new Result<ResultState, string>(ResultState.Normal);
             if (ignoreMap.Contains(wi))
@@ -78,24 +79,24 @@ namespace FWI
         }
 
         public void SetLoggingInterval(int minutes = 0) => logger.SetLoggingInterval(minutes);
-        public void SetOnLoggingListener(Action<WindowInfo> onLoggingListener) => logger.SetOnLoggingListener(onLoggingListener);
+        public void SetOnLoggingListener(Action<WindowInfoLegacy> onLoggingListener) => logger.SetOnLoggingListener(onLoggingListener);
 
-        public ReadOnlyCollection<WindowInfo> GetTimeline()
+        public ReadOnlyCollection<WindowInfoLegacy> GetTimeline()
         {
             var log = logger.GetLog();
             aliasMap.Filter(log);
 
             return log;
         }
-        public ReadOnlyCollection<WindowInfo> GetTimeline(DateTime from, DateTime to)
+        public ReadOnlyCollection<WindowInfoLegacy> GetTimeline(DateTime from, DateTime to)
         {
-            var log = logger.GetLog(from, to);
+            var log = logger.GetLog(new DateRange(from, to));
             aliasMap.Filter(log);
 
             return log;
         }
 
-        public Dictionary<int, RankResult<WindowInfo>> GetRanks()
+        public Dictionary<int, RankResult<WindowInfoLegacy>> GetRanks()
         {
             var ranks = logger.GetRanks();
             var enumerable = ranks.Values.Select(result => result.Item);
@@ -103,7 +104,7 @@ namespace FWI
 
             return ranks;
         }
-        public Dictionary<int, RankResult<WindowInfo>> GetRanks(int beginRank = 1, int endRank = 1) => logger.GetRanks(beginRank, endRank);
+        public Dictionary<int, RankResult<WindowInfoLegacy>> GetRanks(int beginRank = 1, int endRank = 1) => logger.GetRanks(beginRank, endRank);
 
         public void Import(string path)
         {

@@ -14,14 +14,14 @@ namespace FWI.Loggers
         {
             var wis = timeline.GetWIs(range);
             var rank = new Rank<WindowInfo, string, TimeSpan>((wi) => wi.Name);
-            WindowInfo previousWI = null;
+            WindowInfo previousWI = WindowInfo.NoWindow;
             foreach (var wi in wis)
             {
                 if (previousWI != null) rank[previousWI] += (wi.Date - previousWI.Date);
 
                 previousWI = wi;
             }
-
+            
             if (previousWI != null) rank[previousWI] += (range.End - previousWI.Date);
             return rank;
         }

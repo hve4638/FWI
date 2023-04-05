@@ -70,7 +70,7 @@ namespace FWIServer
             });
 
             fwiManager.SetLoggingInterval(interval);
-            fwiManager.SetOnLoggingListener((WindowInfo item) =>
+            fwiManager.SetOnLoggingListener((WindowInfoLegacy item) =>
             {
                 if (server.Verbose)
                 {

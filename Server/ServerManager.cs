@@ -14,8 +14,8 @@ namespace FWIServer
     class ServerManager
     {
         readonly FWIManager manager;
-        WindowInfo lastWI = new NoWindowInfo();
-        readonly History<WindowInfo> history;
+        WindowInfoLegacy lastWI = new NoWindowInfoLegacy();
+        readonly History<WindowInfoLegacy> history;
         bool hasTarget;
         bool isAFK;
 
@@ -23,11 +23,11 @@ namespace FWIServer
         public ServerManager(FWIManager manager)
         {
             this.manager = manager;
-            history = new History<WindowInfo>();
+            history = new History<WindowInfoLegacy>();
             hasTarget = false;
             isAFK = false;
         }
-        public WindowInfo LastWI => (history.Count == 0 ? new NoWindowInfo() : history.GetLast());
+        public WindowInfoLegacy LastWI => (history.Count == 0 ? new NoWindowInfoLegacy() : history.GetLast());
 
         public void SetTarget(Receiver? receiver = null)
         {
@@ -43,10 +43,10 @@ namespace FWIServer
             }
         }
 
-        public Results<ServerResultState, string> AddWI(WindowInfo wi)
+        public Results<ServerResultState, string> AddWI(WindowInfoLegacy wi)
         {
             var results = new Results<ServerResultState, string>();
-            if (wi is NoWindowInfo && wi is AFKWindowInfo)
+            if (wi is NoWindowInfoLegacy && wi is AFKWindowInfoLegacy)
             {
                 var result = new Result<ServerResultState, string>(ServerResultState.NonFatalIssue);
                 result += "처리할 수 없는 WindowInfo";
@@ -113,7 +113,7 @@ namespace FWIServer
                 try
                 {
                     manager.AddEmpty(date);
-                    history.Add(new AFKWindowInfo(date));
+                    history.Add(new AFKWindowInfoLegacy(date));
 
                     results += new Result<ServerResultState, string>(ServerResultState.Normal);
                     results += new Result<ServerResultState, string>(ServerResultState.ChangeAFK);
@@ -186,7 +186,7 @@ namespace FWIServer
             return results;
         }
 
-        public List<WindowInfo> GetHistory()
+        public List<WindowInfoLegacy> GetHistory()
         {
             return history.GetAll();
         }
@@ -195,7 +195,7 @@ namespace FWIServer
         {
             manager.Update();
             var ranks = manager.GetRanks();
-            Dictionary<int, RankResult<WindowInfo>> sorted = ranks.OrderBy(kvp => kvp.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            Dictionary<int, RankResult<WindowInfoLegacy>> sorted = ranks.OrderBy(kvp => kvp.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             var str = "";
             foreach (var item in sorted)

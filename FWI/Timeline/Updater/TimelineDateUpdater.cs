@@ -5,16 +5,15 @@ using System.Linq;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using HUtility;
 
 namespace FWI
 {
     public class TimelineDateUpdater : ITimelineUpdater
     {
-        
         static readonly Func<DateTime> getDateTimeDef = () => DateTime.Now;
         Func<DateTime> getDateTime;
-        readonly Dictionary<string, WindowInfo> windowInfoDic;
-        readonly Rank rank;
+        readonly Rank<WindowInfo, string, TimeSpan> rank;
         DateTime begin, end;
         DateTime last;
         WindowInfo lastWI;
@@ -25,26 +24,25 @@ namespace FWI
 
         }
 
-        public TimelineDateUpdater(DateTime begin, DateTime end, WindowInfo initWI = null)
+        public TimelineDateUpdater(DateTime begin, DateTime end, WindowInfo? initWI = null)
         {
-            rank = new Rank();
+            rank = new Rank<WindowInfo, string, TimeSpan>((wi) => wi.Name);
             onEnd = (WindowInfo wi) => { };
-            windowInfoDic = new Dictionary<string, WindowInfo>();
             getDateTime = getDateTimeDef;
 
-            Reset(begin:begin, end:end, initWI:initWI);
+            Reset(begin:begin, end:end, initWI: initWI ?? WindowInfo.NoWindow);
         }
 
-        public void Reset(DateTime begin, DateTime end, WindowInfo initWI = null)
+        public void Reset(DateTime begin, DateTime end) => Reset(begin, end, WindowInfo.NoWindow);
+        public void Reset(DateTime begin, DateTime end, WindowInfo initWI)
         {
             this.begin = begin;
             this.end = end;
             last = DateTime.MinValue;
-            lastWI = new NoWindowInfo();
+            lastWI = WindowInfo.NoWindow;
             rank.Clear();
-            windowInfoDic.Clear();
 
-            if (!(initWI == null || initWI is NoWindowInfo))
+            if (!initWI.IsNoWindow())
             {
                 if (end > initWI.Date) Add(initWI);
                 else throw new TimeSequenceException()
@@ -77,7 +75,7 @@ namespace FWI
 
         TimeSpan UpdateBeginWI(WindowInfo wi)
         {
-            if (lastWI is NoWindowInfo || lastWI.Date <= wi.Date) lastWI = wi;
+            if (lastWI.IsNoWindow() || lastWI.Date <= wi.Date) lastWI = wi;
 
             return TimeSpan.Zero;
         }
@@ -93,7 +91,7 @@ namespace FWI
         TimeSpan UpdateWI(WindowInfo wi)
         {
             TimeSpan time = TimeSpan.Zero;
-            if (!(lastWI is NoWindowInfo)) time = AddRankLast(wi.Date);
+            if (!lastWI.IsNoWindow()) time = AddRankLast(wi.Date);
             lastWI = wi;
             last = wi.Date;
 
@@ -106,8 +104,7 @@ namespace FWI
             if (last >= begin) time = toDate - last; 
             else time = toDate - begin;
 
-            if (!windowInfoDic.ContainsKey(lastWI.Name)) windowInfoDic[lastWI.Name] = lastWI;
-            rank.Add(lastWI, time);
+            rank[lastWI] += time;
 
             return time;
         }
@@ -131,14 +128,11 @@ namespace FWI
             }
         }
 
-        bool HasNoLastWI() => (lastWI == null || lastWI is NoWindowInfo);
+        bool HasNoLastWI() => lastWI.IsNoWindow();
 
         public bool Empty => (rank.Count == 0);
         public bool HasOne() => (rank.Count > 0);
-        public WindowInfo One()
-        {
-            return windowInfoDic[rank.One()];
-        }
+        public WindowInfo One() => rank.One();
 
         public WindowInfo Last => lastWI;
         public DateTime BeginDate => begin;
