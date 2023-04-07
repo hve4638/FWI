@@ -23,7 +23,7 @@ namespace FWI
 
         public FWIManager(string signiture)
         {
-            logger = new LoggerLegacy();
+            logger = new SingleLogger();
             aliasMap = new AliasMap();
             ignoreMap = new IgnoreMap();
 
@@ -43,10 +43,10 @@ namespace FWI
         {
             foreach(var key in path.Keys) pathDict[key] = path[key];
             
-            if (logger is LoggerLegacy)
+            if (logger is SingleLogger)
             {
-                var singleLogger = logger as LoggerLegacy;
-                singleLogger.SetPath(pathDict);
+                var singleLogger = logger as SingleLogger;
+                //singleLogger.SetPath(pathDict);
             }
         }
 

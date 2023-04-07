@@ -16,6 +16,7 @@ namespace FWI
         ITimelineReadOnly Slice(DateRange range);
         ITimelineReadOnly Slice(DateTime start, DateTime end);
 
+        int Count { get; }
         void Export(StreamWriter stream, SerializeType type);
     }
 }

@@ -50,12 +50,12 @@ namespace FWI
         public ReadOnlyCollection<WindowInfo> GetTimeline() => timeline.GetAllWIs();
         public ReadOnlyCollection<WindowInfo> GetTimeline(DateRange range) => timeline.GetWIs(range);
 
-        public Dictionary<int, RankResult<WindowInfo>> GetRanks()
+        public IRank<WindowInfo, TimeSpan> GetRanks()
         {
             return rankCache.GetRank(timeline.Range);
         }
 
-        public Dictionary<int, RankResult<WindowInfo>> GetRanks(int beginRank, int endRank)
+        public IRank<WindowInfo, TimeSpan> GetRanks(int beginRank, int endRank)
         {
             throw new NotImplementedException();
         }

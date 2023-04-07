@@ -13,6 +13,8 @@ namespace FWI
         ILogger AddWI(WindowInfo wi);
         ILogger AddDefaultWI(DateTime date);
 
+        void SetPath(string path);
+
         ReadOnlyCollection<WindowInfo> GetLog();
         /// <summary>
         /// 해당 범위에 포함되는 WindowInfo를 가져옵니다.범위 경계에 걸치는 WindowInfo도 가져옵니다.
@@ -27,11 +29,10 @@ namespace FWI
         [Obsolete]
         ReadOnlyCollection<WindowInfo> GetTimeline(DateRange range);
 
-        Dictionary<int, RankResult<WindowInfo>> GetRanks();
-        Dictionary<int, RankResult<WindowInfo>> GetRanks(int beginRank, int endRank);
+        IRank<WindowInfo, TimeSpan> GetRanks();
+        IRank<WindowInfo, TimeSpan> GetRanks(int beginRank, int endRank);
 
         void Update(DateTime time);
-
         void SetLoggingInterval(int minutes);
         void SetOnLoggingListener(Action<WindowInfo> listener);
 
