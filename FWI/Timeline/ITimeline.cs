@@ -13,10 +13,7 @@ namespace FWI
     /// </summary>
     public interface ITimeline : ITimelineReadOnly
     {
-        void AddLog(WindowInfo wi);
-        void AddLog(WindowInfo[] log);
-        void AddLog(List<WindowInfo> log);
-        void AddLog(ReadOnlyCollection<WindowInfo> log);
-        void Import(StreamWriter stream, SerializeType type);
+        void AddWI(WindowInfo wi);
+        void Import(StreamReader stream, SerializeType type);
     }
 }

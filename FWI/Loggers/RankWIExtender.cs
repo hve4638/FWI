@@ -17,12 +17,12 @@ namespace FWI.Loggers
             WindowInfo previousWI = WindowInfo.NoWindow;
             foreach (var wi in wis)
             {
-                if (previousWI != null) rank[previousWI] += (wi.Date - previousWI.Date);
+                if (previousWI.IsNoWindow()) rank[previousWI] += (wi.Date - previousWI.Date);
 
                 previousWI = wi;
             }
             
-            if (previousWI != null) rank[previousWI] += (range.End - previousWI.Date);
+            if (previousWI.IsNoWindow()) rank[previousWI] += (range.End - previousWI.Date);
             return rank;
         }
     }

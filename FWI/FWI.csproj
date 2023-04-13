@@ -94,11 +94,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Test\Timeline\Filter\AliasMapTest.cs" />
+    <Compile Include="Test\Timeline\Filter\IgnoreMapTest.cs" />
+    <Compile Include="Timeline\ITimelineExtender.cs" />
+    <Compile Include="WindowInfo\Filter\IWindowInfoFilter.cs" />
+    <Compile Include="WindowInfo\Filter\IWindowInfoFilterExtender.cs" />
+    <Compile Include="WindowInfo\Filter\WindowInfoIgnoreFilter.cs" />
     <Compile Include="Loggers\RankWIExtender.cs" />
     <Compile Include="Loggers\SingleLogger.cs" />
     <Compile Include="Loggers\TimelineRankCache\TimelineRankCache.cs" />
     <Compile Include="SerializeType.cs" />
-    <Compile Include="AliasMap.cs" />
+    <Compile Include="WindowInfo\Filter\Legacy\AliasMapLegacy.cs" />
     <Compile Include="IOStream\FormatOutputStream.cs" />
     <Compile Include="IOStream\InputStream.cs" />
     <Compile Include="IOStream\IOutputStream.cs" />
@@ -144,7 +150,7 @@
     <Compile Include="Exceptions\ParseException.cs" />
     <Compile Include="Exceptions\TimeSequenceException.cs" />
     <Compile Include="HUtils.cs" />
-    <Compile Include="IgnoreManager.cs" />
+    <Compile Include="WindowInfo\Filter\Legacy\IgnoreMapLegacy.cs" />
     <Compile Include="Results\ResultsParser.cs" />
     <Compile Include="Results\ResultState.cs" />
     <Compile Include="Test\Commands\CommandArgsTest.cs" />
@@ -167,11 +173,13 @@
     <Compile Include="Timeline\ITimeline.cs" />
     <Compile Include="Timeline\Serializable\TimelineSerializableDeserializer.cs" />
     <Compile Include="Timeline\Serializable\TimelineSerializableSerializeExtender.cs" />
+    <Compile Include="Timeline\TimelineFinder.cs" />
     <Compile Include="Timeline\Updater\TimelineInstantUpdater.cs" />
     <Compile Include="FWIManager.cs" />
     <Compile Include="Loggers\ILogger.cs" />
     <Compile Include="Timeline\Serializable\TimelineSerializable.cs" />
     <Compile Include="Timeline\TimelineSliced.cs" />
+    <Compile Include="WindowInfo\Filter\WindowInfoAliasFilter.cs" />
     <Compile Include="WindowInfo\WILegacy\AFKWindowInfoLegacy.cs" />
     <Compile Include="WindowInfo\WILegacy\NoWindowInfoLegacy.cs" />
     <Compile Include="Rank\Rank.cs" />

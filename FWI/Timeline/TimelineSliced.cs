@@ -17,6 +17,8 @@ namespace FWI
         readonly ITimelineReadOnly original;
         public DateRange Range { get; private set; }
 
+        public int Count => throw new NotImplementedException();
+
         public TimelineSliced(ITimeline original, DateRange range)
         {
             this.original = original;

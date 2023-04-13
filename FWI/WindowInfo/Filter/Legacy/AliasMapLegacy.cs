@@ -9,11 +9,12 @@ using System.Threading.Tasks;
 
 namespace FWI
 {
-    public class AliasMap
+    [Obsolete]
+    public class AliasMapLegacy
     {
         readonly Dictionary<string, string> dict;
 
-        public AliasMap()
+        public AliasMapLegacy()
         {
             dict = new Dictionary<string, string>();
         }
@@ -36,14 +37,14 @@ namespace FWI
             }
         }
 
-        public AliasMap Import(string filename)
+        public AliasMapLegacy Import(string filename)
         {
             var reader = new StreamReader(filename);
             Import(reader);
             reader.Close();
             return this;
         }
-        public AliasMap Import(StreamReader reader)
+        public AliasMapLegacy Import(StreamReader reader)
         {
             while (!reader.EndOfStream)
             {
@@ -62,14 +63,14 @@ namespace FWI
             return this;
         }
 
-        public AliasMap Export(string filename)
+        public AliasMapLegacy Export(string filename)
         {
             var writer = new StreamWriter(filename);
             Export(writer);
             writer.Close();
             return this;
         }
-        public AliasMap Export(StreamWriter writer)
+        public AliasMapLegacy Export(StreamWriter writer)
         {
             foreach(var item in dict) writer.Write($"{item.Key} : {item.Value}\n");
             return this;

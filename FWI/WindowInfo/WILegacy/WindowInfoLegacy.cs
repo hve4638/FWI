@@ -126,5 +126,26 @@ namespace FWI
 
             return hash;
         }
+
+        public static implicit operator WindowInfo(WindowInfoLegacy legacy)
+        {
+            if (legacy is NoWindowInfoLegacy) return WindowInfo.NoWindow;
+            else if (legacy is AFKWindowInfoLegacy)
+            {
+                var wi = WindowInfo.AFK;
+                wi.Date = legacy.Date;
+                return wi;
+            }
+            else
+            {
+                return new WindowInfo()
+                {
+                    Name = legacy.Name,
+                    Title = legacy.Title,
+                    Alias = legacy.Alias,
+                    Date = legacy.Date,
+                };
+            }
+        }
     }
 }

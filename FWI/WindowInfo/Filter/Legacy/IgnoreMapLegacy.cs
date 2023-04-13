@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace FWI
 {
-    public class IgnoreMap
+    [Obsolete]
+    public class IgnoreMapLegacy
     {
         readonly HashSet<string> set;
 
-        public IgnoreMap()
+        public IgnoreMapLegacy()
         {
             set = new HashSet<string>();
         }
@@ -22,17 +23,16 @@ namespace FWI
             set.Add(name);
         }
 
-        public bool Contains(WindowInfoLegacy wi) => Contains(wi.Name);
         public bool Contains(string name) => set.Contains(name);
 
-        public IgnoreMap Import(string filename)
+        public IgnoreMapLegacy Import(string filename)
         {
             var reader = new StreamReader(filename);
             Import(reader);
             reader.Close();
             return this;
         }
-        public IgnoreMap Import(StreamReader reader)
+        public IgnoreMapLegacy Import(StreamReader reader)
         {
             while (!reader.EndOfStream)
             {
@@ -42,14 +42,14 @@ namespace FWI
             return this;
         }
 
-        public IgnoreMap Export(string filename)
+        public IgnoreMapLegacy Export(string filename)
         {
             var writer = new StreamWriter(filename);
             Export(writer);
             writer.Close();
             return this;
         }
-        public IgnoreMap Export(StreamWriter writer)
+        public IgnoreMapLegacy Export(StreamWriter writer)
         {
             foreach (var item in set) writer.Write($"{item}\n");
             return this;

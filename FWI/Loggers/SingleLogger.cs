@@ -27,7 +27,7 @@ namespace FWI
         public void SetMenualDateTimeChanger(Func<DateTime> dateTimeDelegate) => timeline.SetMenualDateTime(dateTimeDelegate);
         public ILogger AddWI(WindowInfo wi)
         {
-            timeline.AddLog(wi);
+            timeline.AddWI(wi);
             return this;
         }
         public ILogger AddDefaultWI(DateTime date)
@@ -38,7 +38,7 @@ namespace FWI
         {
             var wi = WindowInfo.AFK;
             wi.Date = date;
-            timeline.AddLog(wi);
+            timeline.AddWI(wi);
             return this;
         }
 
@@ -80,5 +80,10 @@ namespace FWI
         public ReadOnlyCollection<WindowInfo> GetLog() => GetTimeline();
         [Obsolete]
         public ReadOnlyCollection<WindowInfo> GetLog(DateRange range) => GetTimeline(range);
+
+        public void SetPath(string path)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -80,7 +80,7 @@ namespace FWIServer
 
                     case "ignore":
                         {
-                            var ignoreSet = fwiManager.GetIgnore();
+                            var ignoreSet = fwiManager.GetIgnores();
 
                             output.WriteLine($"ignore list:");
                             foreach (var value in ignoreSet)

@@ -54,7 +54,9 @@
     <Compile Include="DataStructure\Results\StateResult.cs" />
     <Compile Include="DataStructure\Results\Results.cs" />
     <Compile Include="DataStructure\Results\ResultsParser.cs" />
+    <Compile Include="Extender\HashExtender.cs" />
     <Compile Include="IComparableExtender.cs" />
+    <Compile Include="Extender\DictionaryExtender.cs" />
     <Compile Include="Tasks\AlarmTask.cs" />
     <Compile Include="DataStructure\Rank\Exceptions\RankNotFoundException.cs" />
     <Compile Include="DataStructure\Rank\IRankDictionary.cs" />
@@ -66,7 +68,7 @@
     <Compile Include="Tasks\IntervalThread.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataStructure\Rank\Rank.cs" />
-    <Compile Include="StringExtender.cs" />
+    <Compile Include="Extender\StringExtender.cs" />
     <Compile Include="Test\HistoryTest.cs" />
     <Compile Include="Testing\MockStream\MockStreamReader.cs" />
     <Compile Include="Testing\MockStream\MockStreamWriter.cs" />

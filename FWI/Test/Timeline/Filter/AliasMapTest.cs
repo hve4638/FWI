@@ -4,19 +4,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FWI;
+using HUtility.Testing;
 
-namespace FWITest.FWI
+namespace FWI.Test
 {
     [TestClass]
-    public class AliasMapTest
+    public class WindowInfoAliasFilterTest
     {
         [TestMethod]
         public void TestAdd()
         {
-            var manager = new AliasMapLegacy();
-            manager.Add("hello.exe", "Hello World");
-            manager.Add("make.exe", "MAKE");
+            var manager = new WindowInfoAliasFilter();
+            manager["hello.exe"] = "Hello World";
+            manager["make.exe"] = "MAKE";
 
             var expected = new Dictionary<string, string>
             {

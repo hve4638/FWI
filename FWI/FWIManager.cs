@@ -14,8 +14,8 @@ namespace FWI
     public class FWIManager
     {
         readonly Dictionary<string, string> pathDict;
-        readonly AliasMap aliasMap;
-        readonly IgnoreMap ignoreMap;
+        readonly WindowInfoAliasFilter aliasFilter;
+        readonly WindowInfoIgnoreFilter ignoreFilter;
         readonly ILogger logger;
 
         public string Signiture { get; set; }
@@ -24,8 +24,8 @@ namespace FWI
         public FWIManager(string signiture)
         {
             logger = new SingleLogger();
-            aliasMap = new AliasMap();
-            ignoreMap = new IgnoreMap();
+            aliasFilter = new WindowInfoAliasFilter();
+            ignoreFilter = new WindowInfoIgnoreFilter();
 
             Signiture = signiture;
             TraceCount = 0;
@@ -51,20 +51,24 @@ namespace FWI
         }
 
         /// <exception cref="TimeSequenceException"></exception>
-        public Result<ResultState, string> AddWI(WindowInfoLegacy wi)
+        public Result<ResultState, string> AddWI(WindowInfo wi)
         {
             var results = new Result<ResultState, string>(ResultState.Normal);
-            if (ignoreMap.Contains(wi))
+            
+            ignoreFilter.Filter(ref wi);
+            if (wi.IsNoWindow())
             {
-                results += $"ignoreMap 필터링됨";
+                results += "ignoreMap 필터링됨";
             }
             else
             {
-                aliasMap.Filter(ref wi);
+                aliasFilter.Filter(ref wi);
                 logger.AddWI(wi);
             }
+
             return results;
         }
+
         /// <exception cref="TimeSequenceException"></exception>
         public FWIManager AddEmpty(DateTime date)
         {
@@ -79,55 +83,49 @@ namespace FWI
         }
 
         public void SetLoggingInterval(int minutes = 0) => logger.SetLoggingInterval(minutes);
-        public void SetOnLoggingListener(Action<WindowInfoLegacy> onLoggingListener) => logger.SetOnLoggingListener(onLoggingListener);
+        public void SetOnLoggingListener(Action<WindowInfo> onLoggingListener)
+            => logger.SetOnLoggingListener(onLoggingListener);
 
-        public ReadOnlyCollection<WindowInfoLegacy> GetTimeline()
+        public ReadOnlyCollection<WindowInfo> GetTimeline()
         {
             var log = logger.GetLog();
-            aliasMap.Filter(log);
-
+            aliasFilter.Filter(log);
             return log;
         }
-        public ReadOnlyCollection<WindowInfoLegacy> GetTimeline(DateTime from, DateTime to)
+        public ReadOnlyCollection<WindowInfo> GetTimeline(DateTime from, DateTime to)
         {
             var log = logger.GetLog(new DateRange(from, to));
-            aliasMap.Filter(log);
-
+            aliasFilter.Filter(log);
             return log;
         }
 
-        public Dictionary<int, RankResult<WindowInfoLegacy>> GetRanks()
+        public IRank<WindowInfo, TimeSpan> GetRanks()
         {
             var ranks = logger.GetRanks();
-            var enumerable = ranks.Values.Select(result => result.Item);
-            aliasMap.Filter(enumerable);
+
+            //var enumerable = ranks.Values.Select(result => result.Item);
+            //aliasFilter.Filter(enumerable);
 
             return ranks;
         }
-        public Dictionary<int, RankResult<WindowInfoLegacy>> GetRanks(int beginRank = 1, int endRank = 1) => logger.GetRanks(beginRank, endRank);
+        public IRank<WindowInfo, TimeSpan> GetRanks(int beginRank = 1, int endRank = 1)
+            => logger.GetRanks(beginRank, endRank);
 
-        public void Import(string path)
-        {
-            logger.Import(path);
-        }
-        public void Export(string path)
-        {
-            logger.Export(path);
-        }
+        public void Import(string path) => logger.Import(path);
+        public void Export(string path) => logger.Export(path);
 
         public void SaveFilter()
         {
-            aliasMap.Export(pathDict["alias"]);
-            ignoreMap.Export(pathDict["ignore"]);
+            aliasFilter.Export(pathDict["alias"]);
+            ignoreFilter.Export(pathDict["ignore"]);
         }
         public Result<ResultState, string> LoadFilter()
         {
-            var results = new Result<ResultState, string>();
-            results.State = ResultState.Normal;
+            var results = new Result<ResultState, string>(ResultState.Normal);
 
             try
             {
-                aliasMap.Import(pathDict["alias"]);
+                aliasFilter.Import(pathDict["alias"]);
             }
             catch (FileNotFoundException)
             {
@@ -137,7 +135,7 @@ namespace FWI
 
             try
             {
-                ignoreMap.Import(pathDict["ignore"]);
+                ignoreFilter.Import(pathDict["ignore"]);
             }
             catch (FileNotFoundException)
             {
@@ -148,8 +146,8 @@ namespace FWI
             return results;
         }
 
-        public ReadOnlyDictionary<string, string> GetAlias() => aliasMap.Items;
-        public HashSet<string> GetIgnore() => ignoreMap.Items;
+        public ReadOnlyDictionary<string, string> GetAlias() => aliasFilter.Items;
+        public HashSet<string> GetIgnores() => ignoreFilter.Items;
 
         public int GetLogHashCode()
         {
